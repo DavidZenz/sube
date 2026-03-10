@@ -9,6 +9,8 @@
 ^\\.github/
 ^\\.github/workflows$
 ^\\.github/workflows/.*$
+^inst/references$
+^inst/references/.*$
 ^cran-comments\\.md$
 ^pkgdown$
 ^docs$
