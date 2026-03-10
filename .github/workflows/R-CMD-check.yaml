@@ -28,7 +28,9 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: |
+            any::rcmdcheck
+            local::.
           needs: check
 
       - name: Check
@@ -36,4 +38,3 @@ jobs:
         with:
           build_args: 'c("--no-manual")'
           upload-snapshots: false
-
