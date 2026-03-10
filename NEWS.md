@@ -1,3 +1,10 @@
+# sube 0.1.2
+
+- Bumped the development version for the next feature pass.
+- Next implementation scope:
+  explicit Leontief matrix access/export and paper-style comparison plots for
+  Leontief and SUBE results.
+
 # sube 0.1.1
 
 - Bumped the development version for the next documentation-focused pass.

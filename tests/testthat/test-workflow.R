@@ -53,3 +53,29 @@ test_that("filtering, plotting, and writing behave", {
   out <- write_sube(tmp, filtered, format = "csv")
   expect_true(file.exists(out))
 })
+
+test_that("leontief extraction and comparison helpers work", {
+  sut <- sube_example_data("sut_data")
+  cpa_map <- sube_example_data("cpa_map")
+  ind_map <- sube_example_data("ind_map")
+  inputs <- sube_example_data("inputs")
+  result <- compute_sube(build_matrices(sut, cpa_map, ind_map), inputs)
+  models <- estimate_elasticities(sube_example_data("model_data"), predictor_vars = c("P01", "P02"))
+
+  matrices_long <- extract_leontief_matrices(result, matrix = "L", format = "long")
+  expect_true(all(c("COUNTRY", "YEAR", "matrix", "row", "col", "value") %in% names(matrices_long)))
+
+  comparison <- prepare_sube_comparison(result, models, measure = "multiplier", variables = c("GO"))
+  expect_true(all(c("COUNTRY", "CPAagg", "variable", "measure", "type", "value") %in% names(comparison)))
+  expect_true(all(c("leontief", "ols", "pooled", "between") %in% unique(comparison$type)))
+
+  paper_boxes <- plot_paper_comparison(comparison, kind = "by_country", measure = "multiplier", variables = c("GO"))
+  expect_true(is.list(paper_boxes))
+  expect_s3_class(paper_boxes[[1]][[1]], "ggplot")
+
+  paper_reg <- plot_paper_regression(comparison, method = "between", measure = "multiplier", variables = c("GO"))
+  expect_s3_class(paper_reg[[1]], "ggplot")
+
+  interval_plots <- plot_paper_interval_ranges(models, by = "country", variables = c("GO"))
+  expect_s3_class(interval_plots[[1]][[1]], "ggplot")
+})

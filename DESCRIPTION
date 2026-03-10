@@ -1,6 +1,6 @@
 Package: sube
 Title: Supply-Use Based Econometric Workflow Tools
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(
     person("David", "Zenz", email = "office@davidzenz.com", role = c("aut", "cre"))
   )
@@ -23,6 +23,7 @@ Imports:
     broom,
     data.table,
     ggplot2,
+    ggrepel,
     haven,
     openxlsx,
     plm

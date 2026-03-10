@@ -8,3 +8,9 @@
 #' @keywords internal
 "_PACKAGE"
 
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(c(
+    "..keep", ".N", "CPAgroup", "Dp", "leontief", "lwr", "measure",
+    "outlier", "std.error", "trend", "type", "upr", "value", "y"
+  ))
+}

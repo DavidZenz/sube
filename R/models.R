@@ -49,6 +49,8 @@ estimate_elasticities <- function(
       all.x = TRUE
     )
     estimates <- merge(estimates, intervals, by = "term", all.x = TRUE)
+    estimates[is.na(lwr) & is.finite(std.error), lwr := estimate - 1.96 * std.error]
+    estimates[is.na(upr) & is.finite(std.error), upr := estimate + 1.96 * std.error]
     mean_x <- as.list(base[, lapply(.SD, mean), .SDcols = predictor_vars])
     estimates[, mean := unlist(mean_x[term])]
     mean_y <- mean(base[[response]], na.rm = TRUE)

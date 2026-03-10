@@ -77,6 +77,8 @@ compute_sube <- function(
       diagnostics[[name]] <- data.table(country = country, year = year, status = "singular_leontief")
       next
     }
+    dimnames(A) <- list(bundle$products, bundle$products)
+    dimnames(L) <- list(bundle$products, bundle$products)
 
     fd_rows <- matrix_bundle$final_demand[YEAR == year & REP == country]
     fd_rows <- fd_rows[match(bundle$products, CPAagg)]
