@@ -12,6 +12,13 @@ library(sube)
 ```
 
 `sube` packages the core SUBE workflow into a small set of reusable functions.
+It is intended both as a practical toolkit for supply-use based econometrics
+and as a companion package to the Stehrer, Rueda-Cantuche, Amores, and Zenz
+paper on confidence intervals for input-output multipliers.
+
+The central idea is that rectangular supply and use tables can support a more
+flexible econometric treatment of multipliers than point-estimate Leontief
+analysis alone, especially when combined with panel-style data structures.
 
 ## Load sample inputs
 
@@ -44,3 +51,16 @@ model_data <- sube_example_data("model_data")
 models <- estimate_elasticities(model_data, predictor_vars = c("P01", "P02"))
 head(models$tidy)
 ```
+
+## Relation to the companion paper
+
+The package workflow mirrors the broad structure used in the companion paper:
+
+1. start from supply and use data,
+2. derive domestic and aggregated matrices,
+3. compute Leontief-style benchmark results, and
+4. estimate SUBE regressions on prepared modeling tables.
+
+The shipped example data is intentionally tiny, but the workflow is meant to
+scale to larger inter-country and multi-year settings of the kind discussed in
+the paper.
