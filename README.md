@@ -59,6 +59,5 @@ Release-quality checks should be run from a built tarball:
 
 ```bash
 R CMD build .
-R CMD check sube_0.1.0.tar.gz --no-manual
+R CMD check sube_0.1.1.tar.gz --no-manual
 ```
-

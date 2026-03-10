@@ -1,6 +1,6 @@
 Package: sube
 Title: Supply-Use Based Econometric Workflow Tools
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("David", "Zenz", email = "office@davidzenz.com", role = c("aut", "cre"))
   )
