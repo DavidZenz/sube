@@ -1,9 +1,8 @@
 ---
 title: "Preparing Data for sube"
-output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Preparing Data for sube}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 
@@ -51,4 +50,3 @@ when present.
 ```{r}
 sube_example_data("inputs")
 ```
-

@@ -6,6 +6,9 @@
 ^AGENTS\\.md$
 ^archive$
 ^\\.github$
+^\\.github/
+^\\.github/workflows$
+^\\.github/workflows/.*$
 ^cran-comments\\.md$
 ^pkgdown$
 ^docs$

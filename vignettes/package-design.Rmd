@@ -1,9 +1,8 @@
 ---
 title: "Package Design"
-output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Package design}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 
@@ -32,4 +31,3 @@ converted into tidy tables as needed:
 - `sube_matrices`
 - `sube_results`
 - `sube_models`
-

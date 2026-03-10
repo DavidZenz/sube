@@ -1,9 +1,8 @@
 ---
 title: "Getting Started with sube"
-output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Getting Started with sube}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 
@@ -45,4 +44,3 @@ model_data <- sube_example_data("model_data")
 models <- estimate_elasticities(model_data, predictor_vars = c("P01", "P02"))
 head(models$tidy)
 ```
-
