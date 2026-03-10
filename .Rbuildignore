@@ -1,0 +1,14 @@
+^\\.Rproj\\.user$
+^\\.Rhistory$
+^\\.RData$
+^\\.Ruserdata$
+^sube\\.Rproj$
+^AGENTS\\.md$
+^archive$
+^\\.github$
+^cran-comments\\.md$
+^pkgdown$
+^docs$
+^.*\\.tar\\.gz$
+^\\.\\.?Rcheck$
+^sube\\.Rcheck$

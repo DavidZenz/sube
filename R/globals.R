@@ -1,0 +1,23 @@
+utils::globalVariables(c(
+  ".",
+  "..industries",
+  "COUNTRY",
+  "CPA",
+  "CPAagg",
+  "CPAAGG",
+  "elasticity",
+  "estimate",
+  "GO",
+  "INDagg",
+  "INDUSTRY",
+  "MEASURE",
+  "PAR",
+  "REP",
+  "term",
+  "TYPE",
+  "VALUE",
+  "VAR",
+  "variable",
+  "VARIABLE",
+  "YEAR"
+))
