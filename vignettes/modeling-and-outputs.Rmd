@@ -13,6 +13,13 @@ library(sube)
 
 This article covers the tidy result layer, filtering, plots, and export.
 
+It also shows how the package supports the comparison logic used in the
+companion paper,
+[Wrapping input-output multipliers in confidence intervals](https://doi.org/10.1186/s40008-024-00331-4).
+The key idea is to keep Leontief benchmark results and SUBE model outputs in a
+shared comparison structure instead of treating them as separate reporting
+pipelines.
+
 ## Compute the sample workflow
 
 ```{r}
@@ -32,13 +39,40 @@ filtered <- filter_sube(result$tidy)
 plot_sube(filtered, by = "country", kind = "boxplot", measure = "multiplier")
 ```
 
+## Paper-style comparison plots
+
+```{r}
+models <- estimate_elasticities(
+  sube_example_data("model_data"),
+  predictor_vars = c("P01", "P02")
+)
+
+comparison <- prepare_sube_comparison(
+  result,
+  models,
+  measure = "multiplier",
+  variables = c("GO", "VA")
+)
+
+names(plot_paper_comparison(
+  comparison,
+  kind = "by_country",
+  measure = "multiplier",
+  variables = "GO"
+))
+```
+
+These helpers are designed for the same kinds of questions emphasized in the
+paper: where Leontief and econometric estimates line up, where they diverge,
+and how those differences vary across countries and products.
+
 ## Export
 
 ```{r, eval = FALSE}
 write_sube("outputs/final_results", filtered, format = "csv")
 ```
 
-## Model estimation
+## Model estimation tables
 
 ```{r}
 models <- estimate_elasticities(
@@ -46,4 +80,22 @@ models <- estimate_elasticities(
   predictor_vars = c("P01", "P02")
 )
 head(models$pooled)
+```
+
+The comparison layer can also be used for regression-style and interval-range
+plots when the modeling results contain enough information:
+
+```{r}
+paper_regression <- plot_paper_regression(
+  comparison,
+  method = "between",
+  measure = "multiplier",
+  variables = "GO"
+)
+
+interval_ranges <- plot_paper_interval_ranges(
+  models,
+  by = "country",
+  variables = "GO"
+)
 ```

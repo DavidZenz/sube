@@ -16,9 +16,27 @@ It is intended both as a practical toolkit for supply-use based econometrics
 and as a companion package to the Stehrer, Rueda-Cantuche, Amores, and Zenz
 paper on confidence intervals for input-output multipliers.
 
-The central idea is that rectangular supply and use tables can support a more
-flexible econometric treatment of multipliers than point-estimate Leontief
-analysis alone, especially when combined with panel-style data structures.
+Companion paper:
+[Wrapping input-output multipliers in confidence intervals](https://doi.org/10.1186/s40008-024-00331-4),
+*Journal of Economic Structures* 13, 17 (2024).
+
+The central idea is that rectangular supply and use tables can support more
+than point-estimate Leontief analysis alone. With the right data preparation,
+they can also support econometric multiplier work, comparison plots, and a more
+explicit treatment of uncertainty across countries, products, and years.
+
+That paper motivation matters for the package design. `sube` does not treat the
+econometric layer as a side calculation after Leontief analysis; it treats
+Leontief benchmarks, SUBE estimates, and comparison plots as one coherent
+research workflow.
+
+This vignette shows the compact public workflow:
+
+1. import or load supply-use data,
+2. build domestic matrices,
+3. compute Leontief benchmark results,
+4. estimate SUBE models, and
+5. compare both layers with tidy outputs and plots.
 
 ## Load sample inputs
 
@@ -37,19 +55,58 @@ bundle <- build_matrices(domestic, cpa_map, ind_map)
 names(bundle)
 ```
 
-## Compute results
+## Compute Leontief benchmark results
 
 ```{r}
 result <- compute_sube(bundle, inputs)
 head(result$summary)
 ```
 
-## Estimate elasticity models
+The returned object contains both tidy outputs and the underlying matrix layer.
+
+```{r}
+names(result)
+names(result$matrices[[1]])
+```
+
+## Estimate SUBE models
 
 ```{r}
 model_data <- sube_example_data("model_data")
 models <- estimate_elasticities(model_data, predictor_vars = c("P01", "P02"))
 head(models$tidy)
+```
+
+## Compare Leontief and SUBE outputs
+
+```{r}
+comparison <- prepare_sube_comparison(
+  leontief = result,
+  models = models,
+  measure = "multiplier",
+  variables = c("GO", "VA")
+)
+
+head(comparison)
+```
+
+The comparison layer is designed to support the style of country, product,
+density, and regression comparisons used in the companion paper.
+
+```{r}
+country_plots <- plot_paper_comparison(
+  comparison,
+  kind = "by_country",
+  measure = "multiplier",
+  variables = "GO"
+)
+
+paper_regression <- plot_paper_regression(
+  comparison,
+  method = "between",
+  measure = "multiplier",
+  variables = "GO"
+)
 ```
 
 ## Relation to the companion paper
@@ -58,8 +115,9 @@ The package workflow mirrors the broad structure used in the companion paper:
 
 1. start from supply and use data,
 2. derive domestic and aggregated matrices,
-3. compute Leontief-style benchmark results, and
-4. estimate SUBE regressions on prepared modeling tables.
+3. compute Leontief-style benchmark results,
+4. estimate SUBE regressions on prepared modeling tables, and
+5. compare benchmark and econometric results with common plotting layouts.
 
 The shipped example data is intentionally tiny, but the workflow is meant to
 scale to larger inter-country and multi-year settings of the kind discussed in

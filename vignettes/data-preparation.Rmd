@@ -11,12 +11,18 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(sube)
 ```
 
-`sube` expects three input families:
+`sube` works best when the data contracts are explicit. In practice, most
+projects need four input families:
 
 1. Supply-use table data in long form or workbook form.
 2. Product and industry correspondence tables.
 3. Industry-level input metrics used for multiplier and elasticity
    computation.
+4. A prepared modeling table for SUBE regressions.
+
+The package deliberately separates matrix construction from econometric
+estimation. That keeps the Leontief benchmark workflow usable even when the
+modeling table is assembled elsewhere.
 
 ## Supply-use data
 
@@ -28,6 +34,10 @@ names(sube_example_data("sut_data"))
 
 Use `import_suts()` for normalized CSV files or WIOD-style workbooks, then
 filter with `extract_domestic_block()` when the domestic block is required.
+
+For large comparative projects, it is worth standardizing country, partner,
+year, variable, and product codes before import. The package will normalize
+column names, but it does not guess missing structural fields.
 
 ## Mapping tables
 
@@ -41,6 +51,10 @@ sube_example_data("ind_map")
 The package normalizes names internally, but the first two columns should still
 represent source code and aggregated code.
 
+In practice, these mapping tables determine the resolution of the full
+workflow. If the package-level products differ from the paper-level products,
+the comparison plots will reflect that aggregation choice.
+
 ## Input metrics
 
 The computation stage needs `YEAR`, `REP`, one industry identifier column, and
@@ -50,3 +64,30 @@ when present.
 ```{r}
 sube_example_data("inputs")
 ```
+
+## Modeling table
+
+`estimate_elasticities()` uses a prepared table with:
+
+- country and year identifiers
+- one entity column, such as industries or products
+- response variables such as `GO`, `VA`, `EMP`, or `CO2`
+- predictor columns for the supply-use based explanatory structure
+
+```{r}
+names(sube_example_data("model_data"))
+```
+
+This design is intentional. Some projects will derive the modeling table from
+the same supply-use source, while others will merge additional covariates or
+paper-specific filters before estimation.
+
+## Recommended preparation strategy
+
+For reusable workflows, it is usually best to prepare data in this order:
+
+1. standardize raw supply-use inputs,
+2. verify correspondence tables,
+3. build the domestic matrix bundle,
+4. compute Leontief benchmark results, and
+5. construct the modeling table only after the benchmark layer is stable.

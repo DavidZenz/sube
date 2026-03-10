@@ -4,8 +4,8 @@ template:
 
 home:
   title: sube
-  description: Supply-Use Based Econometric workflow tools for reproducible
-    input-output analysis in R.
+  description: Supply-use based econometric tools for Leontief benchmarks,
+    SUBE models, and paper-style comparison workflows in R.
 
 reference:
   - title: Data import and preparation
@@ -18,33 +18,40 @@ reference:
     contents:
       - compute_sube
       - estimate_elasticities
-  - title: Results and exports
+  - title: Comparisons and outputs
     contents:
+      - extract_leontief_matrices
+      - prepare_sube_comparison
+      - plot_paper_comparison
+      - plot_paper_regression
+      - plot_paper_interval_ranges
       - filter_sube
       - plot_sube
       - write_sube
 
 articles:
-  - title: Get Started
+  - title: Start Here
     navbar: Get started
     contents:
       - getting-started
   - title: Data Preparation
     contents:
       - data-preparation
-  - title: Modeling
+  - title: Modeling and Comparisons
     contents:
       - modeling-and-outputs
-  - title: Package internals
+  - title: Paper Context
     contents:
       - package-design
 
 navbar:
   structure:
-    left:  [reference, articles, news]
+    left:  [reference, articles, paper, news]
     right: [search, github]
   components:
+    paper:
+      text: Paper
+      href: https://link.springer.com/article/10.1186/s40008-024-00331-4
     news:
       text: News
       href: news/index.html
-
