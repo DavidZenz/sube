@@ -1,0 +1,50 @@
+url: https://davidzenz.github.io/sube/
+template:
+  bootstrap: 5
+
+home:
+  title: sube
+  description: Supply-Use Based Econometric workflow tools for reproducible
+    input-output analysis in R.
+
+reference:
+  - title: Data import and preparation
+    contents:
+      - import_suts
+      - extract_domestic_block
+      - sube_example_data
+      - build_matrices
+  - title: Computation and modeling
+    contents:
+      - compute_sube
+      - estimate_elasticities
+  - title: Results and exports
+    contents:
+      - filter_sube
+      - plot_sube
+      - write_sube
+
+articles:
+  - title: Get Started
+    navbar: Get started
+    contents:
+      - getting-started
+  - title: Data Preparation
+    contents:
+      - data-preparation
+  - title: Modeling
+    contents:
+      - modeling-and-outputs
+  - title: Package internals
+    contents:
+      - package-design
+
+navbar:
+  structure:
+    left:  [reference, articles, news]
+    right: [search, github]
+  components:
+    news:
+      text: News
+      href: news/index.html
+

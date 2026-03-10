@@ -1,0 +1,48 @@
+---
+title: "Getting Started with sube"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with sube}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(sube)
+```
+
+`sube` packages the core SUBE workflow into a small set of reusable functions.
+
+## Load sample inputs
+
+```{r}
+sut <- sube_example_data("sut_data")
+cpa_map <- sube_example_data("cpa_map")
+ind_map <- sube_example_data("ind_map")
+inputs <- sube_example_data("inputs")
+```
+
+## Build matrices
+
+```{r}
+domestic <- extract_domestic_block(sut)
+bundle <- build_matrices(domestic, cpa_map, ind_map)
+names(bundle)
+```
+
+## Compute results
+
+```{r}
+result <- compute_sube(bundle, inputs)
+head(result$summary)
+```
+
+## Estimate elasticity models
+
+```{r}
+model_data <- sube_example_data("model_data")
+models <- estimate_elasticities(model_data, predictor_vars = c("P01", "P02"))
+head(models$tidy)
+```
+

@@ -1,0 +1,54 @@
+---
+title: "Preparing Data for sube"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Preparing Data for sube}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(sube)
+```
+
+`sube` expects three input families:
+
+1. Supply-use table data in long form or workbook form.
+2. Product and industry correspondence tables.
+3. Industry-level input metrics used for multiplier and elasticity
+   computation.
+
+## Supply-use data
+
+Imported SUT data should resolve to these columns:
+
+```{r}
+names(sube_example_data("sut_data"))
+```
+
+Use `import_suts()` for normalized CSV files or WIOD-style workbooks, then
+filter with `extract_domestic_block()` when the domestic block is required.
+
+## Mapping tables
+
+The product and industry maps can use simple two-column tables:
+
+```{r}
+sube_example_data("cpa_map")
+sube_example_data("ind_map")
+```
+
+The package normalizes names internally, but the first two columns should still
+represent source code and aggregated code.
+
+## Input metrics
+
+The computation stage needs `YEAR`, `REP`, one industry identifier column, and
+at least `GO`. Additional metrics such as `VA`, `EMP`, and `CO2` are computed
+when present.
+
+```{r}
+sube_example_data("inputs")
+```
+

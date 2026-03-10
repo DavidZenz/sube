@@ -1,0 +1,51 @@
+---
+title: "Modeling and Outputs"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Modeling and outputs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(sube)
+```
+
+This article covers the tidy result layer, filtering, plots, and export.
+
+## Compute the sample workflow
+
+```{r}
+bundle <- build_matrices(
+  extract_domestic_block(sube_example_data("sut_data")),
+  sube_example_data("cpa_map"),
+  sube_example_data("ind_map")
+)
+result <- compute_sube(bundle, sube_example_data("inputs"))
+head(result$tidy)
+```
+
+## Filter and plot
+
+```{r}
+filtered <- filter_sube(result$tidy)
+plot_sube(filtered, by = "country", kind = "boxplot", measure = "multiplier")
+```
+
+## Export
+
+```{r, eval = FALSE}
+write_sube("outputs/final_results", filtered, format = "csv")
+```
+
+## Model estimation
+
+```{r}
+models <- estimate_elasticities(
+  sube_example_data("model_data"),
+  predictor_vars = c("P01", "P02")
+)
+head(models$pooled)
+```
+

@@ -1,0 +1,35 @@
+---
+title: "Package Design"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Package design}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+`sube` is organized around a workflow API instead of a script pipeline.
+
+## Design choices
+
+- Inputs and outputs are explicit function arguments and return objects.
+- Shipped example data is intentionally small so examples and vignettes stay
+  CRAN-safe.
+- File writing is optional and separated from in-memory computation.
+- Historical paper scripts are not part of the package source tree; they are
+  kept locally in an ignored archive for reference only.
+
+## Public objects
+
+The package returns structured objects that are meant to be inspected and then
+converted into tidy tables as needed:
+
+- `sube_suts`
+- `sube_domestic_suts`
+- `sube_matrices`
+- `sube_results`
+- `sube_models`
+
