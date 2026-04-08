@@ -8,15 +8,15 @@
 
 Researchers can run a reproducible end-to-end SUBE workflow in R without falling back to one-off scripts or undocumented paper code.
 
-## Current State
+## Current Milestone: v1.1 Replication, FIGARO & Convenience
 
-Milestone `v1.0` is shipped. The package now has a verified package-first workflow from sample-data import through comparison outputs, aligned public documentation, a clean tarball-based release path, and a documented compatibility wrapper for script-era users.
+**Goal:** Prove the package reproduces the published paper exactly, add FIGARO SUT ingestion as a second data source, and reduce multi-step boilerplate with pipeline and batch helpers.
 
-## Next Milestone Goals
-
-- Define the next milestone scope from the archived v2 ideas in the v1 requirements archive.
-- Decide whether the next focus is higher-level workflow convenience helpers, richer publication/export artifacts, or additional model families.
-- Rebuild `.planning/REQUIREMENTS.md` from scratch for the next milestone instead of carrying forward stale scope.
+**Target features:**
+- Paper replication — upload WIOD data, run the package end-to-end, numerically match the paper's tables/figures against legacy scripts
+- FIGARO SUT ingestion — import FIGARO industry-by-industry supply-use tables into the same long-format SUBE table the WIOD importer produces
+- One-call pipeline — a single function that runs import through compute in one call
+- Batch countries/years — easy way to loop over multiple countries/years and collect results
 
 ## Requirements
 
@@ -36,7 +36,10 @@ Milestone `v1.0` is shipped. The package now has a verified package-first workfl
 
 ### Active
 
-- None currently. Define the next milestone with `/gsd-new-milestone`.
+- [ ] Paper replication with exact numerical match against legacy scripts using uploaded WIOD data
+- [ ] FIGARO industry-by-industry SUT ingestion producing the standard long-format SUBE table
+- [ ] One-call pipeline function covering import through compute
+- [ ] Batch processing across multiple countries/years with collected results
 
 ### Out of Scope
 
@@ -66,5 +69,22 @@ The repository now has a validated package-first maintenance path: exported R fu
 | Treat diagnostics and comparison/export semantics as explicit public contracts | Later phases relied on these behaviors as stable workflow surfaces | ✓ Good |
 | Exclude `.planning/` from source builds so release artifacts stay clean | Tarball checks should validate the package, not local planning metadata | ✓ Good |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-04-08 after v1.0 milestone archive*
+*Last updated: 2026-04-08 after v1.1 milestone start*

@@ -9,19 +9,10 @@ See: .planning/PROJECT.md (updated 2026-04-08)
 
 ## Current Position
 
-Milestone: `v1.0` archived
-Status: Ready for `/gsd-new-milestone`
-Last activity: 2026-04-08 — Archived v1.0 after passed milestone audit and tagged release preparation
-
-Progress: [██████████] 100% for v1.0
-
-## Milestone Snapshot
-
-- Phases: 4
-- Plans: 12
-- Requirements: 13/13 v1 requirements satisfied
-- Timeline: 2026-04-08 -> 2026-04-08
-- Audit: `.planning/v1.0-MILESTONE-AUDIT.md` passed
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-08 — Milestone v1.1 started
 
 ## Open Setup Notes
 
