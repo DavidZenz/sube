@@ -38,6 +38,9 @@ This vignette shows the compact public workflow:
 4. estimate SUBE models, and
 5. compare both layers with tidy outputs and plots.
 
+All examples below use only the shipped sample data, so the full workflow can
+be verified from a clean checkout without external downloads.
+
 ## Load sample inputs
 
 ```{r}
@@ -55,6 +58,13 @@ bundle <- build_matrices(domestic, cpa_map, ind_map)
 names(bundle)
 ```
 
+The matrix bundle should expose the aggregated long data, final demand, and the
+country-year matrix list used by the compute layer.
+
+```{r}
+names(bundle$matrices)
+```
+
 ## Compute Leontief benchmark results
 
 ```{r}
@@ -67,7 +77,12 @@ The returned object contains both tidy outputs and the underlying matrix layer.
 ```{r}
 names(result)
 names(result$matrices[[1]])
+result$diagnostics
 ```
+
+With the shipped sample data, the diagnostics table should report `ok`. On real
+inputs, this table is the first place to check for singular supply, gross
+output, or Leontief branches.
 
 ## Estimate SUBE models
 
