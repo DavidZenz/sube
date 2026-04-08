@@ -1,7 +1,7 @@
 ---
 phase: 1
 slug: core-workflow-contracts
-status: draft
+status: completed
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-04-08
@@ -38,9 +38,9 @@ created: 2026-04-08
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 1-01-01 | 01 | 1 | WF-02 | T-1-01 | Invalid import or mapping shapes fail explicitly instead of silently coercing bad data | unit | `R -q -e 'testthat::test_file("tests/testthat/test-workflow.R")'` | ✅ | ⬜ pending |
-| 1-02-01 | 02 | 1 | WF-03 | T-1-02 | Compute failures either emit stable diagnostics or stop with explicit contract errors | unit | `R -q -e 'testthat::test_file("tests/testthat/test-workflow.R")'` | ✅ | ⬜ pending |
-| 1-03-01 | 03 | 2 | WF-01 | T-1-03 | Shipped example workflow remains runnable from documented entry points | integration | `R -q -e 'testthat::test_dir("tests/testthat")'` | ✅ | ⬜ pending |
+| 1-01-01 | 01 | 1 | WF-02 | T-1-01 | Invalid import or mapping shapes fail explicitly instead of silently coercing bad data | unit | `R -q -e 'testthat::test_file("tests/testthat/test-workflow.R")'` | ✅ | ✅ green |
+| 1-02-01 | 02 | 1 | WF-03 | T-1-02 | Compute failures either emit stable diagnostics or stop with explicit contract errors | unit | `R -q -e 'testthat::test_file("tests/testthat/test-workflow.R")'` | ✅ | ✅ green |
+| 1-03-01 | 03 | 2 | WF-01 | T-1-03 | Shipped example workflow remains runnable from documented entry points | integration | `R -q -e 'testthat::test_dir("tests/testthat")'` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -73,4 +73,4 @@ created: 2026-04-08
 - [x] Feedback latency < 20s
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** passed on 2026-04-08

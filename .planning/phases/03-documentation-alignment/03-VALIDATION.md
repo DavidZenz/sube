@@ -1,7 +1,7 @@
 ---
 phase: 3
 slug: documentation-alignment
-status: draft
+status: completed
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-04-08
@@ -38,9 +38,9 @@ created: 2026-04-08
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 3-01-01 | 01 | 1 | DOC-01, DOC-02 | T-3-01 | README and vignette framing describe the same package workflow and function groupings | integration | `R -q -e 'testthat::test_file("tests/testthat/test-workflow.R")'` | ✅ | ⬜ pending |
-| 3-02-01 | 02 | 1 | DOC-01, DOC-02 | T-3-02 | pkgdown and package/reference surfaces expose the same workflow grouping users see in narrative docs | manual+unit | `R -q -e 'testthat::test_dir("tests/testthat")'` | ✅ | ⬜ pending |
-| 3-03-01 | 03 | 2 | MIG-02, DOC-01 | T-3-03 | Example-data and input-contract guidance let new users infer required inputs from shipped examples without hidden assumptions | integration | `R -q -e 'testthat::test_dir("tests/testthat")'` | ✅ | ⬜ pending |
+| 3-01-01 | 01 | 1 | DOC-01, DOC-02 | T-3-01 | README and vignette framing describe the same package workflow and function groupings | integration | `R -q -e 'testthat::test_file("tests/testthat/test-workflow.R")'` | ✅ | ✅ green |
+| 3-02-01 | 02 | 1 | DOC-01, DOC-02 | T-3-02 | pkgdown and package/reference surfaces expose the same workflow grouping users see in narrative docs | manual+unit | `R -q -e 'testthat::test_dir("tests/testthat")'` | ✅ | ✅ green |
+| 3-03-01 | 03 | 2 | MIG-02, DOC-01 | T-3-03 | Example-data and input-contract guidance let new users infer required inputs from shipped examples without hidden assumptions | integration | `R -q -e 'testthat::test_dir("tests/testthat")'` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -74,4 +74,4 @@ created: 2026-04-08
 - [x] Feedback latency < 20s for automated checks
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** passed on 2026-04-08

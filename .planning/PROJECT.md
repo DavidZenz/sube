@@ -8,6 +8,16 @@
 
 Researchers can run a reproducible end-to-end SUBE workflow in R without falling back to one-off scripts or undocumented paper code.
 
+## Current State
+
+Milestone `v1.0` is shipped. The package now has a verified package-first workflow from sample-data import through comparison outputs, aligned public documentation, a clean tarball-based release path, and a documented compatibility wrapper for script-era users.
+
+## Next Milestone Goals
+
+- Define the next milestone scope from the archived v2 ideas in the v1 requirements archive.
+- Decide whether the next focus is higher-level workflow convenience helpers, richer publication/export artifacts, or additional model families.
+- Rebuild `.planning/REQUIREMENTS.md` from scratch for the next milestone instead of carrying forward stale scope.
+
 ## Requirements
 
 ### Validated
@@ -18,15 +28,15 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 - ✓ Estimate OLS, pooled, and between elasticity models through a stable package API — existing
 - ✓ Filter, plot, and export tidy SUBE outputs and expose a legacy pipeline wrapper script — existing
 - ✓ Generate paper-style Leontief versus SUBE comparison tables and plots from package objects — existing
-- ✓ Reproducible import-to-compute sample workflow with explicit validation and diagnostics coverage — Phase 1
-- ✓ Explicit Leontief extraction, comparison-table, plot, and export workflow validated from shipped package objects — Phase 2
-- ✓ README, vignettes, pkgdown, and release-facing docs aligned to the package-first workflow and sample-data contract — Phase 3
-- ✓ Keep a practical bridge for users migrating from the historical script workflow to package functions — Phase 4
-- ✓ Harden GitHub Actions and release-check automation around the documented package workflow — Phase 4
+- ✓ Reproducible import-to-compute sample workflow with explicit validation and diagnostics coverage — v1.0
+- ✓ Explicit Leontief extraction, comparison-table, plot, and export workflow validated from shipped package objects — v1.0
+- ✓ README, vignettes, pkgdown, and release-facing docs aligned to the package-first workflow and sample-data contract — v1.0
+- ✓ Keep a practical bridge for users migrating from the historical script workflow to package functions — v1.0
+- ✓ Harden GitHub Actions and release-check automation around the documented package workflow — v1.0
 
 ### Active
 
-- None currently. All roadmap requirements in this milestone are validated.
+- None currently. Define the next milestone with `/gsd-new-milestone`.
 
 ### Out of Scope
 
@@ -36,15 +46,15 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 
 ## Context
 
-The repository now has a validated package-first maintenance path: exported R functions, `testthat` coverage, vignettes, pkgdown configuration, a hardened `R-CMD-check` workflow, and clean tarball-based release verification. A legacy wrapper script remains in `inst/scripts/run_legacy_pipeline.R` as a compatibility bridge, while historical paper material stays out of the package bundle except for local reference material in `inst/references/`. Project guidance, release notes, and CI instructions now describe the same package structure and release path.
+The repository now has a validated package-first maintenance path: exported R functions, `testthat` coverage, vignettes, pkgdown configuration, a hardened `R-CMD-check` workflow, clean tarball-based release verification, and archived milestone records under `.planning/milestones/`. Historical paper material remains outside the package bundle except for local reference material in `inst/references/`.
 
 ## Constraints
 
-- **Tech stack**: R package targeting `R (>= 4.2.0)` with `data.table`, `ggplot2`, `openxlsx`, `haven`, and `plm` — the public API and tests already depend on this stack
-- **Compatibility**: Public exported functions should remain side-effect-light and sample-data driven — the README, vignettes, and tests all assume reusable package functions
-- **Release quality**: Changes should continue to pass tarball-based `R CMD check` and `testthat` workflows — CRAN notes and GitHub Actions are built around that expectation, and the Actions path should be treated as a first-class maintenance surface
-- **Data footprint**: Only small example data should ship with the package — large historical inputs remain outside the package bundle
-- **Documentation**: README, vignettes, pkgdown reference groups, and NEWS should describe the same workflow surface — current repo value depends on a coherent package story
+- **Tech stack**: R package targeting `R (>= 4.2.0)` with `data.table`, `ggplot2`, `openxlsx`, `haven`, and `plm`
+- **Compatibility**: Public exported functions should remain side-effect-light and sample-data driven
+- **Release quality**: Changes should continue to pass tarball-based `R CMD check` and `testthat` workflows
+- **Data footprint**: Only small example data should ship with the package
+- **Documentation**: README, vignettes, pkgdown reference groups, and NEWS should describe the same workflow surface
 
 ## Key Decisions
 
@@ -53,25 +63,8 @@ The repository now has a validated package-first maintenance path: exported R fu
 | Treat `sube` as a brownfield package project, not a new script collection | The repo already has `DESCRIPTION`, exported functions, tests, vignettes, and release artifacts | ✓ Good |
 | Use the package-first workflow as the canonical product surface | README, tests, and pkgdown all center on reusable functions rather than numbered scripts | ✓ Good |
 | Keep legacy script support limited to a compatibility wrapper | `inst/scripts/run_legacy_pipeline.R` provides migration help without reopening the old architecture | ✓ Good |
-| Focus the next milestone on workflow hardening, documentation alignment, and release readiness | The current repo already implements the main workflow, so the next leverage is stabilization and clarity | ✓ Good |
-| Treat diagnostics as part of the public reproducibility contract | Phase 1 showed users need explicit visibility into `result$diagnostics` for trustworthy workflow verification | ✓ Good |
-
-## Evolution
-
-This document evolves at phase transitions and milestone boundaries.
-
-**After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? -> Move to Out of Scope with reason
-2. Requirements validated? -> Move to Validated with phase reference
-3. New requirements emerged? -> Add to Active
-4. Decisions to log? -> Add to Key Decisions
-5. "What This Is" still accurate? -> Update if drifted
-
-**After each milestone** (via `/gsd-complete-milestone`):
-1. Full review of all sections
-2. Core Value check -> still the right priority?
-3. Audit Out of Scope -> reasons still valid?
-4. Update Context with current state
+| Treat diagnostics and comparison/export semantics as explicit public contracts | Later phases relied on these behaviors as stable workflow surfaces | ✓ Good |
+| Exclude `.planning/` from source builds so release artifacts stay clean | Tarball checks should validate the package, not local planning metadata | ✓ Good |
 
 ---
-*Last updated: 2026-04-08 after Phase 4 completion*
+*Last updated: 2026-04-08 after v1.0 milestone archive*
