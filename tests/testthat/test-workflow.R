@@ -1,6 +1,20 @@
 library(testthat)
 library(sube)
 
+make_sample_comparison_workflow <- function() {
+  sut <- sube_example_data("sut_data")
+  cpa_map <- sube_example_data("cpa_map")
+  ind_map <- sube_example_data("ind_map")
+  inputs <- sube_example_data("inputs")
+  result <- compute_sube(build_matrices(sut, cpa_map, ind_map), inputs)
+  models <- suppressWarnings(estimate_elasticities(
+    sube_example_data("model_data"),
+    predictor_vars = c("P01", "P02")
+  ))
+
+  list(result = result, models = models)
+}
+
 make_singular_supply_bundle <- function() {
   bundle <- list(
     aggregated = data.table::data.table(),
@@ -123,11 +137,8 @@ test_that("regression workflow returns all model tables", {
 })
 
 test_that("filtering, plotting, and writing behave", {
-  sut <- sube_example_data("sut_data")
-  cpa_map <- sube_example_data("cpa_map")
-  ind_map <- sube_example_data("ind_map")
-  inputs <- sube_example_data("inputs")
-  result <- compute_sube(build_matrices(sut, cpa_map, ind_map), inputs)
+  workflow <- make_sample_comparison_workflow()
+  result <- workflow$result
 
   filtered <- filter_sube(result$tidy)
   expect_true(nrow(filtered) <= nrow(result$tidy))
@@ -135,33 +146,72 @@ test_that("filtering, plotting, and writing behave", {
   plot <- plot_sube(filtered, by = "country", kind = "boxplot", measure = "multiplier")
   expect_s3_class(plot, "ggplot")
 
-  tmp <- tempfile("sube-", fileext = ".csv")
-  out <- write_sube(tmp, filtered, format = "csv")
-  expect_true(file.exists(out))
+  density_plot <- plot_sube(filtered, by = "product", kind = "density", measure = "multiplier", variable = "GO")
+  expect_s3_class(density_plot, "ggplot")
+
+  csv_path <- tempfile("sube-", fileext = ".csv")
+  csv_out <- write_sube(csv_path, filtered, format = "csv")
+  expect_true(file.exists(csv_out))
+
+  rds_path <- tempfile("sube-", fileext = ".rds")
+  rds_out <- write_sube(rds_path, filtered, format = "rds")
+  expect_true(file.exists(rds_out))
+
+  export_dir <- tempfile("sube-exports-")
+  dir_out <- write_sube(export_dir, list(filtered = filtered, summary = result$summary), format = "csv")
+  expect_true(dir.exists(dir_out))
+  expect_true(file.exists(file.path(dir_out, "filtered.csv")))
+  expect_true(file.exists(file.path(dir_out, "summary.csv")))
 })
 
 test_that("leontief extraction and comparison helpers work", {
-  sut <- sube_example_data("sut_data")
-  cpa_map <- sube_example_data("cpa_map")
-  ind_map <- sube_example_data("ind_map")
-  inputs <- sube_example_data("inputs")
-  result <- compute_sube(build_matrices(sut, cpa_map, ind_map), inputs)
-  models <- suppressWarnings(estimate_elasticities(sube_example_data("model_data"), predictor_vars = c("P01", "P02")))
+  workflow <- make_sample_comparison_workflow()
+  result <- workflow$result
+  models <- workflow$models
+
+  matrices_list <- extract_leontief_matrices(result, matrix = "L", format = "list")
+  expect_true(is.list(matrices_list))
+  expect_true(length(matrices_list) > 0)
+  expect_true(all(c("country", "year", "data") %in% names(matrices_list[[1]])))
+  expect_true(is.matrix(matrices_list[[1]]$data))
 
   matrices_long <- extract_leontief_matrices(result, matrix = "L", format = "long")
   expect_true(all(c("COUNTRY", "YEAR", "matrix", "row", "col", "value") %in% names(matrices_long)))
 
+  matrices_wide <- extract_leontief_matrices(result, matrix = "A", format = "wide")
+  expect_true(all(c("COUNTRY", "YEAR", "matrix", "row") %in% names(matrices_wide)))
+  expect_true(any(setdiff(names(matrices_wide), c("COUNTRY", "YEAR", "matrix", "row")) %in% unique(matrices_long$col)))
+
   comparison <- prepare_sube_comparison(result, models, measure = "multiplier", variables = c("GO"))
-  expect_true(all(c("COUNTRY", "CPAagg", "variable", "measure", "type", "value") %in% names(comparison)))
+  comparison_multi <- prepare_sube_comparison(result, models, measure = "multiplier", variables = c("GO", "VA"))
+  yearly_comparison <- prepare_sube_comparison(
+    result,
+    models,
+    measure = "multiplier",
+    variables = c("GO"),
+    aggregate_years = FALSE
+  )
+  expect_true(all(c("COUNTRY", "CPAagg", "variable", "measure", "type", "value", "CPAgroup") %in% names(comparison)))
+  expect_true(all(c("COUNTRY", "YEAR", "CPAagg", "variable", "measure", "type", "value", "CPAgroup") %in% names(yearly_comparison)))
+  expect_false("YEAR" %in% names(comparison))
   expect_true(all(c("leontief", "ols", "pooled", "between") %in% unique(comparison$type)))
 
   paper_boxes <- plot_paper_comparison(comparison, kind = "by_country", measure = "multiplier", variables = c("GO"))
   expect_true(is.list(paper_boxes))
+  expect_true("Leontief" %in% names(paper_boxes))
   expect_s3_class(paper_boxes[[1]][[1]], "ggplot")
+
+  paper_density <- plot_paper_comparison(comparison_multi, kind = "density", measure = "multiplier", variables = c("GO", "VA"))
+  expect_true(is.list(paper_density))
+  expect_true(all(c("GO", "VA") %in% names(paper_density)))
+  expect_s3_class(paper_density$GO, "ggplot")
 
   paper_reg <- plot_paper_regression(comparison, method = "between", measure = "multiplier", variables = c("GO"))
   expect_s3_class(paper_reg[[1]], "ggplot")
 
-  interval_plots <- plot_paper_interval_ranges(models, by = "country", variables = c("GO"))
+  interval_plots <- plot_paper_interval_ranges(models, by = "product", variables = c("GO"))
+  expect_true(is.list(interval_plots))
+  expect_true(all(c("ols", "pooled") %in% names(interval_plots)))
+  expect_true(all(names(interval_plots) %in% c("ols", "pooled", "between")))
   expect_s3_class(interval_plots[[1]][[1]], "ggplot")
 })

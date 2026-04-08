@@ -54,6 +54,9 @@ comparison <- prepare_sube_comparison(
   variables = c("GO", "VA")
 )
 
+leontief_long <- extract_leontief_matrices(result, matrix = "L", format = "long")
+head(leontief_long)
+
 names(plot_paper_comparison(
   comparison,
   kind = "by_country",
@@ -61,6 +64,8 @@ names(plot_paper_comparison(
   variables = "GO"
 ))
 ```
+
+`extract_leontief_matrices()` also supports `format = "list"` and `format = "wide"` when you want matrix-oriented outputs instead of the tidy long table used by most comparison helpers.
 
 These helpers are designed for the same kinds of questions emphasized in the
 paper: where Leontief and econometric estimates line up, where they diverge,
@@ -70,7 +75,14 @@ and how those differences vary across countries and products.
 
 ```{r, eval = FALSE}
 write_sube("outputs/final_results", filtered, format = "csv")
+write_sube(
+  "outputs/comparison_bundle",
+  list(filtered = filtered, summary = result$summary),
+  format = "csv"
+)
 ```
+
+A single table writes to one normalized file path. A named list writes one file per entry into the target directory, which is useful for comparison-ready bundles.
 
 ## Model estimation tables
 
@@ -83,7 +95,7 @@ head(models$pooled)
 ```
 
 The comparison layer can also be used for regression-style and interval-range
-plots when the modeling results contain enough information:
+plots when the modeling results contain enough information. These helpers return named lists of `ggplot` objects keyed by the available model or variable selections in the supplied data:
 
 ```{r}
 paper_regression <- plot_paper_regression(

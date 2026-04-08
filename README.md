@@ -65,8 +65,11 @@ table:
 model_data <- sube_example_data("model_data")
 models <- estimate_elasticities(model_data, predictor_vars = c("P01", "P02"))
 comparison <- prepare_sube_comparison(result, models, measure = "multiplier")
+head(extract_leontief_matrices(result, matrix = "L", format = "long"))
 names(plot_paper_comparison(comparison, kind = "by_country", variables = "GO"))
 ```
+
+`write_sube()` writes a single table to one file or a named list of tables to a directory of files, so comparison outputs can be exported without extra post-processing code.
 
 ## Why the package is structured this way
 
