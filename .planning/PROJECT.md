@@ -21,11 +21,12 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 - ✓ Reproducible import-to-compute sample workflow with explicit validation and diagnostics coverage — Phase 1
 - ✓ Explicit Leontief extraction, comparison-table, plot, and export workflow validated from shipped package objects — Phase 2
 - ✓ README, vignettes, pkgdown, and release-facing docs aligned to the package-first workflow and sample-data contract — Phase 3
+- ✓ Keep a practical bridge for users migrating from the historical script workflow to package functions — Phase 4
+- ✓ Harden GitHub Actions and release-check automation around the documented package workflow — Phase 4
 
 ### Active
 
-- [ ] Keep a practical bridge for users migrating from the historical script workflow to package functions
-- [ ] Harden GitHub Actions and release-check automation around the documented package workflow
+- None currently. All roadmap requirements in this milestone are validated.
 
 ### Out of Scope
 
@@ -35,7 +36,7 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 
 ## Context
 
-The repository already contains a released package skeleton (`Version: 0.1.2`), exported R functions, `testthat` coverage, vignettes, pkgdown configuration, and built package artifacts. The README and pkgdown config position `sube` as a general supply-use based econometrics package and a companion to the 2024 Stehrer et al. paper. A legacy wrapper script remains in `inst/scripts/run_legacy_pipeline.R` for compatibility, while historical paper material is intentionally kept out of the package bundle except for local reference material in `inst/references/`. The checked-in `AGENTS.md` still describes an older script-driven layout, so project planning should follow the current package structure rather than that stale description.
+The repository now has a validated package-first maintenance path: exported R functions, `testthat` coverage, vignettes, pkgdown configuration, a hardened `R-CMD-check` workflow, and clean tarball-based release verification. A legacy wrapper script remains in `inst/scripts/run_legacy_pipeline.R` as a compatibility bridge, while historical paper material stays out of the package bundle except for local reference material in `inst/references/`. Project guidance, release notes, and CI instructions now describe the same package structure and release path.
 
 ## Constraints
 
@@ -51,7 +52,7 @@ The repository already contains a released package skeleton (`Version: 0.1.2`), 
 |----------|-----------|---------|
 | Treat `sube` as a brownfield package project, not a new script collection | The repo already has `DESCRIPTION`, exported functions, tests, vignettes, and release artifacts | ✓ Good |
 | Use the package-first workflow as the canonical product surface | README, tests, and pkgdown all center on reusable functions rather than numbered scripts | ✓ Good |
-| Keep legacy script support limited to a compatibility wrapper | `inst/scripts/run_legacy_pipeline.R` provides migration help without reopening the old architecture | Pending |
+| Keep legacy script support limited to a compatibility wrapper | `inst/scripts/run_legacy_pipeline.R` provides migration help without reopening the old architecture | ✓ Good |
 | Focus the next milestone on workflow hardening, documentation alignment, and release readiness | The current repo already implements the main workflow, so the next leverage is stabilization and clarity | ✓ Good |
 | Treat diagnostics as part of the public reproducibility contract | Phase 1 showed users need explicit visibility into `result$diagnostics` for trustworthy workflow verification | ✓ Good |
 
@@ -73,4 +74,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-08 after Phase 3 completion*
+*Last updated: 2026-04-08 after Phase 4 completion*

@@ -7,9 +7,9 @@
 
 ### Workflow hardening
 
-- [ ] **WF-01**: User can run the documented end-to-end sample workflow from shipped example data without external downloads
-- [ ] **WF-02**: User can move from imported SUT data to domestic matrices and computed SUBE outputs through stable exported functions
-- [ ] **WF-03**: User can access diagnostics and failure states when matrix inversion or required inputs are invalid
+- [x] **WF-01**: User can run the documented end-to-end sample workflow from shipped example data without external downloads
+- [x] **WF-02**: User can move from imported SUT data to domestic matrices and computed SUBE outputs through stable exported functions
+- [x] **WF-03**: User can access diagnostics and failure states when matrix inversion or required inputs are invalid
 
 ### Leontief and comparison outputs
 
@@ -22,12 +22,12 @@
 
 - [x] **DOC-01**: User can find a consistent package narrative across README, vignettes, pkgdown, and NEWS
 - [x] **DOC-02**: User can identify which functions cover data preparation, computation, modeling, and comparison workflows from published docs
-- [ ] **DOC-03**: Maintainer can run package checks and tests from the repository using the documented release workflow
-- [ ] **CI-01**: Maintainer can rely on GitHub Actions to run and report the documented package check workflow consistently
+- [x] **DOC-03**: Maintainer can run package checks and tests from the repository using the documented release workflow
+- [x] **CI-01**: Maintainer can rely on GitHub Actions to run and report the documented package check workflow consistently
 
 ### Migration and compatibility
 
-- [ ] **MIG-01**: User coming from the historical script workflow can run a legacy wrapper script against local input files
+- [x] **MIG-01**: User coming from the historical script workflow can run a legacy wrapper script against local input files
 - [x] **MIG-02**: User can rely on shipped example data to understand required input contracts before using external research datasets
 
 ## v2 Requirements
@@ -59,9 +59,9 @@
 | COMP-04 | Phase 2 | Complete |
 | DOC-01 | Phase 3 | Complete |
 | DOC-02 | Phase 3 | Complete |
-| DOC-03 | Phase 4 | Pending |
-| CI-01 | Phase 4 | Pending |
-| MIG-01 | Phase 4 | Pending |
+| DOC-03 | Phase 4 | Complete |
+| CI-01 | Phase 4 | Complete |
+| MIG-01 | Phase 4 | Complete |
 | MIG-02 | Phase 3 | Complete |
 
 **Coverage:**
@@ -71,4 +71,4 @@
 
 ---
 *Requirements defined: 2026-04-08*
-*Last updated: 2026-04-08 after Phase 3 completion*
+*Last updated: 2026-04-08 after Phase 4 completion*

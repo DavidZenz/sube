@@ -13,7 +13,7 @@ This roadmap assumes the core SUBE package workflow already exists and has basic
 - [x] **Phase 1: Core Workflow Contracts** - Confirm and harden the import-to-compute package contracts around shipped examples and diagnostics
 - [x] **Phase 2: Comparison Layer Stabilization** - Stabilize Leontief extraction, comparison shaping, and export/plot outputs as a coherent public workflow
 - [x] **Phase 3: Documentation Alignment** - Make README, vignettes, and pkgdown tell the same package-first story and input contract
-- [ ] **Phase 4: Release, CI, and Migration Readiness** - Preserve legacy entry points and harden the documented release and GitHub Actions check path
+- [x] **Phase 4: Release, CI, and Migration Readiness** - Preserve legacy entry points and harden the documented release and GitHub Actions check path
 
 ## Phase Details
 
@@ -74,9 +74,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: Harden GitHub Actions and local release-check workflow assumptions
-- [ ] 04-02: Audit and document the legacy wrapper script and migration path
-- [ ] 04-03: Update stale project guidance and release notes where they contradict the package-first repo
+- [x] 04-01: Harden GitHub Actions and local release-check workflow assumptions
+- [x] 04-02: Audit and document the legacy wrapper script and migration path
+- [x] 04-03: Update stale project guidance and release notes where they contradict the package-first repo
 
 ## Progress
 
@@ -88,4 +88,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Core Workflow Contracts | 3/3 | Complete | 2026-04-08 |
 | 2. Comparison Layer Stabilization | 3/3 | Complete | 2026-04-08 |
 | 3. Documentation Alignment | 3/3 | Complete | 2026-04-08 |
-| 4. Release, CI, and Migration Readiness | 0/3 | Not started | - |
+| 4. Release, CI, and Migration Readiness | 3/3 | Complete | 2026-04-08 |
