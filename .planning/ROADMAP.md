@@ -12,8 +12,8 @@ This roadmap assumes the core SUBE package workflow already exists and has basic
 
 - [x] **Phase 1: Core Workflow Contracts** - Confirm and harden the import-to-compute package contracts around shipped examples and diagnostics
 - [x] **Phase 2: Comparison Layer Stabilization** - Stabilize Leontief extraction, comparison shaping, and export/plot outputs as a coherent public workflow
-- [ ] **Phase 3: Documentation Alignment** - Make README, vignettes, and pkgdown tell the same package-first story and input contract
-- [ ] **Phase 4: Release and Migration Readiness** - Preserve legacy entry points and verify the package passes documented release checks
+- [x] **Phase 3: Documentation Alignment** - Make README, vignettes, and pkgdown tell the same package-first story and input contract
+- [ ] **Phase 4: Release, CI, and Migration Readiness** - Preserve legacy entry points and harden the documented release and GitHub Actions check path
 
 ## Phase Details
 
@@ -58,22 +58,23 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: Reconcile README and vignette framing with the brownfield package architecture
-- [ ] 03-02: Align pkgdown navigation and reference groups with the documented workflow
-- [ ] 03-03: Tighten example-data and input-contract guidance for new users
+- [x] 03-01: Reconcile README and vignette framing with the brownfield package architecture
+- [x] 03-02: Align pkgdown navigation and reference groups with the documented workflow
+- [x] 03-03: Tighten example-data and input-contract guidance for new users
 
-### Phase 4: Release and Migration Readiness
-**Goal**: Keep the package releasable while preserving a minimal migration path from the historical script workflow.
+### Phase 4: Release, CI, and Migration Readiness
+**Goal**: Keep the package releasable, harden GitHub Actions checks, and preserve a minimal migration path from the historical script workflow.
 **Depends on**: Phase 3
-**Requirements**: [DOC-03, MIG-01]
+**Requirements**: [DOC-03, CI-01, MIG-01]
 **Success Criteria** (what must be TRUE):
   1. Maintainers can run the documented build, check, and test flow successfully.
-  2. Legacy users still have a working wrapper path into the package workflow with documented inputs.
-  3. Release notes and project instructions reflect the current package structure rather than stale script-first assumptions.
+  2. GitHub Actions runs the documented package check path with clear failure surfaces and current assumptions.
+  3. Legacy users still have a working wrapper path into the package workflow with documented inputs.
+  4. Release notes and project instructions reflect the current package structure rather than stale script-first assumptions.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: Verify release commands, CI assumptions, and local check instructions
+- [ ] 04-01: Harden GitHub Actions and local release-check workflow assumptions
 - [ ] 04-02: Audit and document the legacy wrapper script and migration path
 - [ ] 04-03: Update stale project guidance and release notes where they contradict the package-first repo
 
@@ -86,5 +87,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Core Workflow Contracts | 3/3 | Complete | 2026-04-08 |
 | 2. Comparison Layer Stabilization | 3/3 | Complete | 2026-04-08 |
-| 3. Documentation Alignment | 0/3 | Not started | - |
-| 4. Release and Migration Readiness | 0/3 | Not started | - |
+| 3. Documentation Alignment | 3/3 | Complete | 2026-04-08 |
+| 4. Release, CI, and Migration Readiness | 0/3 | Not started | - |

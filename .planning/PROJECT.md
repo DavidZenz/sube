@@ -20,11 +20,12 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 - ✓ Generate paper-style Leontief versus SUBE comparison tables and plots from package objects — existing
 - ✓ Reproducible import-to-compute sample workflow with explicit validation and diagnostics coverage — Phase 1
 - ✓ Explicit Leontief extraction, comparison-table, plot, and export workflow validated from shipped package objects — Phase 2
+- ✓ README, vignettes, pkgdown, and release-facing docs aligned to the package-first workflow and sample-data contract — Phase 3
 
 ### Active
 
-- [ ] Keep the package documentation, vignettes, and pkgdown site aligned with the package-first architecture
 - [ ] Keep a practical bridge for users migrating from the historical script workflow to package functions
+- [ ] Harden GitHub Actions and release-check automation around the documented package workflow
 
 ### Out of Scope
 
@@ -40,7 +41,7 @@ The repository already contains a released package skeleton (`Version: 0.1.2`), 
 
 - **Tech stack**: R package targeting `R (>= 4.2.0)` with `data.table`, `ggplot2`, `openxlsx`, `haven`, and `plm` — the public API and tests already depend on this stack
 - **Compatibility**: Public exported functions should remain side-effect-light and sample-data driven — the README, vignettes, and tests all assume reusable package functions
-- **Release quality**: Changes should continue to pass tarball-based `R CMD check` and `testthat` workflows — CRAN notes and GitHub Actions are built around that expectation
+- **Release quality**: Changes should continue to pass tarball-based `R CMD check` and `testthat` workflows — CRAN notes and GitHub Actions are built around that expectation, and the Actions path should be treated as a first-class maintenance surface
 - **Data footprint**: Only small example data should ship with the package — large historical inputs remain outside the package bundle
 - **Documentation**: README, vignettes, pkgdown reference groups, and NEWS should describe the same workflow surface — current repo value depends on a coherent package story
 
@@ -72,4 +73,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-08 after Phase 2 completion*
+*Last updated: 2026-04-08 after Phase 3 completion*

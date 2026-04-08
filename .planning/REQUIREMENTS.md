@@ -20,14 +20,15 @@
 
 ### Documentation and release
 
-- [ ] **DOC-01**: User can find a consistent package narrative across README, vignettes, pkgdown, and NEWS
-- [ ] **DOC-02**: User can identify which functions cover data preparation, computation, modeling, and comparison workflows from published docs
+- [x] **DOC-01**: User can find a consistent package narrative across README, vignettes, pkgdown, and NEWS
+- [x] **DOC-02**: User can identify which functions cover data preparation, computation, modeling, and comparison workflows from published docs
 - [ ] **DOC-03**: Maintainer can run package checks and tests from the repository using the documented release workflow
+- [ ] **CI-01**: Maintainer can rely on GitHub Actions to run and report the documented package check workflow consistently
 
 ### Migration and compatibility
 
 - [ ] **MIG-01**: User coming from the historical script workflow can run a legacy wrapper script against local input files
-- [ ] **MIG-02**: User can rely on shipped example data to understand required input contracts before using external research datasets
+- [x] **MIG-02**: User can rely on shipped example data to understand required input contracts before using external research datasets
 
 ## v2 Requirements
 
@@ -56,17 +57,18 @@
 | COMP-02 | Phase 2 | Complete |
 | COMP-03 | Phase 2 | Complete |
 | COMP-04 | Phase 2 | Complete |
-| DOC-01 | Phase 3 | Pending |
-| DOC-02 | Phase 3 | Pending |
+| DOC-01 | Phase 3 | Complete |
+| DOC-02 | Phase 3 | Complete |
 | DOC-03 | Phase 4 | Pending |
+| CI-01 | Phase 4 | Pending |
 | MIG-01 | Phase 4 | Pending |
-| MIG-02 | Phase 3 | Pending |
+| MIG-02 | Phase 3 | Complete |
 
 **Coverage:**
-- v1 requirements: 12 total
-- Mapped to phases: 12
+- v1 requirements: 13 total
+- Mapped to phases: 13
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-08*
-*Last updated: 2026-04-08 after Phase 2 completion*
+*Last updated: 2026-04-08 after Phase 3 completion*
