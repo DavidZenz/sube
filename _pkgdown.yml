@@ -14,11 +14,11 @@ reference:
       - extract_domestic_block
       - sube_example_data
       - build_matrices
-  - title: Computation and modeling
+  - title: Compute, model, and compare
     contents:
       - compute_sube
       - estimate_elasticities
-  - title: Comparisons and outputs
+  - title: Comparison and export helpers
     contents:
       - extract_leontief_matrices
       - prepare_sube_comparison
@@ -30,17 +30,17 @@ reference:
       - write_sube
 
 articles:
-  - title: Start Here
+  - title: Workflow Start Here
     navbar: Get started
     contents:
       - getting-started
-  - title: Data Preparation
+  - title: Inputs and Preparation
     contents:
       - data-preparation
-  - title: Modeling and Comparisons
+  - title: Modeling, Comparison, and Outputs
     contents:
       - modeling-and-outputs
-  - title: Paper Context
+  - title: Package Design and Paper Context
     contents:
       - package-design
 

@@ -24,6 +24,15 @@ The package deliberately separates matrix construction from econometric
 estimation. That keeps the Leontief benchmark workflow usable even when the
 modeling table is assembled elsewhere.
 
+The shipped example objects map directly to those four families:
+
+- `sube_example_data("sut_data")` -> normalized supply-use table input
+- `sube_example_data("cpa_map")` and `sube_example_data("ind_map")` -> product and industry correspondence tables
+- `sube_example_data("inputs")` -> compute-layer input metrics
+- `sube_example_data("model_data")` -> prepared modeling table for `estimate_elasticities()`
+
+That sample-data path is the easiest way to understand the required contracts before switching to external research data.
+
 ## Supply-use data
 
 Imported SUT data should resolve to these columns:
@@ -84,7 +93,7 @@ paper-specific filters before estimation.
 
 ## Recommended preparation strategy
 
-For reusable workflows, it is usually best to prepare data in this order:
+For reusable workflows, it is usually best to prepare data in this order. The shipped examples follow the same sequence, so you can inspect each object family before substituting your own files:
 
 1. standardize raw supply-use inputs,
 2. verify correspondence tables,

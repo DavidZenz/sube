@@ -2,7 +2,7 @@
 \alias{import_suts}
 \alias{extract_domestic_block}
 \alias{sube_example_data}
-\title{Import and Prepare Supply-Use Data}
+\title{Import, Example Data, and Supply-Use Preparation}
 \usage{
 import_suts(path, sheets = c("SUP", "USE"), recursive = FALSE)
 
@@ -23,6 +23,6 @@ sube_example_data(name = c("sut_data", "cpa_map", "ind_map", "inputs", "model_da
 returns a small shipped example table.
 }
 \description{
-Helpers for reading SUBE-style supply-use tables and loading sample data.
+Helpers for reading SUBE-style supply-use tables, extracting domestic blocks, and loading the shipped example objects that anchor the package workflow.
 }
 

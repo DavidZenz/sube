@@ -4,7 +4,7 @@
 \alias{plot_paper_comparison}
 \alias{plot_paper_regression}
 \alias{plot_paper_interval_ranges}
-\title{Leontief and Paper-Style Comparison Tools}
+\title{Leontief Extraction and Comparison Workflow Tools}
 \usage{
 extract_leontief_matrices(results, matrix = c("A", "L"), format = c("list", "long", "wide"))
 
@@ -59,6 +59,5 @@ Extraction helpers return lists or \code{data.table} objects. Plot helpers
 return named lists of \code{ggplot} objects.
 }
 \description{
-Utilities for exposing Leontief matrices and reproducing the comparison and
-plotting logic used in the archived paper workflow.
+Utilities for exposing Leontief matrices, preparing comparison tables, and reproducing the comparison, plotting, and interpretation workflow described in the package documentation and companion paper context.
 }

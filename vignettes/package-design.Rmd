@@ -10,9 +10,7 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-`sube` is organized around a workflow API instead of a script pipeline.
-That design choice is tied directly to the research problem developed in the
-companion paper,
+`sube` is organized around a workflow API instead of a script pipeline. That design choice is tied to the research problem developed in the companion paper, but the package documentation treats the operational workflow as primary and the paper as motivation.
 [Wrapping input-output multipliers in confidence intervals](https://doi.org/10.1186/s40008-024-00331-4).
 
 ## Why this package exists
@@ -23,9 +21,7 @@ The package sits between two traditions:
 - econometric work that compares multiplier behavior across countries, products,
   and years
 
-The paper motivates why those should be brought together. `sube` turns that
-motivation into reusable software by keeping benchmark matrices, econometric
-models, and comparison plots in the same package.
+The paper motivates why those should be brought together. `sube` turns that motivation into reusable software by keeping benchmark matrices, econometric models, comparison tables, and export helpers in the same package workflow.
 
 ## Design choices
 
@@ -44,11 +40,9 @@ The public package API is organized around a research sequence:
 2. build domestic matrices,
 3. compute Leontief benchmark results,
 4. estimate SUBE models, and
-5. compare both layers with tidy tables and plots.
+5. compare and export both layers from package objects.
 
-That last step is important. The package is not only about producing model
-coefficients; it is also about making the Leontief-versus-SUBE comparison easy
-to inspect, communicate, and reproduce.
+That last step is important. The package is not only about producing model coefficients; it is also about making the Leontief-versus-SUBE comparison easy to inspect, communicate, reproduce, and export without a separate script pipeline.
 
 ## Public objects
 

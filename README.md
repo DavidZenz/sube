@@ -1,9 +1,6 @@
 # sube
 
-`sube` is an R package for supply-use based econometrics. It supports a full
-workflow from rectangular supply and use tables to domestic matrix
-construction, Leontief-style benchmark multipliers, SUBE regression estimates,
-and paper-style comparison plots.
+`sube` is an R package for supply-use based econometrics. It supports a package-first workflow from rectangular supply and use tables to domestic matrix construction, Leontief-style benchmark multipliers, SUBE regression estimates, and comparison-ready outputs.
 
 The package is designed for applied input-output work, especially when supply
 and use tables are part of a larger comparative or panel-data setting. It is
@@ -38,6 +35,18 @@ install package dependencies.
 - estimates OLS, pooled, and between SUBE models
 - prepares paper-style comparison tables and plots
 
+## Workflow at a glance
+
+The package-first workflow is:
+
+1. import or load supply-use data and shipped examples
+2. build domestic matrices
+3. compute Leontief benchmark results
+4. estimate SUBE models
+5. compare and export outputs
+
+The shipped example objects mirror those stages: `sut_data`, `cpa_map`, `ind_map`, `inputs`, and `model_data` show the expected input contracts before you switch to external research data.
+
 ## Core workflow
 
 ```r
@@ -58,8 +67,7 @@ result <- compute_sube(bundle, inputs)
 head(result$tidy)
 ```
 
-Model estimation and comparison are separate steps on a prepared modeling
-table:
+Model estimation, comparison, and export are separate steps on a prepared modeling table:
 
 ```r
 model_data <- sube_example_data("model_data")
@@ -69,7 +77,7 @@ head(extract_leontief_matrices(result, matrix = "L", format = "long"))
 names(plot_paper_comparison(comparison, kind = "by_country", variables = "GO"))
 ```
 
-`write_sube()` writes a single table to one file or a named list of tables to a directory of files, so comparison outputs can be exported without extra post-processing code.
+`write_sube()` writes a single table to one file or a named list of tables to a directory of files, so comparison outputs can be exported without extra post-processing code. The same five-stage workflow is used throughout the README, vignettes, and pkgdown site.
 
 ## Why the package is structured this way
 
@@ -99,8 +107,7 @@ For local documentation work, the paper reference is kept in
 - `vignette("data-preparation", package = "sube")` for the input contracts
 - `vignette("modeling-and-outputs", package = "sube")` for modeling and plot
   outputs
-- `vignette("package-design", package = "sube")` for the paper-comparison
-  framing and interpretation layer
+- `vignette("package-design", package = "sube")` for how the package workflow relates to the companion paper
 
 The full reference and articles are designed to be published with `pkgdown`,
 with the website acting as the main public documentation surface.

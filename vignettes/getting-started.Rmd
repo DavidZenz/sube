@@ -30,18 +30,20 @@ econometric layer as a side calculation after Leontief analysis; it treats
 Leontief benchmarks, SUBE estimates, and comparison plots as one coherent
 research workflow.
 
-This vignette shows the compact public workflow:
+This vignette shows the compact public workflow used across the package docs:
 
 1. import or load supply-use data,
 2. build domestic matrices,
 3. compute Leontief benchmark results,
 4. estimate SUBE models, and
-5. compare both layers with tidy outputs and plots.
+5. compare or export both layers from package objects.
 
 All examples below use only the shipped sample data, so the full workflow can
 be verified from a clean checkout without external downloads.
 
 ## Load sample inputs
+
+The shipped example objects map directly to the workflow stages: `sut_data` for supply-use tables, `cpa_map` and `ind_map` for aggregation, `inputs` for the compute layer, and `model_data` for SUBE estimation.
 
 ```{r}
 sut <- sube_example_data("sut_data")
@@ -105,8 +107,7 @@ comparison <- prepare_sube_comparison(
 head(comparison)
 ```
 
-The comparison layer is designed to support the style of country, product,
-density, and regression comparisons used in the companion paper.
+The comparison layer is designed to support the same country, product, density, regression, and export paths described in the README and modeling/output vignette.
 
 ```{r}
 country_plots <- plot_paper_comparison(
@@ -122,6 +123,8 @@ paper_regression <- plot_paper_regression(
   measure = "multiplier",
   variables = "GO"
 )
+
+write_sube("outputs/benchmark_summary", result$summary, format = "csv")
 ```
 
 ## Relation to the companion paper

@@ -1,9 +1,8 @@
 # sube 0.1.2
 
-- Bumped the development version for the next feature pass.
-- Next implementation scope:
-  explicit Leontief matrix access/export and paper-style comparison plots for
-  Leontief and SUBE results.
+- Added explicit Leontief matrix extraction in list, long, and wide formats.
+- Added paper-style comparison, plotting, and export helpers around package objects.
+- Tightened the package-first documentation story around the stabilized workflow surface.
 
 # sube 0.1.1
 
