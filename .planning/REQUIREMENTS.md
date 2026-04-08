@@ -13,10 +13,10 @@
 
 ### Leontief and comparison outputs
 
-- [ ] **COMP-01**: User can extract computed Leontief matrices in list, long, or wide form from a `sube_results` object
-- [ ] **COMP-02**: User can prepare a comparison table that aligns Leontief and SUBE model outputs for selected measures and variables
-- [ ] **COMP-03**: User can generate paper-style comparison plots by country, product, regression fit, and interval range from package objects
-- [ ] **COMP-04**: User can export comparison-ready or summary outputs to CSV, RDS, or DTA without custom post-processing scripts
+- [x] **COMP-01**: User can extract computed Leontief matrices in list, long, or wide form from a `sube_results` object
+- [x] **COMP-02**: User can prepare a comparison table that aligns Leontief and SUBE model outputs for selected measures and variables
+- [x] **COMP-03**: User can generate paper-style comparison plots by country, product, regression fit, and interval range from package objects
+- [x] **COMP-04**: User can export comparison-ready or summary outputs to CSV, RDS, or DTA without custom post-processing scripts
 
 ### Documentation and release
 
@@ -52,10 +52,10 @@
 | WF-01 | Phase 1 | Complete |
 | WF-02 | Phase 1 | Complete |
 | WF-03 | Phase 1 | Complete |
-| COMP-01 | Phase 2 | Pending |
-| COMP-02 | Phase 2 | Pending |
-| COMP-03 | Phase 2 | Pending |
-| COMP-04 | Phase 2 | Pending |
+| COMP-01 | Phase 2 | Complete |
+| COMP-02 | Phase 2 | Complete |
+| COMP-03 | Phase 2 | Complete |
+| COMP-04 | Phase 2 | Complete |
 | DOC-01 | Phase 3 | Pending |
 | DOC-02 | Phase 3 | Pending |
 | DOC-03 | Phase 4 | Pending |
@@ -69,4 +69,4 @@
 
 ---
 *Requirements defined: 2026-04-08*
-*Last updated: 2026-04-08 after Phase 1 completion*
+*Last updated: 2026-04-08 after Phase 2 completion*

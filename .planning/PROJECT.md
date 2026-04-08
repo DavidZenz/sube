@@ -19,10 +19,10 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 - ✓ Filter, plot, and export tidy SUBE outputs and expose a legacy pipeline wrapper script — existing
 - ✓ Generate paper-style Leontief versus SUBE comparison tables and plots from package objects — existing
 - ✓ Reproducible import-to-compute sample workflow with explicit validation and diagnostics coverage — Phase 1
+- ✓ Explicit Leontief extraction, comparison-table, plot, and export workflow validated from shipped package objects — Phase 2
 
 ### Active
 
-- [ ] Stabilize the explicit Leontief matrix extraction and comparison layer as a documented public workflow
 - [ ] Keep the package documentation, vignettes, and pkgdown site aligned with the package-first architecture
 - [ ] Keep a practical bridge for users migrating from the historical script workflow to package functions
 
@@ -72,4 +72,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-08 after Phase 1 completion*
+*Last updated: 2026-04-08 after Phase 2 completion*

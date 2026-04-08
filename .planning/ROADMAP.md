@@ -11,7 +11,7 @@ This roadmap assumes the core SUBE package workflow already exists and has basic
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Core Workflow Contracts** - Confirm and harden the import-to-compute package contracts around shipped examples and diagnostics
-- [ ] **Phase 2: Comparison Layer Stabilization** - Stabilize Leontief extraction, comparison shaping, and export/plot outputs as a coherent public workflow
+- [x] **Phase 2: Comparison Layer Stabilization** - Stabilize Leontief extraction, comparison shaping, and export/plot outputs as a coherent public workflow
 - [ ] **Phase 3: Documentation Alignment** - Make README, vignettes, and pkgdown tell the same package-first story and input contract
 - [ ] **Phase 4: Release and Migration Readiness** - Preserve legacy entry points and verify the package passes documented release checks
 
@@ -43,9 +43,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Verify and normalize comparison data structures and extraction helpers
-- [ ] 02-02: Harden plotting and export workflows for paper-style outputs
-- [ ] 02-03: Add or refine tests and examples around the comparison layer
+- [x] 02-01: Verify and normalize comparison data structures and extraction helpers
+- [x] 02-02: Harden plotting and export workflows for paper-style outputs
+- [x] 02-03: Add or refine tests and examples around the comparison layer
 
 ### Phase 3: Documentation Alignment
 **Goal**: Align README, vignettes, pkgdown navigation, and input guidance with the real package workflow and comparison story.
@@ -85,6 +85,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Workflow Contracts | 3/3 | Complete | 2026-04-08 |
-| 2. Comparison Layer Stabilization | 0/3 | Not started | - |
+| 2. Comparison Layer Stabilization | 3/3 | Complete | 2026-04-08 |
 | 3. Documentation Alignment | 0/3 | Not started | - |
 | 4. Release and Migration Readiness | 0/3 | Not started | - |
