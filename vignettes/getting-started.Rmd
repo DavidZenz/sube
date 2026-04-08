@@ -109,7 +109,7 @@ head(comparison)
 
 The comparison layer is designed to support the same country, product, density, regression, and export paths described in the README and modeling/output vignette.
 
-```{r}
+```{r, eval = FALSE}
 country_plots <- plot_paper_comparison(
   comparison,
   kind = "by_country",

@@ -215,3 +215,39 @@ test_that("leontief extraction and comparison helpers work", {
   expect_true(all(names(interval_plots) %in% c("ols", "pooled", "between")))
   expect_s3_class(interval_plots[[1]][[1]], "ggplot")
 })
+
+test_that("legacy wrapper script remains a usable migration bridge", {
+  skip_if(Sys.which("Rscript") == "", "Rscript is required for wrapper validation")
+
+  sut_path <- tempfile(fileext = ".csv")
+  cpa_map_path <- tempfile(fileext = ".csv")
+  ind_map_path <- tempfile(fileext = ".csv")
+  inputs_path <- tempfile(fileext = ".csv")
+  output_dir <- tempfile("sube-legacy-")
+
+  data.table::fwrite(sube_example_data("sut_data"), sut_path)
+  data.table::fwrite(sube_example_data("cpa_map"), cpa_map_path)
+  data.table::fwrite(sube_example_data("ind_map"), ind_map_path)
+  data.table::fwrite(sube_example_data("inputs"), inputs_path)
+
+  source_script_path <- testthat::test_path("..", "..", "inst", "scripts", "run_legacy_pipeline.R")
+  installed_script_path <- system.file("scripts", "run_legacy_pipeline.R", package = "sube")
+  script_path <- if (file.exists(source_script_path)) {
+    normalizePath(source_script_path, mustWork = TRUE)
+  } else {
+    normalizePath(installed_script_path, mustWork = TRUE)
+  }
+
+  status <- system2(
+    Sys.which("Rscript"),
+    c(script_path, sut_path, cpa_map_path, ind_map_path, inputs_path, output_dir),
+    stdout = TRUE,
+    stderr = TRUE
+  )
+
+  expect_null(attr(status, "status"))
+  expect_true(dir.exists(output_dir))
+  expect_true(file.exists(file.path(output_dir, "sube_results.csv")))
+  expect_true(file.exists(file.path(output_dir, "sube_tidy.csv")))
+})
+

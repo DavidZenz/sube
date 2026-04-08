@@ -3,6 +3,7 @@
 - Added explicit Leontief matrix extraction in list, long, and wide formats.
 - Added paper-style comparison, plotting, and export helpers around package objects.
 - Tightened the package-first documentation story around the stabilized workflow surface.
+- Aligned the local release path with GitHub Actions and kept the legacy wrapper as a documented compatibility bridge.
 
 # sube 0.1.1
 

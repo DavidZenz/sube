@@ -134,9 +134,22 @@ BibTeX-style citation for the paper:
 
 ## Development
 
-Release-quality checks should be run from a built tarball:
+The local release path should mirror the GitHub Actions `R-CMD-check` workflow as closely as practical:
 
 ```bash
+R -q -e 'testthat::test_dir("tests/testthat")'
 R CMD build .
 R CMD check sube_0.1.2.tar.gz --no-manual
 ```
+
+GitHub Actions runs the same test suite before the tarball-oriented package check on the supported platforms.
+
+## Legacy migration
+
+The preferred interface is the package API, but a narrow compatibility wrapper remains available for script-era users:
+
+```bash
+Rscript inst/scripts/run_legacy_pipeline.R path/to/sut.csv path/to/cpa_map.csv path/to/ind_map.csv path/to/inputs.csv output_dir
+```
+
+That wrapper imports the SUT input, extracts the domestic block, runs `build_matrices()` and `compute_sube()`, and writes `sube_results.csv` plus `sube_tidy.csv` into the chosen output directory.
