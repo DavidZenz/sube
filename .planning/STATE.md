@@ -1,3 +1,19 @@
+---
+gsd_state_version: 1.0
+milestone: v1.1
+milestone_name: Replication, FIGARO & Convenience
+status: planning
+stopped_at: Phase 5 context gathered
+last_updated: "2026-04-09T08:58:38.150Z"
+last_activity: 2026-04-08 — v1.1 roadmap created (Phases 5-6)
+progress:
+  total_phases: 2
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
+---
+
 # Project State
 
 ## Project Reference
@@ -19,6 +35,7 @@ Progress: [░░░░░░░░░░] 0%
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 12 (v1.0)
 - Average duration: — (v1.1 not started)
 - Total execution time: — (v1.1 not started)
@@ -30,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | v1.0 (1-4) | 12 | — | — |
 
 **Recent Trend:**
+
 - Last 5 plans: v1.0 execution (archived)
 - Trend: Stable
 
@@ -54,6 +72,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-08
-Stopped at: Roadmap created for v1.1; Phase 5 ready to plan
-Resume file: None
+Last session: 2026-04-09T08:58:38.148Z
+Stopped at: Phase 5 context gathered
+Resume file: .planning/phases/05-figaro-sut-ingestion/05-CONTEXT.md
