@@ -9,3 +9,6 @@ archive/
 sube.Rcheck/
 pkgdown/
 docs/
+# Large research datasets for replication and FIGARO ingestion (not shipped with the package)
+inst/extdata/wiod/
+inst/extdata/figaro/

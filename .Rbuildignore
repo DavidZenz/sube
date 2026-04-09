@@ -16,3 +16,7 @@
 ^sube\.Rcheck$
 ^\.planning$
 ^\.planning/.*$
+^inst/extdata/wiod$
+^inst/extdata/wiod/.*$
+^inst/extdata/figaro$
+^inst/extdata/figaro/.*$
