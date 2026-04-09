@@ -156,17 +156,78 @@ already provides.
   memory during `fread`; ensure sufficient RAM before calling on full
   releases."
 
+### Research-Driven Additions (2026-04-09, post-RESEARCH.md)
+
+The gsd-phase-researcher verified D-01..D-18 against live code and the
+live FIGARO flat files (inspected in session at `inst/extdata/figaro/`)
+and surfaced three gaps plus one follow-up decision. The following are
+locked additions with the same authority as D-01..D-18.
+
+- **D-19: Filter primary-input rows on the USE file.** The FIGARO USE
+  file contains non-product rows (`B2A3G`, `D1`, `D21X31`, `D29X39`,
+  `OP_RES`, `OP_NRES`) carrying `refArea = "W2"`. These are SNA/ESA
+  primary-input blocks (value added, taxes, operating surplus), not
+  products. `read_figaro()` MUST drop rows where `rowPi` does not start
+  with `CPA_` before applying the `CPA_` prefix strip from D-06. The
+  planner should implement this defensively as
+  `dt <- dt[startsWith(rowPi, "CPA_")]` rather than
+  `dt <- dt[refArea != "W2"]` so it survives future FIGARO releases that
+  may relocate primary inputs.
+
+- **D-20: FIGARO final-demand columns aggregate to `VAR = "FU_bas"` by
+  default, with optional `final_demand_vars=` argument.** FIGARO
+  publishes five final-demand codes (`P3_S13`, `P3_S14`, `P3_S15`,
+  `P51G`, `P5M`) where WIOD publishes one (`FU_bas`). Inside
+  `read_figaro()`, sum these five codes per `(REP, PAR, CPA)` into a
+  single synthetic row with `VAR = "FU_bas"` so `build_matrices()`
+  consumes the result with its default `final_demand_var = "FU_bas"`
+  filter. `build_matrices()` is NOT modified.
+  - Expose an optional argument `final_demand_vars =
+    c("P3_S13","P3_S14","P3_S15","P51G","P5M")` on `read_figaro()` so
+    advanced users can override the aggregation set (e.g., to include
+    only household consumption). Argument validates that all supplied
+    codes exist in the USE file's `colPi` column and errors out with a
+    clear message if any are missing.
+  - Default behavior matches WIOD convention; non-default use is
+    documented in `@details`.
+
+- **D-21: `FIGW1` is a real country code — preserve as-is.** `FIGW1`
+  ("FIGARO rest of world 1") appears in both `refArea` and
+  `counterpartArea` of the live files alongside real countries. It MUST
+  NOT be filtered. Do not add any `refArea`/`counterpartArea` filter
+  beyond the D-19 primary-input filter. A regression test verifying
+  `FIGW1` survives import is required.
+
+- **D-22: Updated `read_figaro()` signature.** D-13 is superseded:
+  ```r
+  read_figaro(path, year, final_demand_vars = c("P3_S13","P3_S14","P3_S15","P51G","P5M"))
+  ```
+  `path` and `year` remain required; `final_demand_vars` is optional
+  with the FIGARO default. Output class tag `c("sube_suts",
+  "data.table", "data.frame")` is unchanged.
+
+- **D-23: DESCRIPTION Version is NOT bumped in Phase 5.** Version stays
+  at `0.1.2` through Phase 5 and Phase 6. Bump happens once at
+  milestone v1.1 archive time (e.g., to `0.2.0` or `1.1.0`), not per
+  phase. Phase 5 plans must NOT include a DESCRIPTION version-bump
+  task. `NEWS.md` updates remain in scope.
+
 ### Claude's Discretion
 
 - Exact error message wording for missing/invalid `year`, ambiguous
-  directory contents, and missing files
+  directory contents, missing files, and invalid `final_demand_vars`
+  entries (D-20)
 - Whether to emit a `message()` summary on successful load (row count,
-  country count, year) — researcher ergonomics
+  country count, year, dropped-primary-inputs count) — researcher
+  ergonomics
 - Whether `.parse_figaro_row()` / `.parse_figaro_col()` exist at all as
   internal helpers, or if the transformation is inline in `read_figaro()`
-  (likely inline given D-01)
+  (inline is expected given D-01 + D-19 + D-20)
 - pkgdown reference group placement (add to same group as `import_suts()`)
 - Exact `NEWS.md` wording for the new function
+- Whether the synthetic fixture uses `REP1`/`REP2` abstract codes or
+  real country codes; researcher recommends abstract codes with a
+  separate `FIGW1` regression test block
 
 ### Folded Todos
 
