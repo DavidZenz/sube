@@ -11,6 +11,7 @@ reference:
   - title: Data import and preparation
     contents:
       - import_suts
+      - read_figaro
       - extract_domestic_block
       - sube_example_data
       - build_matrices
