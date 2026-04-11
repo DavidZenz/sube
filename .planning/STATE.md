@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: Replication, FIGARO & Convenience
 status: planning
 stopped_at: Phase 5 context gathered
-last_updated: "2026-04-09T08:58:38.150Z"
-last_activity: 2026-04-08 — v1.1 roadmap created (Phases 5-6)
+last_updated: "2026-04-11T15:20:24.933Z"
+last_activity: 2026-04-11
 progress:
   total_phases: 2
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  completed_phases: 1
+  total_plans: 4
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-08)
 
 ## Current Position
 
-Phase: 5 of 6 (FIGARO SUT Ingestion)
-Plan: 0 of ? in current phase
+Phase: 6 of 6 (paper replication verification)
+Plan: Not started
 Status: Ready to plan
-Last activity: 2026-04-08 — v1.1 roadmap created (Phases 5-6)
+Last activity: 2026-04-11
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -36,7 +36,7 @@ Progress: [░░░░░░░░░░] 0%
 
 **Velocity:**
 
-- Total plans completed: 12 (v1.0)
+- Total plans completed: 16 (v1.0)
 - Average duration: — (v1.1 not started)
 - Total execution time: — (v1.1 not started)
 
@@ -45,6 +45,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | v1.0 (1-4) | 12 | — | — |
+| 05 | 4 | - | - |
 
 **Recent Trend:**
 
