@@ -13,6 +13,7 @@ utils::globalVariables(c(
   "MEASURE",
   "PAR",
   "REP",
+  "rowPi",
   "term",
   "TYPE",
   "VALUE",
