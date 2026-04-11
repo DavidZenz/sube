@@ -44,7 +44,7 @@
   synonyms <- list(
     cpa = c("CPA", "CPA56", "CPA_CODE"),
     cpa_agg = c("CPAAGG", "CPA_AGG", "PRODUCT", "PRODUCT_AGG"),
-    vars = c("VARS", "VAR", "INDUSTRY", "IND", "CODE"),
+    vars = c("VARS", "VAR", "INDUSTRY", "IND", "CODE", "NACE", "NACE_R2"),
     ind_agg = c("INDAGG", "IND_AGG", "INDUSTRY_AGG", "SECTOR")
   )
 
