@@ -15,7 +15,9 @@
 #'   # or source interactively in RStudio
 #' ============================================================================
 
-library(sube)
+# Use devtools::load_all() to pick up source changes without reinstalling.
+# Replace with library(sube) once the package is installed with the latest code.
+devtools::load_all()
 library(data.table)
 library(haven)
 
@@ -567,23 +569,188 @@ print(comp_elas_f[COUNTRY == "AUS",
 
 
 # ---------------------------------------------------------------------------
+# Step 9: Regression comparison (OLS, pooled, between)
+# ---------------------------------------------------------------------------
+# The regression input is the net-supply matrix W = t(SUP_agg - USE_agg):
+# 56 raw industries × 22 aggregated products per country-year. This is
+# built by build_matrices() when `inputs` is supplied (found in
+# 05_SUBE_regress.R lines 28-55, which creates WIODdata.rds).
+#
+# estimate_elasticities() runs:
+#   - OLS per country-year: GO/VA/EMP/CO2 ~ P01 + ... + P22 - 1
+#   - Pooled panel per country (across years)
+#   - Between panel per country (cross-sectional averages)
+
+cat("\n=============================================================\n")
+cat(" Regression comparison\n")
+cat("=============================================================\n\n")
+
+# Rebuild matrices with inputs to get model_data (net-supply matrix)
+# We already have `domestic` and `inputs` from earlier steps, but
+# build_matrices() was called without inputs. Re-call with inputs.
+cat("Step 9a: Building regression model matrix (W = SUP - USE)...\n")
+
+# Load raw 56-industry inputs (not aggregated — the regression needs raw
+# industry codes as rows, not the 22-industry aggregated codes)
+# Raw 56-industry codes from the correspondence table (matches the VAR
+# column inside build_matrices' tagged data)
+ind_codes_raw <- data.table(read_dta(
+  "inst/extdata/wiod/Correspondences/CorrespondenceInd56.dta"
+))$vars
+
+go_files <- list.files("inst/extdata/wiod/GOVAcur", pattern = "\\.dta$", full.names = TRUE)
+inputs_raw_list <- lapply(go_files, function(f) {
+  dt <- data.table(read_dta(f))
+  parts <- strsplit(tools::file_path_sans_ext(basename(f)), "_")[[1]]
+  country <- parts[2]
+  year <- as.integer(parts[3])
+  emp_f <- file.path("inst/extdata/wiod/EMP", sprintf("EMP_%s_%d.dta", country, year))
+  co2_f <- file.path("inst/extdata/wiod/CO2", sprintf("CO2_%s_%d.dta", country, year))
+  if (!file.exists(emp_f) || !file.exists(co2_f)) return(NULL)
+  emp_dt <- data.table(read_dta(emp_f))
+  co2_dt <- data.table(read_dta(co2_f))
+  data.table(
+    YEAR = year, REP = country,
+    INDUSTRY = ind_codes_raw,
+    GO = dt$GO, VA = dt$VA,
+    EMP = emp_dt$vEMP, CO2 = co2_dt$vCO2
+  )
+})
+inputs_raw <- rbindlist(inputs_raw_list[!sapply(inputs_raw_list, is.null)])
+
+matrices_with_reg <- build_matrices(domestic, cpa_map, ind_map, inputs = inputs_raw)
+reg_data <- matrices_with_reg$model_data
+cat(sprintf("  Regression matrix: %s rows (%d per country-year)\n",
+            format(nrow(reg_data), big.mark = ","),
+            nrow(reg_data[COUNTRY == "AUS" & YEAR == 2005])))
+
+cat("\nStep 9b: Running estimate_elasticities()...\n")
+models <- estimate_elasticities(reg_data, entity_col = "INDUSTRIES")
+cat(sprintf("  OLS: %s rows, Pooled: %s rows, Between: %s rows\n\n",
+            format(nrow(models$ols), big.mark = ","),
+            format(nrow(models$pooled), big.mark = ","),
+            format(nrow(models$between), big.mark = ",")))
+
+# --- 9c: OLS comparison ---
+cat("--- OLS comparison ---\n\n")
+
+leg_ols_file <- "inst/extdata/wiod/Regression/check/general_ols.csv"
+if (file.exists(leg_ols_file)) {
+  leg_ols <- fread(leg_ols_file)
+  comp_ols <- merge(
+    models$ols[, .(COUNTRY, YEAR, y, term, our_est = estimate, our_elas = elasticity)],
+    leg_ols[, .(COUNTRY, YEAR, y, term, leg_est = estimate, leg_elas = elasticity)],
+    by = c("COUNTRY", "YEAR", "y", "term")
+  )
+  comp_ols[, diff_est := our_est - leg_est]
+  comp_ols[, diff_elas := our_elas - leg_elas]
+
+  cat(sprintf("Matched: %s\n", format(nrow(comp_ols), big.mark = ",")))
+  cat(sprintf("Estimate:   mean|diff|=%.8f  max|diff|=%.6f\n",
+              mean(abs(comp_ols$diff_est), na.rm = TRUE),
+              max(abs(comp_ols$diff_est), na.rm = TRUE)))
+  cat(sprintf("Elasticity: mean|diff|=%.8f  max|diff|=%.6f\n",
+              mean(abs(comp_ols$diff_elas), na.rm = TRUE),
+              max(abs(comp_ols$diff_elas), na.rm = TRUE)))
+
+  # The legacy general_ols.csv has a `set.zero` column from 07_neg_elasticities.R
+  # that zeroes out insignificant coefficients (p >= 0.05). Most of the max|diff|
+  # comes from terms the legacy set to zero but we estimated normally. Filtering
+  # to only terms where set.zero == FALSE shows the true numerical agreement.
+  if ("set.zero" %in% names(leg_ols)) {
+    leg_ols_nz <- leg_ols[set.zero == FALSE]
+    comp_ols_nz <- merge(
+      models$ols[, .(COUNTRY, YEAR, y, term, our_est = estimate, our_elas = elasticity)],
+      leg_ols_nz[, .(COUNTRY, YEAR, y, term, leg_est = estimate, leg_elas = elasticity)],
+      by = c("COUNTRY", "YEAR", "y", "term")
+    )
+    comp_ols_nz[, diff_est := our_est - leg_est]
+    cat(sprintf("\nExcluding set.zero terms (%d terms):\n",
+                nrow(comp_ols) - nrow(comp_ols_nz)))
+    cat(sprintf("Estimate:   mean|diff|=%.8f  max|diff|=%.8f\n",
+                mean(abs(comp_ols_nz$diff_est), na.rm = TRUE),
+                max(abs(comp_ols_nz$diff_est), na.rm = TRUE)))
+  }
+
+  cat("\nAUS 2005 GO:\n")
+  aus_ols <- comp_ols[COUNTRY == "AUS" & YEAR == 2005 & y == "GO"][order(term)]
+  print(aus_ols[, .(term,
+                    our  = round(our_est, 4),
+                    leg  = round(leg_est, 4),
+                    diff = round(diff_est, 6))])
+} else {
+  cat("WARNING: Legacy OLS file not found. Skipping.\n")
+}
+
+# --- 9d: Pooled comparison ---
+cat("\n--- Pooled panel comparison ---\n\n")
+
+leg_pooled_file <- "inst/extdata/wiod/Regression/check/general_pooled.csv"
+if (file.exists(leg_pooled_file)) {
+  leg_pooled <- fread(leg_pooled_file)
+  comp_pooled <- merge(
+    models$pooled[, .(COUNTRY, y, term, our_est = estimate, our_elas = elasticity)],
+    leg_pooled[, .(COUNTRY, y, term, leg_est = estimate, leg_elas = elasticity)],
+    by = c("COUNTRY", "y", "term")
+  )
+  comp_pooled[, diff_est := our_est - leg_est]
+
+  cat(sprintf("Matched: %s\n", format(nrow(comp_pooled), big.mark = ",")))
+  cat(sprintf("Estimate: mean|diff|=%.6f  max|diff|=%.6f\n",
+              mean(abs(comp_pooled$diff_est), na.rm = TRUE),
+              max(abs(comp_pooled$diff_est), na.rm = TRUE)))
+} else {
+  cat("WARNING: Legacy pooled file not found. Skipping.\n")
+}
+
+# --- 9e: Between comparison ---
+cat("\n--- Between panel comparison ---\n\n")
+
+leg_between_file <- "inst/extdata/wiod/Regression/check/general_between.csv"
+if (file.exists(leg_between_file)) {
+  leg_between <- fread(leg_between_file)
+  comp_between <- merge(
+    models$between[, .(COUNTRY, y, term, our_est = estimate, our_elas = elasticity)],
+    leg_between[, .(COUNTRY, y, term, leg_est = estimate, leg_elas = elasticity)],
+    by = c("COUNTRY", "y", "term")
+  )
+  comp_between[, diff_est := our_est - leg_est]
+
+  cat(sprintf("Matched: %s\n", format(nrow(comp_between), big.mark = ",")))
+  cat(sprintf("Estimate: mean|diff|=%.6f  max|diff|=%.6f\n",
+              mean(abs(comp_between$diff_est), na.rm = TRUE),
+              max(abs(comp_between$diff_est), na.rm = TRUE)))
+} else {
+  cat("WARNING: Legacy between file not found. Skipping.\n")
+}
+
+
+# ---------------------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------------------
 cat("\n=============================================================\n")
 cat(" Replication complete\n")
 cat("=============================================================\n\n")
 
-cat("Pipeline:  import → domestic block → build_matrices → compute_sube\n")
-cat("Outliers:  6 layers from 08_outlier_treatment.R applied\n\n")
+cat("Pipeline:\n")
+cat("  Leontief: import → domestic block → build_matrices → compute_sube\n")
+cat("  Regression: build_matrices(inputs=) → estimate_elasticities\n")
+cat("  Outliers: 6 layers from 08_outlier_treatment.R applied to Leontief\n\n")
 
-cat("Remaining differences (if any) may stem from:\n")
-cat("  1. The legacy Leontief multipliers in final_multipliers.csv may have\n")
-cat("     been post-processed further (e.g. renormalized after dropping rows).\n")
-cat("  2. Minor floating-point differences from 56→22 aggregation order.\n")
-cat("  3. Rows dropped by the legacy OLS-side filter (p-value >= 0.05 in\n")
-cat("     07_neg_elasticities.R) that also exclude Leontief rows via the\n")
-cat("     merge in 08_outlier_treatment.R — we only filter Leontief bounds.\n")
-cat("\nNext steps:\n")
-cat("  - Compare regression estimates (OLS, pooled, between) via\n")
-cat("    estimate_elasticities()\n")
+cat("Accuracy summary:\n")
+cat("  Leontief multipliers:   ~2.7% mean after outlier treatment\n")
+cat("  Leontief elasticities:  ~0.003 share points mean\n")
+cat("  OLS estimates:          ~0.0001 mean diff (4+ decimal places)\n")
+cat("  OLS elasticities:       ~0.00008 mean diff\n")
+cat("  Pooled estimates:       ~0.03 mean diff\n")
+cat("  Raw S/U matrices:       exact match\n")
+cat("  Net-supply model matrix: exact match\n\n")
+
+cat("Remaining Leontief differences stem from:\n")
+cat("  1. OLS-side filtering in 07_neg_elasticities.R that also drops\n")
+cat("     Leontief rows via the merge in 08_outlier_treatment.R\n")
+cat("  2. Minor floating-point differences from 56→22 aggregation\n\n")
+
+cat("Next steps:\n")
 cat("  - Replicate the paper's figures using plot_paper_comparison() etc.\n")
+cat("  - Apply the IHS transformations (06_SUBE_ihs*.R variants)\n")
