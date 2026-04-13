@@ -12,8 +12,16 @@
 #' @param final_demand_var Column identifier used for final demand within the
 #'   long SUT data. Defaults to `"FU_bas"`.
 #'
-#' @return A list with aggregated long-form data, final demand, and a list of
-#'   country-year matrices. The object has class `"sube_matrices"`.
+#' @return A list with class `"sube_matrices"` containing:
+#'   \describe{
+#'     \item{aggregated}{Fully aggregated long-form data (22 products × 22 industries).}
+#'     \item{final_demand}{Final demand by aggregated product.}
+#'     \item{matrices}{Country-year supply and use matrices (22×22).}
+#'     \item{model_data}{Product-aggregated long-form data with raw industry codes
+#'       (56 industries × 22 products per country-year). This is the intermediate
+#'       demand matrix with only columns aggregated — the input for
+#'       [estimate_elasticities()].}
+#'   }
 #' @export
 build_matrices <- function(sut_data, cpa_map, ind_map, final_demand_var = "FU_bas") {
   sut_data <- .standardize_names(sut_data)
@@ -35,10 +43,22 @@ build_matrices <- function(sut_data, cpa_map, ind_map, final_demand_var = "FU_ba
   fd <- fd[!is.na(CPAagg), .(FD = sum(VALUE, na.rm = TRUE)), by = .(YEAR, REP, CPAagg)]
 
   core <- sut_data[VAR != final_demand_var]
-  aggregated <- merge(core, cpa_map, by = "CPA", all.x = TRUE)
-  aggregated <- merge(aggregated, ind_map, by = "VAR", all.x = TRUE)
-  aggregated <- aggregated[!is.na(CPAagg) & !is.na(INDagg)]
-  aggregated <- aggregated[
+  tagged <- merge(core, cpa_map, by = "CPA", all.x = TRUE)
+  tagged <- merge(tagged, ind_map, by = "VAR", all.x = TRUE)
+  tagged <- tagged[!is.na(CPAagg) & !is.na(INDagg)]
+
+  # model_data: aggregate products only (56 raw industries × 22 aggregated
+  # products per country-year). This is the intermediate demand structure
+  # needed for regression in estimate_elasticities() — the legacy pipeline
+  # runs OLS on 56 industry rows, not the 22×22 fully aggregated matrix.
+  model_data <- tagged[
+    ,
+    .(VALUE = sum(as.numeric(VALUE), na.rm = TRUE)),
+    by = .(YEAR, REP, PAR, TYPE, VAR, CPAagg)
+  ]
+
+  # aggregated: fully aggregate both products and industries (22×22)
+  aggregated <- tagged[
     ,
     .(VALUE = sum(as.numeric(VALUE), na.rm = TRUE)),
     by = .(YEAR, REP, PAR, TYPE, CPAagg, INDagg)
@@ -89,7 +109,8 @@ build_matrices <- function(sut_data, cpa_map, ind_map, final_demand_var = "FU_ba
   out <- list(
     aggregated = aggregated[],
     final_demand = fd[],
-    matrices = matrices
+    matrices = matrices,
+    model_data = model_data[]
   )
   class(out) <- c("sube_matrices", class(out))
   out
