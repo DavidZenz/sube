@@ -18,6 +18,7 @@
 build_matrices <- function(sut_data, cpa_map, ind_map, final_demand_var = "FU_bas") {
   sut_data <- .standardize_names(sut_data)
   .sube_required_columns(sut_data, c("REP", "PAR", "CPA", "VAR", "VALUE", "YEAR", "TYPE"))
+  sut_data[, VAR := toupper(as.character(VAR))]
 
   cpa_map <- .coerce_map(cpa_map, "cpa", "cpa_agg")
   ind_map <- .coerce_map(ind_map, "vars", "ind_agg")

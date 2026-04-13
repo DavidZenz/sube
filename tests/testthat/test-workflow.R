@@ -60,10 +60,9 @@ test_that("import and matrix helpers fail explicitly for malformed inputs", {
 
   bad_csv <- tempfile(fileext = ".csv")
   data.table::fwrite(data.table::data.table(REP = "AT", PAR = "AT", CPA = "P1"), bad_csv)
-  expect_error(
-    import_suts(bad_csv),
-    "Missing required columns: VAR, VALUE, YEAR, TYPE",
-    fixed = TRUE
+  expect_warning(
+    expect_error(import_suts(bad_csv), "No usable SUT data", fixed = TRUE),
+    "not a recognized SUT format"
   )
 
   sut <- sube_example_data("sut_data")

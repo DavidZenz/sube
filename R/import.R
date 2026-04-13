@@ -40,8 +40,47 @@ import_suts <- function(path, sheets = c("SUP", "USE"), recursive = FALSE) {
   tables <- lapply(files, function(file_name) {
     if (grepl("\\.csv$", file_name, ignore.case = TRUE)) {
       data <- .standardize_names(fread(file_name))
-      .sube_required_columns(data, c("REP", "PAR", "CPA", "VAR", "VALUE", "YEAR", "TYPE"))
-      return(data[, .(REP, PAR, CPA, VAR, VALUE, YEAR, TYPE)])
+      canonical <- c("REP", "PAR", "CPA", "VAR", "VALUE", "YEAR", "TYPE")
+
+      if (all(canonical %in% names(data))) {
+        # Already in long format — use directly
+        return(data[, canonical, with = FALSE])
+      }
+
+      # Wide format: has REP, PAR, CPA, YEAR, TYPE but industry codes as
+      # columns instead of a VAR/VALUE pair. Melt industry columns to long.
+      wide_id <- c("REP", "PAR", "CPA", "YEAR", "TYPE")
+      if (!all(wide_id %in% names(data))) {
+        warning(sprintf(
+          "Skipping %s — not a recognized SUT format (missing: %s).",
+          basename(file_name),
+          paste(setdiff(wide_id, names(data)), collapse = ", ")
+        ), call. = FALSE)
+        return(NULL)
+      }
+
+      # Non-industry columns to exclude from melting (known WIOD aggregates)
+      known_agg <- c(
+        "DSUP_BAS", "IMP", "SUP_BAS", "EXPTTM", "REEXP", "INTTTM",
+        "DUSE_BAS", "FU_BAS", "USE_BAS",
+        "INTC", "CONS_H", "CONS_NP", "CONS_G", "CONS",
+        "GFCF", "INVEN", "GCF", "EXP"
+      )
+      ind_cols <- setdiff(names(data), c(wide_id, known_agg))
+
+      long <- melt(data, id.vars = wide_id, measure.vars = ind_cols,
+                   variable.name = "VAR", value.name = "VALUE")
+      long[, VAR := as.character(VAR)]
+
+      # Append FU_BAS as separate rows if present (final demand at basic prices)
+      if ("FU_BAS" %in% names(data)) {
+        fd <- data[, c(wide_id, "FU_BAS"), with = FALSE]
+        fd[, VAR := "FU_BAS"]
+        setnames(fd, "FU_BAS", "VALUE")
+        long <- rbindlist(list(long, fd), use.names = TRUE, fill = TRUE)
+      }
+
+      return(long[, .(REP, PAR, CPA, VAR, VALUE, YEAR, TYPE)])
     }
 
     wb <- loadWorkbook(file_name)
@@ -61,6 +100,11 @@ import_suts <- function(path, sheets = c("SUP", "USE"), recursive = FALSE) {
       long[, .(REP, PAR, CPA, VAR, VALUE, YEAR, TYPE)]
     }), fill = TRUE)
   })
+
+  tables <- tables[!vapply(tables, is.null, logical(1))]
+  if (length(tables) == 0L) {
+    stop("No usable SUT data found in the input files.", call. = FALSE)
+  }
 
   out <- rbindlist(tables, fill = TRUE)
   class(out) <- c("sube_suts", class(out))
