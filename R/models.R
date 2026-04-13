@@ -80,18 +80,35 @@ estimate_elasticities <- function(
   for (country in countries) {
     subset <- data[get(country_col) == country]
     for (response in response_vars) {
-      pdata <- plm::pdata.frame(
-        as.data.frame(subset[, c(year_col, entity_col, predictor_vars, response_vars), with = FALSE]),
-        index = c(year_col, entity_col)
+      pdata <- tryCatch(
+        plm::pdata.frame(
+          as.data.frame(subset[, c(year_col, entity_col, predictor_vars, response_vars), with = FALSE]),
+          index = c(year_col, entity_col)
+        ),
+        error = function(e) NULL
       )
+      if (is.null(pdata)) next
+
       pooled_formula <- as.formula(sprintf("%s ~ %s - 1", response, paste(predictor_vars, collapse = " + ")))
-      pooled_fit <- plm::plm(pooled_formula, data = pdata, model = "pooling", effect = "time")
-      pooled[[paste(country, response, sep = "_")]] <- make_result(data.table::as.data.table(pdata), pooled_fit, response, "pooled", country)
+      pooled_fit <- tryCatch(plm::plm(pooled_formula, data = pdata, model = "pooling", effect = "time"), error = function(e) NULL)
+      if (!is.null(pooled_fit)) {
+        pooled[[paste(country, response, sep = "_")]] <- tryCatch(
+          make_result(data.table::as.data.table(pdata), pooled_fit, response, "pooled", country),
+          error = function(e) NULL
+        )
+      }
 
       between_formula <- as.formula(sprintf("%s ~ %s", response, paste(predictor_vars, collapse = " + ")))
-      between_fit <- plm::plm(between_formula, data = pdata, model = "between", effect = "time")
-      between_result <- make_result(data.table::as.data.table(pdata), between_fit, response, "between", country)
-      between[[paste(country, response, sep = "_")]] <- between_result[term != "(Intercept)"]
+      between_fit <- tryCatch(plm::plm(between_formula, data = pdata, model = "between", effect = "time"), error = function(e) NULL)
+      if (!is.null(between_fit)) {
+        between_result <- tryCatch(
+          make_result(data.table::as.data.table(pdata), between_fit, response, "between", country),
+          error = function(e) NULL
+        )
+        if (!is.null(between_result)) {
+          between[[paste(country, response, sep = "_")]] <- between_result[term != "(Intercept)"]
+        }
+      }
     }
   }
 

@@ -103,16 +103,20 @@ build_matrices <- function(sut_data, cpa_map, ind_map, final_demand_var = "FU_ba
   matrices <- Filter(Negate(is.null), matrices)
   names(matrices) <- vapply(matrices, function(x) paste(x$country, x$year, sep = "_"), character(1))
 
-  # model_data: Leontief-transformed regression matrix.
-  # Only computed when `inputs` is supplied (needs GO per raw industry).
+  # model_data: Net-supply regression matrix (W = SUP - USE).
+  # Only computed when `inputs` is supplied (needs GO/VA/EMP/CO2 per industry).
   #
-  # The legacy regression (06_SUBE_regress.R) operates on the Z matrix at the
-  # raw industry level: Z = U %*% solve(t(S + I)) %*% diag(GO), where S and U
-  # are 56×56 raw matrices. Only Z's product dimension (rows) is aggregated
-  # from 56 to 22; the industry dimension (columns) stays at 56 raw codes.
-  # The result is transposed to give 56 industry rows × 22 product columns,
-  # which, together with GO/VA/EMP/CO2 per raw industry, forms the regression
-  # data for estimate_elasticities().
+  # The legacy regression (05_SUBE_regress.R lines 28-55) builds the regression
+  # input as:
+  #   1. Read raw per-country SUP and USE CSVs (56 CPA rows × 56 industry cols)
+  #   2. Merge CPA with product correspondence → get CPAagg
+  #   3. Melt + aggregate by CPAagg → 22 product rows × 56 industry cols
+  #   4. W = SUP_agg - USE_agg (net supply at 22 products × 56 industries)
+  #   5. Transpose → 56 industries × 22 products
+  #   6. Append GO, VA, EMP, CO2 per raw industry
+  #
+  # This net-supply matrix is then regressed as:
+  #   GO ~ P01 + P02 + ... + P22 - 1  (OLS, pooled, between)
   model_data <- data.table()
 
   if (!is.null(inputs)) {
@@ -122,7 +126,6 @@ build_matrices <- function(sut_data, cpa_map, ind_map, final_demand_var = "FU_ba
     .sube_required_columns(inputs_dt, c("YEAR", "REP", "INDUSTRIES", "GO"))
 
     raw_vars <- sort(unique(tagged$VAR))
-    raw_cpas <- sort(unique(tagged$CPA))
     cpa_to_agg <- unique(cpa_map[, .(CPA, CPAagg)])
 
     model_data_list <- lapply(seq_len(nrow(ids)), function(i) {
@@ -135,50 +138,43 @@ build_matrices <- function(sut_data, cpa_map, ind_map, final_demand_var = "FU_ba
       sub <- tagged[YEAR == year_i & REP == country_i]
       if (nrow(sub) == 0L) return(NULL)
 
-      # Build raw 56×56 supply and use matrices (CPA rows × VAR columns)
-      sup_raw <- dcast(sub[TYPE == "SUP"], CPA ~ VAR, value.var = "VALUE",
-                       fill = 0, fun.aggregate = sum)
-      use_raw <- dcast(sub[TYPE == "USE"], CPA ~ VAR, value.var = "VALUE",
-                       fill = 0, fun.aggregate = sum)
+      # Product-aggregate SUP and USE separately (keep raw industry columns)
+      # tagged already has CPAagg from the CPA correspondence merge
+      sup_agg <- sub[TYPE == "SUP",
+                     .(VALUE = sum(as.numeric(VALUE), na.rm = TRUE)),
+                     by = .(CPAagg, VAR)]
+      use_agg <- sub[TYPE == "USE",
+                     .(VALUE = sum(as.numeric(VALUE), na.rm = TRUE)),
+                     by = .(CPAagg, VAR)]
 
-      present_cpas <- intersect(raw_cpas, intersect(sup_raw$CPA, use_raw$CPA))
-      present_vars <- intersect(raw_vars, intersect(names(sup_raw)[-1], names(use_raw)[-1]))
-      if (length(present_cpas) < 2L || length(present_vars) < 2L) return(NULL)
+      # Dcast: 22 product rows × 56 industry columns
+      sup_wide <- dcast(sup_agg, CPAagg ~ VAR, value.var = "VALUE", fill = 0)
+      use_wide <- dcast(use_agg, CPAagg ~ VAR, value.var = "VALUE", fill = 0)
 
-      sup_raw <- sup_raw[match(present_cpas, CPA)]
-      use_raw <- use_raw[match(present_cpas, CPA)]
-      S_raw <- as.matrix(sup_raw[, ..present_vars])
-      U_raw <- as.matrix(use_raw[, ..present_vars])
+      # Align rows and columns
+      common_prods <- intersect(sup_wide$CPAagg, use_wide$CPAagg)
+      common_vars <- intersect(names(sup_wide)[-1], names(use_wide)[-1])
+      if (length(common_prods) < 2L || length(common_vars) < 2L) return(NULL)
 
-      # A = U %*% solve(t(S + I)), matching legacy 03_SUBE.R lines 176-177
-      S_adj <- S_raw + diag(nrow(S_raw))
-      tS_inv <- .safe_solve(t(S_adj))
-      if (is.null(tS_inv)) return(NULL)
-      A_raw <- U_raw %*% tS_inv
+      sup_wide <- sup_wide[match(sort(common_prods), CPAagg)]
+      use_wide <- use_wide[match(sort(common_prods), CPAagg)]
 
-      # Z = A %*% diag(GO) — intermediate demand in monetary units
-      # GO must be aligned to the column order (present_vars = raw industries)
-      go_vec <- inp[match(present_vars, INDUSTRIES)]$GO
-      if (length(go_vec) != length(present_vars) || anyNA(go_vec)) return(NULL)
-      Z_raw <- A_raw %*% diag(go_vec)  # 56 CPA rows × 56 industry columns
+      # W = SUP - USE (net supply), 22 products × 56 industries
+      W <- as.matrix(sup_wide[, ..common_vars]) - as.matrix(use_wide[, ..common_vars])
+      rownames(W) <- sort(common_prods)
+      colnames(W) <- common_vars
 
-      # Aggregate Z's ROW dimension (products) from 56 → 22, keep columns raw
-      # Result: 22 aggregated products × 56 raw industries
-      Z_dt <- data.table(Z_raw)
-      setnames(Z_dt, present_vars)
-      Z_dt[, CPA := present_cpas]
-      Z_long <- melt(Z_dt, id.vars = "CPA", variable.name = "INDUSTRIES",
-                      value.name = "ZVAL")
-      Z_long <- merge(Z_long, cpa_to_agg, by = "CPA", all.x = TRUE)
-      Z_agg <- Z_long[!is.na(CPAagg),
-                       .(ZVAL = sum(ZVAL, na.rm = TRUE)),
-                       by = .(INDUSTRIES, CPAagg)]
+      # Transpose: 56 industries × 22 products
+      W_t <- t(W)
 
-      # Dcast: 56 raw industry rows × 22 aggregated product columns
-      wide <- dcast(Z_agg, INDUSTRIES ~ CPAagg, value.var = "ZVAL", fill = 0)
+      # Build the regression data.table
+      wide <- data.table(W_t)
+      setnames(wide, sort(common_prods))
+      wide[, INDUSTRIES := rownames(W_t)]
 
       # Append GO/VA/EMP/CO2 per raw industry
       inp_aligned <- inp[match(wide$INDUSTRIES, INDUSTRIES)]
+      if (anyNA(inp_aligned$GO)) return(NULL)
       wide[, YEAR := year_i]
       wide[, COUNTRY := country_i]
       wide[, GO := inp_aligned$GO]
