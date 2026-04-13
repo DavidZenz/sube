@@ -31,14 +31,33 @@ against the legacy output.
 AUS GO multipliers: 17 of 18 products within 1% of legacy. The one outlier
 (P07, 12%) is likely excluded in the legacy by the OLS-side merge filter.
 
-### Known friction points
+### Known issues (fixed)
 
-1. **Wide CSV format**: the WIOD domestic CSVs need manual `melt()` — `import_suts()`
-   currently only handles pre-melted long CSVs or Excel workbooks.
-2. **Case mismatch**: `build_matrices()` does `toupper(final_demand_var)` but melted
-   VAR values keep original case. Fix: uppercase VAR values before calling.
-3. **Inputs aggregation**: raw GO/VA/EMP/CO2 `.dta` files are 56-industry; must
-   aggregate to 22 industries using the correspondence table.
+1. **Wide CSV format**: `import_suts()` now auto-detects and melts wide-format CSVs.
+   Non-SUT files (e.g. `VA_*.csv`) in the same directory are skipped with a warning.
+2. **Case mismatch**: `build_matrices()` now uppercases VAR values internally, so
+   `FU_bas` matches `FU_BAS` without manual preprocessing.
+
+### Open issue: regression model matrix
+
+The legacy regression (`06_SUBE_regress.R`) operates on a **56 raw industries × 22
+aggregated products** model matrix — the Z matrix with only *columns* aggregated
+to products, keeping all 56 NACE industry *rows*. This gives 56 observations per
+country-year for OLS.
+
+The current `build_matrices()` + `compute_sube()` pipeline fully aggregates to
+**22×22** (both products and industries), producing only 22 rows per country-year.
+This makes the Leontief multipliers correct (aggregation commutes with the matrix
+inversion) but the regression coefficients differ because OLS with 22 vs 56
+observations gives different estimates.
+
+**Impact**: Leontief multipliers and elasticities replicate correctly (~2.7% mean
+diff after outlier treatment). Regression estimates (OLS, pooled, between) do not
+match because the model matrix has the wrong shape.
+
+**Fix needed**: `build_matrices()` needs an option to return the 56×22
+pre-industry-aggregation Z matrix alongside the aggregated 22×22 matrices. This
+matrix feeds `estimate_elasticities()` for the regression comparison.
 
 ### Requirements
 
