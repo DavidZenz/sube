@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Replication, FIGARO & Convenience
-status: planning
+status: executing
 stopped_at: Phase 5 context gathered
-last_updated: "2026-04-11T15:20:24.933Z"
-last_activity: 2026-04-11
+last_updated: "2026-04-15T12:20:06.347Z"
+last_activity: 2026-04-15 -- Phase 06 execution started
 progress:
   total_phases: 2
   completed_phases: 1
-  total_plans: 4
+  total_plans: 7
   completed_plans: 4
-  percent: 100
+  percent: 57
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-08)
 
 **Core value:** Researchers can run a reproducible end-to-end SUBE workflow in R without falling back to one-off scripts or undocumented paper code.
-**Current focus:** Phase 5 — FIGARO SUT Ingestion
+**Current focus:** Phase 06 — paper-replication-verification
 
 ## Current Position
 
-Phase: 6 of 6 (paper replication verification)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-04-11
+Phase: 06 (paper-replication-verification) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 06
+Last activity: 2026-04-15 -- Phase 06 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
