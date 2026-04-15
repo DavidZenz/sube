@@ -106,12 +106,55 @@ extract_leontief_matrices <- function(results, matrix = c("A", "L"), format = c(
   }), fill = TRUE)
 }
 
-.apply_paper_filters <- function(data) {
+#' Apply the paper's outlier treatment
+#'
+#' Applies the six exclusion layers from the 2018 paper's legacy script
+#' \code{archive/legacy-scripts/08_outlier_treatment.R} (lines 89-181) to a
+#' SUBE comparison table or results summary. These are historical,
+#' paper-specific filters - not general-purpose data-quality rules.
+#'
+#' The six layers:
+#' \enumerate{
+#'   \item Drop whole countries: \code{CAN}, \code{CYP}.
+#'   \item Drop country-year range: \code{BEL} 2000-2008; drop \code{CO2} rows with \code{YEAR > 2009}.
+#'   \item Drop 38 country-product pairs across 14 countries (e.g. \code{LUX} P04/P05/P06/...).
+#'   \item Drop \code{CO2} rows for \code{CHE}, \code{HRV}, \code{NOR}.
+#'   \item Multiplier plausibility bounds (only when \code{apply_bounds = TRUE}):
+#'     \code{GO} in [1, 4], \code{VA} in [0, 1], \code{EMP}/\code{CO2} >= 0.
+#'   \item Drop rows where elasticity is negative.
+#' }
+#'
+#' @param data A tidy comparison table (the shape returned by
+#'   \code{\link{prepare_sube_comparison}}) or a SUBE results summary with
+#'   \code{COUNTRY, YEAR, CPAagg, variable, measure, value} columns.
+#' @param variables Character vector subset of \code{c("GO", "VA", "EMP", "CO2")}
+#'   indicating which metrics to retain. Rows whose \code{variable} is not in
+#'   this set are dropped before the layered filters apply. Defaults to all four.
+#' @param apply_bounds Logical; whether to apply layer 5 (multiplier
+#'   plausibility bounds). Defaults to \code{TRUE}. Set \code{FALSE} to keep
+#'   multiplier outliers in the output.
+#' @return A filtered \code{data.table} with the same columns as \code{data}.
+#' @export
+#' @examples
+#' \dontrun{
+#'   comp <- prepare_sube_comparison(leontief, models)
+#'   filt <- filter_paper_outliers(comp)
+#'   filt_no_bounds <- filter_paper_outliers(comp, apply_bounds = FALSE)
+#' }
+filter_paper_outliers <- function(data,
+                                  variables = c("GO", "VA", "EMP", "CO2"),
+                                  apply_bounds = TRUE) {
+  variables <- toupper(variables)
   out <- data.table::copy(data)
+  if ("variable" %in% names(out)) {
+    out <- out[variable %in% variables]
+  }
   out <- out[!COUNTRY %in% c("CAN", "CYP")]
   if ("YEAR" %in% names(out)) {
     out <- out[!(COUNTRY == "BEL" & YEAR %in% 2000:2008)]
-    out <- out[!(variable == "CO2" & YEAR > 2009)]
+    if ("variable" %in% names(out)) {
+      out <- out[!(variable == "CO2" & YEAR > 2009)]
+    }
   }
 
   exclusion_map <- list(
@@ -134,12 +177,16 @@ extract_leontief_matrices <- function(results, matrix = c("A", "L"), format = c(
     out <- out[!(COUNTRY == country & CPAagg %in% exclusion_map[[country]])]
   }
 
-  out <- out[!(variable == "CO2" & COUNTRY %in% c("CHE", "HRV", "NOR"))]
+  if ("variable" %in% names(out)) {
+    out <- out[!(variable == "CO2" & COUNTRY %in% c("CHE", "HRV", "NOR"))]
+  }
 
-  if ("value" %in% names(out)) {
+  if (isTRUE(apply_bounds) && "value" %in% names(out) && "variable" %in% names(out) && "measure" %in% names(out)) {
     out <- out[!(measure == "multiplier" & variable == "GO" & (value < 1 | value > 4))]
     out <- out[!(measure == "multiplier" & variable == "VA" & (value < 0 | value > 1))]
     out <- out[!(measure == "multiplier" & variable %in% c("EMP", "CO2") & value < 0)]
+  }
+  if ("value" %in% names(out) && "measure" %in% names(out)) {
     out <- out[!(measure == "elasticity" & value < 0)]
   }
   out[]
@@ -184,7 +231,7 @@ prepare_sube_comparison <- function(
 
   comparison[, CPAgroup := .paper_cpa_group(CPAagg)]
   if (apply_paper_filters) {
-    comparison <- .apply_paper_filters(comparison)
+    comparison <- filter_paper_outliers(comparison, variables = variables)
   }
   comparison[]
 }
@@ -322,7 +369,7 @@ plot_paper_interval_ranges <- function(models, by = c("country", "product"), var
   data[, CPAagg := term]
   data[, CPAgroup := .paper_cpa_group(CPAagg)]
   data[, Dp := ((upr - lwr) * 100 / estimate) / 2]
-  data <- .apply_paper_filters(data[, .(COUNTRY, CPAagg, CPAgroup, type, variable = y, Dp)])
+  data <- filter_paper_outliers(data[, .(COUNTRY, CPAagg, CPAgroup, type, variable = y, Dp)])
 
   plots <- list()
   for (current_type in unique(data$type)) {
