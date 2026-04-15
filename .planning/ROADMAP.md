@@ -43,7 +43,10 @@
   1. Running the replication test with `SUBE_WIOD_DIR` set produces a pass, confirming numerical match within defined tolerance
   2. The replication test is automatically skipped in CI and on CRAN when `SUBE_WIOD_DIR` is absent
   3. A vignette documents the full reproduction workflow step-by-step and builds cleanly with `eval=FALSE`
-**Plans**: TBD
+**Plans**: 3 plans
+  - [ ] 06-01-replication-test-PLAN.md — Gated testthat suite (helper + 3 test_that blocks for W/SUP/USE matrices, AUS/DEU/USA/JPN × 2005)
+  - [ ] 06-02-filter-paper-outliers-export-PLAN.md — Export filter_paper_outliers() with variables/apply_bounds args, roxygen block, NAMESPACE + .Rd
+  - [ ] 06-03-replication-vignette-PLAN.md — 9-section paper-replication.Rmd, pkgdown group split, NEWS.md bullets, R CMD check --as-cran
 
 ## Progress
 
@@ -53,4 +56,4 @@ Phases execute in numeric order: 5 → 6
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 5. FIGARO SUT Ingestion | v1.1 | 0/? | Not started | - |
-| 6. Paper Replication Verification | v1.1 | 0/? | Not started | - |
+| 6. Paper Replication Verification | v1.1 | 0/3 | Not started | - |
