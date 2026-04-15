@@ -1,0 +1,157 @@
+---
+title: "Reproducing the SUBE Paper"
+vignette: >
+  %\VignetteIndexEntry{Reproducing the SUBE Paper}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>",
+  eval = FALSE
+)
+library(sube)
+```
+
+# 1. What this vignette replicates
+
+The 2018 SUBE paper computes Leontief multipliers, elasticities, and
+regression coefficients from WIOD international supply-use tables. This
+vignette walks through the end-to-end reproduction of the paper's raw
+supply, use, and net-supply matrices using only the functions exported
+by `sube`. All code chunks are shown `eval = FALSE` so the vignette
+builds cleanly on CRAN and in CI without requiring the ~4 GB WIOD data
+archive.
+
+The gated test at `tests/testthat/test-replication.R` asserts bit-level
+numerical equivalence for a representative subset (AUS, DEU, USA, JPN
+for 2005). Running it locally is covered in section 9.
+
+# 2. Obtaining the WIOD data
+
+Download the WIOD international supply-use tables and companion files
+from Eurostat / the WIOD website. The expected layout under
+`$SUBE_WIOD_DIR`:
+
+```
+$SUBE_WIOD_DIR/
+  International SUTs domestic/
+    Int_SUTs_domestic_SUP_2005_May18.csv
+    Int_SUTs_domestic_USE_2005_May18.csv
+    ...
+  Correspondences/
+    CorrespondenceCPA56.dta
+    CorrespondenceInd56.dta
+  GOVAcur/      GO_{country}_{year}.dta
+  EMP/          EMP_{country}_{year}.dta
+  CO2/          CO2_{country}_{year}.dta
+  Regression/data/   {country}_{year}.csv  (legacy ground-truth W matrices)
+```
+
+Set the environment variable before running the gated test:
+
+```bash
+export SUBE_WIOD_DIR=/path/to/wiod
+```
+
+# 3. Importing the domestic block
+
+```{r}
+sut <- import_suts(file.path(Sys.getenv("SUBE_WIOD_DIR"),
+                             "International SUTs domestic"))
+domestic <- extract_domestic_block(sut)
+domestic[REP == "AUS" & YEAR == 2005][1:3]
+#> Returns a sube_domestic_suts long table with REP == PAR rows only.
+```
+
+# 4. Aggregation via correspondence tables
+
+```{r}
+root <- Sys.getenv("SUBE_WIOD_DIR")
+cpa_map <- data.table::data.table(haven::read_dta(
+  file.path(root, "Correspondences", "CorrespondenceCPA56.dta")))
+ind_map <- data.table::data.table(haven::read_dta(
+  file.path(root, "Correspondences", "CorrespondenceInd56.dta")))
+data.table::setnames(cpa_map, "CPAagg", "CPA_AGG")
+data.table::setnames(ind_map, "Indagg", "IND_AGG")
+```
+
+The CPA56 and Ind56 maps project the raw 56-sector NACE codes onto the
+22-sector aggregation used throughout the paper.
+
+# 5. Computing Leontief multipliers and elasticities
+
+```{r}
+results <- compute_sube(domestic, cpa_map, ind_map)
+results$tidy[COUNTRY == "AUS" & YEAR == 2005 & measure == "multiplier"][1:5]
+```
+
+`compute_sube()` builds the aggregated S and U matrices, inverts
+`(I - A)`, and emits tidy multiplier and elasticity tables.
+
+# 6. Applying the paper's outlier treatment
+
+```{r}
+models <- estimate_elasticities(results)
+comp <- prepare_sube_comparison(results, models)
+comp_filtered <- filter_paper_outliers(comp)
+#> Applies the six exclusion layers from 08_outlier_treatment.R:89-181 --
+#> see ?filter_paper_outliers for the full rule list.
+```
+
+Pass `apply_bounds = FALSE` to keep multiplier outliers in the output,
+or pass `variables = c("GO", "VA", "EMP")` to skip the CO2-specific
+rules when CO2 data is unavailable.
+
+# 7. Running the regressions
+
+```{r}
+models <- estimate_elasticities(results)
+models$OLS[term == "P01" & variable == "GO"]
+#> The SUBE paper's OLS, pooled, and between estimators are all produced
+#> in one call. See ?estimate_elasticities for the full return shape.
+```
+
+# 8. Comparing with the legacy paper output
+
+Running the full pipeline on the 2018 WIOD data yields:
+
+```
+#> Raw supply and use matrices: exact match (bit-identical)
+#> Net-supply model matrix W = t(SUP_agg - USE_agg): exact match
+#> Leontief multipliers after outlier treatment: ~2.7% mean abs. diff.
+#> OLS coefficients (significant terms): match to 4+ decimal places
+```
+
+The matrix-level differences are zero; the multiplier- and
+coefficient-level differences are methodological (averaging order,
+filter interaction) and are documented in full in
+`inst/scripts/replicate_paper.R`.
+
+# 9. Running the gated test locally
+
+With `SUBE_WIOD_DIR` pointing at a populated WIOD tree:
+
+```bash
+SUBE_WIOD_DIR=/path/to/wiod Rscript -e 'devtools::test(filter = "replication")'
+```
+
+Without the env var (or on CRAN / CI), the test auto-skips:
+
+```bash
+Rscript -e 'devtools::test(filter = "replication")'
+#> SKIP (SUBE_WIOD_DIR not set - paper replication test skipped)
+```
+
+# Beyond this vignette
+
+- **IHS regression variants.** `archive/legacy-scripts/06_SUBE_ihs*.R`,
+  `06_SUBE_lin-ihs*.R`, `06_SUBE_ihs-lin*.R` fit inverse-hyperbolic-sine
+  transformed variants. Not part of `sube` v1.1; use the legacy scripts
+  directly if needed.
+- **Paper figures.** `plot_paper_comparison()`, `plot_paper_regression()`,
+  and `plot_paper_interval_ranges()` reproduce the published figures.
+  Each ships with its own man page.
+- **Full comparison runbook.** `inst/scripts/replicate_paper.R` is the
+  reference runbook; this vignette is the narrated subset.
