@@ -17,6 +17,19 @@
 - Added `inst/extdata/figaro-sample/` with a synthetic 2-country FIGARO
   fixture and `tests/testthat/test-figaro.R` covering the new importer
   end-to-end.
+- Exported `filter_paper_outliers()` (formerly internal `.apply_paper_filters()`)
+  with `variables` and `apply_bounds` arguments so researchers can apply the
+  paper's six-layer outlier treatment directly to SUBE comparison or results
+  tables. See `?filter_paper_outliers` for the full rule list with citations
+  to `archive/legacy-scripts/08_outlier_treatment.R:89-181`.
+- Added the `paper-replication` vignette: a nine-section walkthrough of the
+  end-to-end reproduction of the 2018 paper's raw supply, use, and
+  net-supply matrices from WIOD data. Builds with `eval = FALSE` so it
+  renders cleanly on CRAN.
+- Added the gated `tests/testthat/test-replication.R` suite (requires
+  `SUBE_WIOD_DIR`; auto-skipped on CRAN and in CI) which asserts bit-level
+  equality against the legacy paper ground-truth matrices for AUS, DEU,
+  USA, and JPN in 2005.
 
 # sube 0.1.2
 

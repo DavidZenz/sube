@@ -19,13 +19,16 @@ reference:
     contents:
       - compute_sube
       - estimate_elasticities
-  - title: Comparison and export helpers
+  - title: Paper replication tools
     contents:
-      - extract_leontief_matrices
+      - filter_paper_outliers
       - prepare_sube_comparison
       - plot_paper_comparison
       - plot_paper_regression
       - plot_paper_interval_ranges
+  - title: Comparison and export helpers
+    contents:
+      - extract_leontief_matrices
       - filter_sube
       - plot_sube
       - write_sube
