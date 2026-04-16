@@ -1,0 +1,263 @@
+---
+title: "FIGARO End-to-End Workflow"
+vignette: >
+  %\VignetteIndexEntry{FIGARO End-to-End Workflow}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>",
+  eval = FALSE
+)
+library(sube)
+```
+
+# 1. What FIGARO is and what this vignette covers
+
+FIGARO is the EU inter-country supply and use tables published at the
+NACE-R2 64-activity detail (A\*64 breakdown), distributed as long-format CSV
+flatfiles — one supply file and one use file per reference year.
+
+This vignette walks through the full researcher journey:
+
+1. Obtaining the FIGARO flatfiles and placing them under `$SUBE_FIGARO_DIR`
+2. Reading the supply and use flatfiles into a canonical `sube_suts` table with
+   `read_figaro()`
+3. Building NACE-based mapping tables from the output
+4. Running `build_matrices()` to get aggregated supply, use, and final-demand
+   matrices
+5. Running `compute_sube()` to obtain Leontief multipliers
+6. Optionally running `estimate_elasticities()` when sidecar VA/EMP/CO2 data
+   is available
+7. Executing the gated integration test locally
+
+Every code chunk is `eval = FALSE` so the vignette renders cleanly on CRAN and
+in CI without requiring the actual FIGARO flatfiles (roughly 400-500 MB each).
+
+# 2. Obtaining the data
+
+FIGARO is distributed as two flat-format CSV files per reference year.
+The expected layout under `$SUBE_FIGARO_DIR` is:
+
+```
+$SUBE_FIGARO_DIR/
+  flatfile_eu-ic-supply_25ed_{YEAR}.csv
+  flatfile_eu-ic-use_25ed_{YEAR}.csv
+```
+
+Typical file size is 400-500 MB per file. Once downloaded and placed in the
+directory, set the environment variable before running any gated tests:
+
+```bash
+export SUBE_FIGARO_DIR=/path/to/figaro
+```
+
+`read_figaro()` and the gated test both read this variable at runtime. When the
+variable is unset, the test skips; when it points to a directory without the
+expected files, `read_figaro()` stops with an informative message.
+
+# 3. Reading the flatfile
+
+For copy-paste purposes, this section uses the synthetic fixture shipped with
+the package. No download is required:
+
+```{r}
+dir <- system.file("extdata", "figaro-sample", package = "sube")
+sut <- read_figaro(dir, year = 2023)
+str(sut)
+#> Classes 'sube_suts' and 'data.table':  ...
+#>  $ REP : chr  "AT" "BE" ...
+#>  $ PAR : chr  "AT" "BE" ...
+#>  $ CPA : chr  "A01" "A01" ...
+#>  $ VAR : chr  "A01" "A01" ...
+#>  $ VALUE: num  ...
+#>  $ YEAR : int  2023 2023 ...
+```
+
+`read_figaro()` does three things at import time:
+
+- **Primary-input row filtering:** rows where `VAR` is one of `B2A3G`, `D1`,
+  `D21X31`, `D29X39`, `OP_RES`, or `OP_NRES` are dropped. These are
+  value-added blocks, not product flows, and should not appear in the supply or
+  use matrices.
+- **`CPA_` prefix stripping:** the raw FIGARO product column carries codes like
+  `CPA_A01`. The prefix is removed at import, so the `CPA` column in the output
+  contains plain NACE-R2 codes (e.g. `A01`). Downstream code never sees the
+  prefix.
+- **Final-demand aggregation:** the five FIGARO final-demand codes (`P3_S13`,
+  `P3_S14`, `P3_S15`, `P51G`, `P5M`) are summed into a single `VAR = "FU_bas"`
+  row per `(REP, PAR, CPA)` so the output is compatible with `build_matrices()`
+  without modification.
+
+To use real FIGARO data, replace the `system.file()` path with the env-var
+pointer:
+
+```{r}
+root <- Sys.getenv("SUBE_FIGARO_DIR")
+sut  <- read_figaro(root, year = 2023)
+```
+
+# 4. Preparing mapping tables
+
+FIGARO uses NACE-R2 3-digit codes for both products (the `CPA` column, after
+prefix stripping) and industries (the `VAR` column for supply flows). Because
+NACE product codes and industry codes are equivalent at the 3-digit level,
+**one aggregation table serves as both `cpa_map` and `ind_map`** for
+`build_matrices()`.
+
+The mapping can be as simple as collapsing all codes to their NACE section
+letter (A-U):
+
+```{r}
+domestic <- extract_domestic_block(sut)
+
+# Collect all unique codes appearing in product and industry positions
+codes <- sort(unique(c(domestic$CPA, setdiff(domestic$VAR, "FU_bas"))))
+
+# Map each 3-digit code to its NACE section letter (first character)
+cpa_map <- data.table::data.table(
+  CPA    = codes,
+  CPAagg = substr(codes, 1, 1)
+)
+
+ind_map <- data.table::data.table(
+  NACE   = codes,
+  INDagg = substr(codes, 1, 1)
+)
+```
+
+Note that the column name differs between the two maps: `CPA` vs. `NACE`.
+`build_matrices()` routes each internally via `.coerce_map()`, which recognises
+`NACE` and `NACE_R2` as synonyms for the industry-identifier column. Using
+different column names ensures each map routes correctly without ambiguity.
+
+For finer resolution you may use NACE 2-digit codes instead:
+`substr(codes, 1, 2)`. The section-level (1-letter) aggregation is simplest
+and produces matrices large enough for non-degenerate Leontief inversion across
+the full A\*64 country set.
+
+# 5. Building matrices
+
+```{r}
+bundle <- build_matrices(domestic, cpa_map, ind_map)
+
+names(bundle)
+#> [1] "aggregated"    "final_demand"  "matrices"
+
+# Inspect the supply matrix for Germany
+b_de <- bundle$matrices[["DE_2023"]]
+dim(b_de$S)
+#> [1] 21 21
+```
+
+`build_matrices()` returns a named list with:
+
+- `aggregated`: the aggregated long-format supply and use table after applying
+  the mapping.
+- `final_demand`: the aggregated final-demand totals by `(country, agg_sector)`.
+- `matrices`: a named list of per-country-year objects, each containing the
+  supply matrix `S`, use matrix `U`, and metadata fields `year`, `country`, and
+  `industries`.
+
+# 6. Computing multipliers
+
+`compute_sube()` takes the matrix bundle and an inputs table, inverts
+`(I - A)` for each country-year, and returns multipliers and a tidy results
+table. When sidecar data (VA, EMP, CO2) is unavailable — the default for
+FIGARO — synthesise a gross-output vector from the supply matrix column sums:
+
+```{r}
+inputs <- data.table::rbindlist(lapply(names(bundle$matrices), function(nm) {
+  b <- bundle$matrices[[nm]]
+  data.table::data.table(
+    YEAR     = b$year,
+    REP      = b$country,
+    INDUSTRY = b$industries,
+    GO       = as.numeric(colSums(b$S))
+  )
+}))
+
+result <- compute_sube(bundle, inputs, metrics = "GO")
+
+names(result)
+#> [1] "summary"    "model_data" "matrices"
+
+result$summary[REP == "DE" & YEAR == 2023][1:5]
+#> Tidy table with one row per (REP, YEAR, INDUSTRY) and multiplier columns.
+```
+
+The multipliers in `result$summary` are deterministic given the supply and use
+matrices plus the gross-output vector. They are the quantities the gated test
+snapshots for reproducibility verification.
+
+# 7. Extending to elasticities
+
+`estimate_elasticities()` fits the SUBE regression models (OLS, pooled, between
+estimators) and requires per-industry gross output and at least one of value
+added (`VA`), employment (`EMP`), or carbon emissions (`CO2`). FIGARO's supply
+and use flatfiles do not include these sidecar variables; researchers must
+supply them from an independent source.
+
+If you have per-industry sidecar data in CSV files with columns
+`INDUSTRY, GO, VA, EMP, CO2`, point the optional env var at the directory:
+
+```{r}
+# Set SUBE_FIGARO_INPUTS_DIR to a directory of per-country CSV files:
+#   DE_2023.csv, FR_2023.csv, IT_2023.csv, NL_2023.csv
+inputs_dir <- Sys.getenv("SUBE_FIGARO_INPUTS_DIR", unset = "")
+if (nzchar(inputs_dir)) {
+  # Load and combine sidecar files (researcher-supplied)
+  sidecar <- data.table::rbindlist(lapply(
+    list.files(inputs_dir, pattern = "\\.csv$", full.names = TRUE),
+    data.table::fread
+  ))
+
+  # Replace the synthetic GO vector with researcher data
+  result_full <- compute_sube(bundle, sidecar, metrics = c("GO", "VA", "EMP"))
+  elasticities <- estimate_elasticities(result_full)
+}
+```
+
+The opt-in path does not have golden-snapshot assertions in the gated test —
+only structural invariants (pipeline completes, coefficients non-NA, signs
+plausible) because snapshot assertions on researcher-supplied regression inputs
+would not be reproducible across environments.
+
+# 8. Running the gated test locally
+
+With `SUBE_FIGARO_DIR` set to the directory containing both flatfiles:
+
+```bash
+SUBE_FIGARO_DIR=/path/to/figaro \
+  Rscript -e 'devtools::test(filter = "figaro-pipeline")'
+```
+
+The first run captures a testthat golden snapshot (stored in
+`tests/testthat/_snaps/figaro-pipeline/`) and emits a note
+`Adding new snapshot`. Subsequent runs compare against the snapshot and fail on
+numeric drift.
+
+Without the env var (or on CRAN/CI), the tests still run but the gated block
+auto-skips while the synthetic-fixture contract test always runs:
+
+```bash
+Rscript -e 'devtools::test(filter = "figaro-pipeline")'
+#> FIG-E2E-02 synthetic contract: PASS
+#> FIG-E2E-01 gated real-data: SKIP (SUBE_FIGARO_DIR not set — FIGARO E2E test skipped)
+```
+
+The skip message is deterministic: `"SUBE_FIGARO_DIR not set — FIGARO E2E test skipped"`.
+
+# 9. What is NOT covered in v1.2
+
+- **FIGARO SIOT (product-by-product) tables.** Only industry-by-industry SUTs
+  are scoped for v1.2. SIOT support is a future-milestone candidate.
+- **Auto-download helpers.** Network access and licensing constraints prevent
+  bundling a download helper in the package. Researchers obtain the flatfiles
+  directly and point `SUBE_FIGARO_DIR` at the download location.
+- **Multi-year batch processing.** Running the full pipeline across multiple
+  years or a wider country set is facilitated by the upcoming CONV-* convenience
+  helpers planned for a later milestone. The workflow above runs one year at a
+  time.

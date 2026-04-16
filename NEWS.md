@@ -1,5 +1,21 @@
 # sube (development version)
 
+- **BREAKING (development contract, INFRA-02):** `resolve_wiod_root()` no
+  longer falls back to `inst/extdata/wiod/` when `SUBE_WIOD_DIR` is unset.
+  The gated replication test now skips cleanly in that case instead of
+  silently using locally-mounted data (which previously caused a known
+  ~4.4% multiplier divergence). Introduced `resolve_figaro_root()` with
+  the same env-var-only contract (`SUBE_FIGARO_DIR`). Test helper
+  renamed `tests/testthat/helper-replication.R` →
+  `tests/testthat/helper-gated-data.R`.
+- Added end-to-end FIGARO validation coverage: a gated real-data test
+  (`SUBE_FIGARO_DIR`, DE/FR/IT/NL × 2023) with a testthat golden snapshot,
+  a synthetic-fixture contract test running on every CRAN build, and a
+  new `figaro-workflow` vignette narrating the full pipeline from
+  flatfile to multipliers. The shipped synthetic fixture under
+  `inst/extdata/figaro-sample/` is extended to 8 real FIGARO A*64 codes
+  × 3 countries to exercise a non-degenerate Leontief inversion on every
+  build.
 - Added `read_figaro()` for importing Eurostat FIGARO industry-by-industry
   supply and use flat-format CSV files into the canonical `sube_suts` long
   table. The importer auto-pairs one supply and one use file from a

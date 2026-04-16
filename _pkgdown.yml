@@ -47,6 +47,12 @@ articles:
   - title: Package Design and Paper Context
     contents:
       - package-design
+  - title: Paper replication
+    contents:
+      - paper-replication
+  - title: FIGARO workflow
+    contents:
+      - figaro-workflow
 
 navbar:
   structure:
