@@ -60,7 +60,11 @@ Plans:
   2. User can call an exported `batch_sube()` that loops `run_sube_pipeline()` over supplied country × year sets and returns collected results in a tidy structure suitable for downstream analysis
   3. When rows are dropped by coercion, matrices are skipped due to missing data, or singular branches are hit, `run_sube_pipeline()` and `batch_sube()` surface human-readable diagnostic warnings that pinpoint the country, year, and cause
   4. Both helpers are exported with roxygen docs, NAMESPACE entries, pkgdown group assignment, and testthat coverage exercising success paths, skip paths, and warning paths
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 08-01-pipeline-core-PLAN.md — Implement `run_sube_pipeline()` with `sube_pipeline_result` S3 class, unified 6-column `$diagnostics` schema, upfront `inputs` validation, all four CONV-03 detection helpers, and single-summary warning emission (CONV-01 + CONV-03 core)
+- [ ] 08-02-batch-sube-PLAN.md — Implement `batch_sube()` with `sube_batch_result` S3 class, copy-guarded maps/inputs, country × year splitter, per-group tryCatch resilience, and cross-group rbindlist merging with `group_key` (CONV-02 + CONV-03 batch scope)
+- [ ] 08-03-docs-vignette-PLAN.md — Regenerate man pages, update `_pkgdown.yml` (D-8.13 + D-8.14), add 3 NEWS.md bullets (D-8.15), ship `vignettes/pipeline-helpers.Rmd`, cross-link from `paper-replication.Rmd`/`figaro-workflow.Rmd`, run `R CMD check --no-manual --no-vignettes` clean
 
 ### Phase 9: Test Infrastructure Tech Debt
 **Goal**: The pre-existing legacy-wrapper subprocess test in `tests/testthat/test-workflow.R:218` runs cleanly under `R CMD check --as-cran`, closing the last non-blocking tarball-check failure inherited from v1.1
@@ -95,6 +99,6 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 (Phase 10 may run in paral
 | 5. FIGARO SUT Ingestion | v1.1 | 4/4 | Complete | 2026-04-16 |
 | 6. Paper Replication Verification | v1.1 | 3/3 | Complete | 2026-04-16 |
 | 7. FIGARO End-to-End Validation & Fallback Hardening | v1.2 | 0/5 | Planned | - |
-| 8. Convenience Helpers | v1.2 | 0/TBD | Not started | - |
+| 8. Convenience Helpers | v1.2 | 0/3 | Planned | - |
 | 9. Test Infrastructure Tech Debt | v1.2 | 0/TBD | Not started | - |
 | 10. Retroactive Nyquist Validation | v1.2 | 0/TBD | Not started | - |
