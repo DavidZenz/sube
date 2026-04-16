@@ -10,10 +10,10 @@ with_env <- function(key, value, code) {
   if (is.null(value)) {
     Sys.unsetenv(key)
   } else {
-    Sys.setenv(setNames(list(value), key))
+    do.call(Sys.setenv, setNames(list(as.character(value)), key))
   }
   on.exit(
-    if (is.na(old)) Sys.unsetenv(key) else Sys.setenv(setNames(list(old), key)),
+    if (is.na(old)) Sys.unsetenv(key) else do.call(Sys.setenv, setNames(list(old), key)),
     add = TRUE
   )
   force(code)
