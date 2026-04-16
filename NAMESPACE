@@ -1,3 +1,4 @@
+export(batch_sube)
 export(build_matrices)
 export(compute_sube)
 export(estimate_elasticities)

@@ -369,3 +369,165 @@ run_sube_pipeline <- function(
 
   .sube_pipeline_result(results, models, diagnostics, call_meta)
 }
+
+# ==============================================================================
+# batch_sube() — CONV-02 + CONV-03 at batch scope (Plan 08-02)
+# ==============================================================================
+
+# D-8.6 / D-8.8. Key format per group aligned with build_matrices() naming
+# convention (REP_YEAR). Preserves sube_suts/sube_domestic_suts class on each
+# slice so downstream helpers continue to see a valid sube_suts.
+.batch_split <- function(sut_data, countries, years, by) {
+  dt <- data.table::as.data.table(sut_data)
+  if (!is.null(countries)) dt <- dt[REP %in% countries]
+  if (!is.null(years))     dt <- dt[YEAR %in% as.integer(years)]
+
+  if (nrow(dt) == 0L) return(list())
+
+  ids <- unique(dt[, .(REP = as.character(REP), YEAR = as.integer(YEAR))])
+
+  group_keys <- switch(by,
+    country_year = paste(ids$REP, ids$YEAR, sep = "_"),
+    country      = unique(ids$REP),
+    year         = as.character(sort(unique(ids$YEAR)))
+  )
+
+  lapply(group_keys, function(gk) {
+    filt <- switch(by,
+      country_year = {
+        parts <- strsplit(gk, "_")[[1L]]
+        rep_i <- parts[1L]; yr_i <- as.integer(parts[2L])
+        dt[REP == rep_i & YEAR == yr_i]
+      },
+      country = dt[REP == gk],
+      year    = dt[YEAR == as.integer(gk)]
+    )
+    # Preserve sube_suts / sube_domestic_suts class on the slice
+    class(filt) <- class(sut_data)
+    list(group_key = gk, sut = filt)
+  })
+}
+
+# D-8.6. Class vector order matches sube_pipeline_result pattern
+# (RESEARCH §6 Risk 4).
+.sube_batch_result <- function(results, summary_dt, tidy_dt, diagnostics, call_meta) {
+  out <- list(
+    results     = results,
+    summary     = summary_dt,
+    tidy        = tidy_dt,
+    diagnostics = diagnostics,
+    call        = call_meta
+  )
+  class(out) <- c("sube_batch_result", "list")
+  out
+}
+
+#' Batch-Run the SUBE Pipeline Over Country x Year Groups
+#'
+#' Loops [run_sube_pipeline()]-style processing over a pre-imported `sube_suts`
+#' table grouped by country, year, or country-year. Each group produces a
+#' [sube_pipeline_result][run_sube_pipeline]; per-group results are preserved
+#' alongside merged tidy `$summary`, `$tidy`, and `$diagnostics` tables
+#' suitable for downstream analysis.
+#'
+#' @param sut_data A `sube_suts` object (from [import_suts()] or
+#'   [read_figaro()]).
+#' @param cpa_map,ind_map,inputs Correspondence tables and industry inputs;
+#'   see [build_matrices()] and [compute_sube()].
+#' @param countries Optional character vector of REP codes; defaults to all
+#'   countries in `sut_data`.
+#' @param years Optional integer vector of years; defaults to all years in
+#'   `sut_data`.
+#' @param by Grouping key; one of `"country_year"` (default, per D-8.8),
+#'   `"country"`, or `"year"`.
+#' @param estimate Forwarded per-group to the compute stage; see
+#'   [run_sube_pipeline()] (D-8.4).
+#' @param ... Forwarded per-group to [build_matrices()] and [compute_sube()].
+#'
+#' @return An object of class `c("sube_batch_result", "list")` with elements
+#'   `$results` (named list of [sube_pipeline_result][run_sube_pipeline], one
+#'   per group), `$summary` (rbindlist of per-group `$results$summary`),
+#'   `$tidy` (rbindlist of per-group `$results$tidy`), `$diagnostics`
+#'   (rbindlist of per-group `$diagnostics` with an added `group_key`
+#'   column), and `$call` (provenance metadata including `by`, `n_groups`,
+#'   `n_errors`).
+#'
+#' @details Per D-8.7, each group's processing is wrapped in `tryCatch`; a
+#'   failing group appends a diagnostics row with `stage = "pipeline"`,
+#'   `status = "error"` and the loop continues. A single summary `warning()`
+#'   is emitted at the end if any group errored or produced non-`"ok"`
+#'   diagnostics (per D-8.10).
+#'
+#' @seealso [run_sube_pipeline()]
+#'
+#' @examples
+#' sut <- sube_example_data("sut_data")
+#' # Duplicate the sample to a second year so batch_sube has 2 groups:
+#' sut2 <- data.table::copy(sut); sut2[, YEAR := 2021L]
+#' sut_multi <- rbind(sut, sut2)
+#' class(sut_multi) <- c("sube_suts", class(sut_multi))
+#'
+#' inp <- sube_example_data("inputs")
+#' inp2 <- data.table::copy(inp); inp2[, YEAR := 2021L]
+#' inp_multi <- rbind(inp, inp2)
+#'
+#' result <- batch_sube(
+#'   sut_data = sut_multi,
+#'   cpa_map  = sube_example_data("cpa_map"),
+#'   ind_map  = sube_example_data("ind_map"),
+#'   inputs   = inp_multi
+#' )
+#' result$summary
+#' result$diagnostics
+#'
+#' @export
+batch_sube <- function(
+    sut_data,
+    cpa_map,
+    ind_map,
+    inputs,
+    countries = NULL,
+    years = NULL,
+    by = c("country_year", "country", "year"),
+    estimate = FALSE,
+    ...
+) {
+  # --- 1. argument validation ---
+  .validate_class(sut_data, "sube_suts")
+  by <- match.arg(by)
+  .validate_pipeline_inputs(inputs)
+
+  call_snapshot <- match.call()
+
+  # --- 2. copy-guards (Pitfall 10 / RESEARCH §4 data.table::copy placement) ---
+  cpa_map <- data.table::copy(cpa_map)
+  ind_map <- data.table::copy(ind_map)
+  inputs  <- data.table::copy(inputs)
+
+  # --- 3. split ---
+  groups <- .batch_split(sut_data, countries, years, by)
+
+  # --- 4. per-group loop (Task 2 fills with .batch_run_one) ---
+  per_group <- list()
+  n_errors  <- 0L
+
+  # Stub: Task 2 replaces this empty loop with real per-group processing.
+
+  # --- 5. assemble merged tables ---
+  summary_dt     <- data.table::data.table()
+  tidy_dt        <- data.table::data.table()
+  diagnostics_dt <- .empty_diagnostics()
+  diagnostics_dt[, group_key := character()]
+
+  call_meta <- list(
+    by              = by,
+    n_groups        = length(groups),
+    n_errors        = n_errors,
+    estimate        = isTRUE(estimate),
+    call            = call_snapshot,
+    r_version       = R.version.string,
+    package_version = as.character(utils::packageVersion("sube"))
+  )
+
+  .sube_batch_result(per_group, summary_dt, tidy_dt, diagnostics_dt, call_meta)
+}
