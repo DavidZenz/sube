@@ -25,7 +25,7 @@ Requirements for milestone v1.2. Each maps to roadmap phases.
 ### Test Infrastructure
 
 - [ ] **INFRA-01**: `tests/testthat/test-workflow.R:218` (legacy-wrapper subprocess test) passes cleanly under `R CMD check --as-cran`, either by threading `R_LIBS`/`.libPaths()` into the `Rscript` subprocess or by applying a principled check-time skip with documented rationale.
-- [ ] **INFRA-02**: `resolve_wiod_root()` requires an explicit `SUBE_WIOD_FALLBACK` opt-in env var before picking up `inst/extdata/wiod/` under `devtools::load_all`; by default, unset `SUBE_WIOD_DIR` → clean skip even when the local fallback directory exists. Ships with a test asserting both the guarded skip and the opt-in path.
+- [ ] **INFRA-02**: `resolve_wiod_root()` is env-var-only: the `inst/extdata/wiod/` local fallback is removed entirely, and a parallel `resolve_figaro_root()` reads only `SUBE_FIGARO_DIR`. Unset env var → clean skip regardless of local dir presence. Ships with contract tests asserting guarded-skip and opt-in paths for both resolvers. (Revised during Phase 7 discuss from earlier `SUBE_WIOD_FALLBACK` opt-in wording — locked by CONTEXT.md D-7.7.)
 
 ### Validation Coverage
 
