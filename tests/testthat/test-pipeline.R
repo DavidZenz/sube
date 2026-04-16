@@ -322,3 +322,117 @@ test_that("batch_sube with stub loop returns sube_batch_result with correct shap
                ignore.order = TRUE)
   expect_equal(res$call$by, "country_year")
 })
+
+# =============================================================================
+# batch_sube() — Plan 08-02 Task 2: per-group processing, resilience, merging
+# =============================================================================
+
+test_that("batch_sube happy path on 2-year duplicate produces merged tables (CONV-02)", {
+  sut <- sube_example_data("sut_data")
+  sut2 <- data.table::copy(sut); sut2[, YEAR := 2021L]
+  sut_multi <- rbind(sut, sut2)
+  class(sut_multi) <- c("sube_suts", class(sut_multi))
+
+  inp <- sube_example_data("inputs")
+  inp2 <- data.table::copy(inp); inp2[, YEAR := 2021L]
+  inp_multi <- rbind(inp, inp2)
+
+  res <- suppressWarnings(batch_sube(
+    sut_data = sut_multi,
+    cpa_map  = sube_example_data("cpa_map"),
+    ind_map  = sube_example_data("ind_map"),
+    inputs   = inp_multi
+  ))
+  expect_s3_class(res, "sube_batch_result")
+  expect_equal(length(res$results), 2L)
+  expect_named(res$results, c("AAA_2020", "AAA_2021"), ignore.order = TRUE)
+  expect_true(all(vapply(res$results, inherits, logical(1),
+                         "sube_pipeline_result")))
+  expect_gte(nrow(res$summary), 2L)
+  expect_gte(nrow(res$tidy), 2L)
+  expect_true("group_key" %in% names(res$diagnostics))
+  expect_equal(res$call$n_groups, 2L)
+  expect_equal(res$call$n_errors, 0L)
+})
+
+test_that("batch_sube is resilient to per-group error (D-8.7)", {
+  sut <- sube_example_data("sut_data")
+  sut2 <- data.table::copy(sut); sut2[, YEAR := 2021L]
+  sut_multi <- rbind(sut, sut2)
+  class(sut_multi) <- c("sube_suts", class(sut_multi))
+
+  # Force group AAA_2021 to error at compute: supply inputs with 2020 only.
+  inp_broken <- sube_example_data("inputs")   # YEAR = 2020 only
+
+  res <- suppressWarnings(batch_sube(
+    sut_data = sut_multi,
+    cpa_map  = sube_example_data("cpa_map"),
+    ind_map  = sube_example_data("ind_map"),
+    inputs   = inp_broken
+  ))
+  expect_s3_class(res, "sube_batch_result")
+  expect_equal(length(res$results), 2L)
+  # AAA_2021 fails at compute (inputs missing 2021 rows)
+  expect_gte(res$call$n_errors, 1L)
+  errs <- res$diagnostics[status == "error"]
+  expect_gte(nrow(errs), 1L)
+  expect_true("AAA_2021" %in% errs$group_key)
+})
+
+test_that("batch_sube summary warning fires once and names errors (D-8.10)", {
+  sut <- sube_example_data("sut_data")
+  sut2 <- data.table::copy(sut); sut2[, YEAR := 2021L]
+  sut_multi <- rbind(sut, sut2)
+  class(sut_multi) <- c("sube_suts", class(sut_multi))
+  inp_broken <- sube_example_data("inputs")
+
+  w <- tryCatch(
+    batch_sube(
+      sut_data = sut_multi,
+      cpa_map  = sube_example_data("cpa_map"),
+      ind_map  = sube_example_data("ind_map"),
+      inputs   = inp_broken
+    ),
+    warning = function(w) w
+  )
+  expect_s3_class(w, "warning")
+  expect_match(conditionMessage(w), "^Batch completed with ")
+  expect_match(conditionMessage(w), "2 group\\(s\\)")
+  expect_match(conditionMessage(w), "See result\\$diagnostics for details\\.")
+})
+
+test_that("batch_sube merged $diagnostics has group_key column with correct values", {
+  sut <- sube_example_data("sut_data")
+  sut2 <- data.table::copy(sut); sut2[, YEAR := 2021L]
+  sut_multi <- rbind(sut, sut2)
+  class(sut_multi) <- c("sube_suts", class(sut_multi))
+  inp <- sube_example_data("inputs")
+  inp2 <- data.table::copy(inp); inp2[, YEAR := 2021L]
+  inp_multi <- rbind(inp, inp2)
+
+  res <- suppressWarnings(batch_sube(
+    sut_data = sut_multi,
+    cpa_map  = sube_example_data("cpa_map"),
+    ind_map  = sube_example_data("ind_map"),
+    inputs   = inp_multi
+  ))
+  expect_named(res$diagnostics,
+               c("country", "year", "stage", "status", "message",
+                 "n_rows", "group_key"))
+  expect_setequal(unique(res$diagnostics$group_key),
+                  c("AAA_2020", "AAA_2021"))
+})
+
+test_that("batch_sube caller's cpa_map is not mutated (Pitfall 10)", {
+  sut <- sube_example_data("sut_data")
+  class(sut) <- c("sube_suts", class(sut))
+  cpa <- sube_example_data("cpa_map")
+  pre_names <- names(cpa)
+  suppressWarnings(batch_sube(
+    sut_data = sut,
+    cpa_map  = cpa,
+    ind_map  = sube_example_data("ind_map"),
+    inputs   = sube_example_data("inputs")
+  ))
+  expect_equal(names(cpa), pre_names)
+})
