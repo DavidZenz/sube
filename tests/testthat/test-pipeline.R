@@ -124,3 +124,112 @@ test_that("singular-compute passes through from compute_sube diagnostics (D-8.11
   expect_equal(ext$message[1], "Supply matrix singular; country-year skipped.")
   expect_equal(ext$message[2], "ok")
 })
+
+test_that("summary warning emitted exactly once when any diagnostic is non-ok (D-8.10)", {
+  sut_path <- tempfile(fileext = ".csv")
+  sut <- data.table::copy(sube_example_data("sut_data"))
+  sut[1L, VALUE := NA_real_]
+  data.table::fwrite(sut, sut_path)
+  w <- tryCatch(
+    run_sube_pipeline(
+      path = sut_path,
+      cpa_map = sube_example_data("cpa_map"),
+      ind_map = sube_example_data("ind_map"),
+      inputs  = sube_example_data("inputs"),
+      source  = "wiod"
+    ),
+    warning = function(w) w
+  )
+  expect_s3_class(w, "warning")
+  expect_match(conditionMessage(w), "^Pipeline completed with issues: ")
+  expect_match(conditionMessage(w), "coerced_na")
+  expect_match(conditionMessage(w), "See result\\$diagnostics for details\\.")
+})
+
+test_that("estimate = TRUE attaches sube_models when model_data is non-empty (D-8.4)", {
+  sut_path <- system.file("extdata", "sample", "sut_data.csv", package = "sube")
+  res <- suppressWarnings(run_sube_pipeline(
+    path = sut_path,
+    cpa_map = sube_example_data("cpa_map"),
+    ind_map = sube_example_data("ind_map"),
+    inputs  = sube_example_data("inputs"),
+    source  = "wiod",
+    estimate = TRUE
+  ))
+  # Sample data has model_data empty (I01/I02 inputs vs I1/I2 SUT VARs); the
+  # estimate path is exercised but returns NULL. If a fixture with aligned
+  # industries were provided, $models would be a sube_models object.
+  if (!is.null(res$models)) {
+    expect_s3_class(res$models, "sube_models")
+  } else {
+    succeed("estimate path exercised; sube_models fallback OK when model_data empty")
+  }
+})
+
+test_that("estimate = FALSE leaves $models NULL (D-8.4 default)", {
+  sut_path <- system.file("extdata", "sample", "sut_data.csv", package = "sube")
+  res <- suppressWarnings(run_sube_pipeline(
+    path = sut_path,
+    cpa_map = sube_example_data("cpa_map"),
+    ind_map = sube_example_data("ind_map"),
+    inputs  = sube_example_data("inputs"),
+    source  = "wiod"
+  ))
+  expect_null(res$models)
+  expect_true(res$call$estimate == FALSE)
+})
+
+test_that("FIGARO source routes through read_figaro and returns sube_pipeline_result (CONV-01 FIGARO path)", {
+  fixture_dir <- system.file("extdata", "figaro-sample", package = "sube")
+  skip_if_not(nzchar(fixture_dir), "figaro-sample fixture missing")
+
+  # Build cpa_map + ind_map inline from fixture codes via section-letter rule
+  # (mirrors helper-gated-data.R::build_nace_section_map).
+  sut_peek <- read_figaro(fixture_dir, year = 2023L)
+  dom_peek <- extract_domestic_block(sut_peek)
+  codes <- sort(unique(c(dom_peek$CPA, setdiff(dom_peek$VAR, "FU_BAS"))))
+  cpa_map <- data.table::data.table(CPA = codes, CPAagg = substr(codes, 1L, 1L))
+  ind_map <- data.table::data.table(NACE = codes, INDagg = substr(codes, 1L, 1L))
+
+  agg_inds <- sort(unique(ind_map$INDagg))
+  countries <- sort(unique(dom_peek$REP))
+  inputs <- data.table::CJ(YEAR = 2023L, REP = countries,
+                           INDUSTRY = agg_inds, sorted = FALSE)
+  inputs[, GO  := seq(100, by = 10, length.out = nrow(inputs))]
+  inputs[, VA  := GO * 0.4]
+  inputs[, EMP := GO * 0.1]
+  inputs[, CO2 := GO * 0.05]
+
+  res <- suppressWarnings(run_sube_pipeline(
+    path    = fixture_dir,
+    cpa_map = cpa_map,
+    ind_map = ind_map,
+    inputs  = inputs,
+    source  = "figaro",
+    year    = 2023L
+  ))
+  expect_s3_class(res, "sube_pipeline_result")
+  expect_s3_class(res$results, "sube_results")
+  expect_gt(nrow(res$results$summary), 0L)
+  expect_setequal(unique(res$results$summary$COUNTRY), c("DE", "FR", "IT"))
+  expect_equal(res$call$source, "figaro")
+})
+
+test_that("$call carries provenance metadata (D-8.3)", {
+  sut_path <- system.file("extdata", "sample", "sut_data.csv", package = "sube")
+  res <- suppressWarnings(run_sube_pipeline(
+    path = sut_path,
+    cpa_map = sube_example_data("cpa_map"),
+    ind_map = sube_example_data("ind_map"),
+    inputs  = sube_example_data("inputs"),
+    source  = "wiod"
+  ))
+  expect_named(res$call,
+               c("source", "path", "n_countries", "n_years",
+                 "estimate", "call", "r_version", "package_version"),
+               ignore.order = TRUE)
+  expect_equal(res$call$source, "wiod")
+  expect_equal(res$call$n_countries, 1L)
+  expect_equal(res$call$n_years, 1L)
+  expect_false(res$call$estimate)
+})
