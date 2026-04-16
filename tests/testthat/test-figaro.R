@@ -10,25 +10,29 @@ figaro_fixture_dir <- function() {
 }
 
 make_tiny_figaro_maps <- function() {
-  # Minimal mapping tables for the FIG-04 integration chain.
-  # Matches the fixture's CPA/NACE codes from Task 1/Task 2.
+  # Matches the extended fixture: 8 real FIGARO A*64 codes, 3 countries,
+  # section-letter aggregation (D-7.1 one-liner).
+  cpa_codes <- c("A01", "A03", "C10T12", "C13T15", "C26", "F", "G46", "G47")
+  section  <- substr(cpa_codes, 1L, 1L)  # A,A,C,C,C,F,G,G
+
   cpa_map <- data.table::data.table(
-    CPA = c("P01", "P02", "P03"),
-    CPAagg = c("PX", "PX", "PY")
+    CPA = cpa_codes,
+    CPAagg = section
   )
   ind_map <- data.table::data.table(
-    NACE = c("I01", "I02", "I03"),  # deliberately uses "NACE" to also exercise FIG-03
-    INDagg = c("IX", "IX", "IY")
+    NACE = cpa_codes,   # exercises NACE-synonym routing via .coerce_map() (FIG-03)
+    INDagg = section
   )
-  inputs <- data.table::data.table(
-    YEAR = 2023L,
-    REP = c("REP1", "REP1", "REP2", "REP2"),
-    INDUSTRY = c("IX", "IY", "IX", "IY"),
-    GO = c(100, 80, 90, 70),
-    VA = c(40, 30, 35, 25),
-    EMP = c(10, 8, 9, 7),
-    CO2 = c(5, 4, 4.5, 3.5)
-  )
+  # inputs covers 3 countries x 4 aggregated industries (A, C, F, G).
+  # GO/VA/EMP/CO2 picked so ratios are sane and no metric is zero.
+  countries <- c("DE", "FR", "IT")
+  agg_inds  <- c("A", "C", "F", "G")
+  inputs <- data.table::CJ(YEAR = 2023L, REP = countries, INDUSTRY = agg_inds,
+                           sorted = FALSE)
+  inputs[, GO  := seq(100, by = 10,  length.out = nrow(inputs))]
+  inputs[, VA  := GO * 0.4]
+  inputs[, EMP := GO * 0.1]
+  inputs[, CO2 := GO * 0.05]
   list(cpa_map = cpa_map, ind_map = ind_map, inputs = inputs)
 }
 
@@ -85,7 +89,8 @@ test_that("read_figaro strips CPA_ prefix and preserves inter-country rows (FIG-
   out <- read_figaro(dir, year = 2023)
 
   expect_true(all(!startsWith(out$CPA, "CPA_")))
-  expect_true(all(out$CPA %in% c("P01", "P02", "P03")))
+  expect_true(all(out$CPA %in% c("A01", "A03", "C10T12", "C13T15",
+                                  "C26", "F", "G46", "G47")))
 
   # Inter-country rows preserved (REP != PAR)
   expect_true(any(out$REP != out$PAR))
@@ -99,7 +104,8 @@ test_that("read_figaro filters primary-input rows with non-CPA rowPi (FIG-02, D-
   expect_false("W2" %in% out$REP)
   expect_false("W2" %in% out$PAR)
   # Every remaining CPA code must have come from CPA_-prefixed rowPi
-  expect_true(all(out$CPA %in% c("P01", "P02", "P03")))
+  expect_true(all(out$CPA %in% c("A01", "A03", "C10T12", "C13T15",
+                                  "C26", "F", "G46", "G47")))
 })
 
 test_that("read_figaro aggregates five FD codes into VAR = 'FU_bas' (FIG-02, D-20)", {
@@ -111,12 +117,12 @@ test_that("read_figaro aggregates five FD codes into VAR = 'FU_bas' (FIG-02, D-2
   # Original FD codes should NOT appear in output
   expect_false(any(c("P3_S13", "P3_S14", "P3_S15", "P51G", "P5M") %in% out$VAR))
 
-  # Fixture: 2 countries × 3 CPA × (2+3+4+5+6)=20 per (REP,CPA)
-  # Plan 02 aggregates over counterpart (FD rows have counterpart = refArea)
-  # so expect 6 FU_bas rows totaling 6 * 20 = 120
+  # Fixture: 3 countries × 8 CPA × (2+3+4+5+6)=20 per (REP,CPA)
+  # FD rows have counterpartArea = refArea, so aggregation by (REP, PAR, CPA)
+  # yields 3 * 8 = 24 FU_bas rows totaling 24 * 20 = 480
   fu_rows <- use_rows[VAR == "FU_bas"]
-  expect_equal(nrow(fu_rows), 6L)
-  expect_equal(sum(fu_rows$VALUE), 120)
+  expect_equal(nrow(fu_rows), 24L)
+  expect_equal(sum(fu_rows$VALUE), 480)
 })
 
 test_that("read_figaro preserves FIGW1 rows (FIG-02, D-21)", {
