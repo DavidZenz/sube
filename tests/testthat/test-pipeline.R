@@ -255,3 +255,70 @@ test_that("$call carries provenance metadata (D-8.3)", {
   expect_equal(res$call$n_years, 1L)
   expect_false(res$call$estimate)
 })
+
+# =============================================================================
+# batch_sube() — Plan 08-02 Task 1: signature, validation, splitter, S3 class
+# =============================================================================
+
+test_that("batch_sube is exported", {
+  expect_true("batch_sube" %in% getNamespaceExports("sube"))
+})
+
+test_that("batch_sube errors on non-sube_suts input (CONV-02 shape check)", {
+  expect_error(
+    batch_sube(
+      sut_data = data.frame(x = 1),   # not sube_suts
+      cpa_map  = sube_example_data("cpa_map"),
+      ind_map  = sube_example_data("ind_map"),
+      inputs   = sube_example_data("inputs")
+    ),
+    "Expected an object of class 'sube_suts'"
+  )
+})
+
+test_that(".batch_split groups correctly by country_year (D-8.8 default)", {
+  sut <- sube_example_data("sut_data")
+  sut2 <- data.table::copy(sut); sut2[, YEAR := 2021L]
+  sut_multi <- rbind(sut, sut2)
+  class(sut_multi) <- c("sube_suts", class(sut_multi))
+  groups <- sube:::.batch_split(sut_multi, NULL, NULL, "country_year")
+  expect_equal(length(groups), 2L)
+  expect_setequal(vapply(groups, function(g) g$group_key, character(1)),
+                  c("AAA_2020", "AAA_2021"))
+})
+
+test_that(".batch_split groups correctly by country", {
+  sut <- sube_example_data("sut_data")
+  class(sut) <- c("sube_suts", class(sut))
+  groups <- sube:::.batch_split(sut, NULL, NULL, "country")
+  expect_equal(length(groups), 1L)
+  expect_equal(groups[[1L]]$group_key, "AAA")
+})
+
+test_that(".batch_split groups correctly by year", {
+  sut <- sube_example_data("sut_data")
+  sut2 <- data.table::copy(sut); sut2[, YEAR := 2021L]
+  sut_multi <- rbind(sut, sut2)
+  class(sut_multi) <- c("sube_suts", class(sut_multi))
+  groups <- sube:::.batch_split(sut_multi, NULL, NULL, "year")
+  expect_equal(length(groups), 2L)
+  expect_setequal(vapply(groups, function(g) g$group_key, character(1)),
+                  c("2020", "2021"))
+})
+
+test_that("batch_sube with stub loop returns sube_batch_result with correct shape", {
+  sut <- sube_example_data("sut_data")
+  class(sut) <- c("sube_suts", class(sut))
+  res <- suppressWarnings(batch_sube(
+    sut_data = sut,
+    cpa_map  = sube_example_data("cpa_map"),
+    ind_map  = sube_example_data("ind_map"),
+    inputs   = sube_example_data("inputs")
+  ))
+  expect_s3_class(res, "sube_batch_result")
+  expect_named(res, c("results", "summary", "tidy", "diagnostics", "call"))
+  expect_named(res$call, c("by", "n_groups", "n_errors", "estimate",
+                           "call", "r_version", "package_version"),
+               ignore.order = TRUE)
+  expect_equal(res$call$by, "country_year")
+})
