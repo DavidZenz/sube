@@ -61,3 +61,51 @@ build_replication_fixtures <- function(root, countries = c("AUS", "DEU", "USA", 
 
   sube::build_matrices(domestic, cpa_map, ind_map, inputs = inputs_raw)
 }
+
+# Derive cpa_map + ind_map from a character vector of CPA codes per D-7.1
+# (section-letter equivalence via substr(code, 1, 1)).
+# Returns list(cpa_map, ind_map) — note different column names on each so
+# .coerce_map()'s NACE synonym routes them correctly (see Pitfall 5).
+build_nace_section_map <- function(codes) {
+  sections <- substr(codes, 1L, 1L)
+  list(
+    cpa_map = data.table::data.table(CPA = codes, CPAagg = sections),
+    ind_map = data.table::data.table(NACE = codes, INDagg = sections)
+  )
+}
+
+# Run the full FIGARO pipeline against the shipped synthetic fixture.
+# Returns list(sut, domestic, bundle, result) — all intermediates preserved
+# for FIG-E2E-02 structural assertions.
+build_figaro_pipeline_fixture_from_synthetic <- function() {
+  fixture_dir <- system.file("extdata", "figaro-sample", package = "sube")
+  stopifnot(nzchar(fixture_dir))
+
+  sut <- sube::read_figaro(fixture_dir, year = 2023L)
+  domestic <- sube::extract_domestic_block(sut)
+
+  # D-7.1: section-letter aggregation. Note: domestic$VAR includes FU_bas
+  # (per read_figaro synth); the industry map should cover only the
+  # non-FD VAR values. Intersect with domestic$CPA to ensure equivalence.
+  codes <- sort(unique(c(domestic$CPA,
+                         setdiff(domestic$VAR, "FU_BAS"))))
+  maps <- build_nace_section_map(codes)
+
+  # Aggregated industries from the section map: A, C, F, G.
+  agg_inds <- sort(unique(maps$ind_map$INDagg))
+  countries <- sort(unique(domestic$REP))
+
+  # Synthetic inputs: GO/VA/EMP/CO2 with sane ratios per (country, aggregated industry).
+  inputs <- data.table::CJ(YEAR = 2023L, REP = countries,
+                           INDUSTRY = agg_inds, sorted = FALSE)
+  inputs[, GO  := seq(100, by = 10, length.out = nrow(inputs))]
+  inputs[, VA  := GO * 0.4]
+  inputs[, EMP := GO * 0.1]
+  inputs[, CO2 := GO * 0.05]
+
+  bundle <- sube::build_matrices(domestic, maps$cpa_map, maps$ind_map)
+  result <- sube::compute_sube(bundle, inputs,
+                               metrics = c("GO", "VA", "EMP", "CO2"))
+
+  list(sut = sut, domestic = domestic, bundle = bundle, result = result)
+}
