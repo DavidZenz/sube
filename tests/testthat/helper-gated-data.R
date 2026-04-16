@@ -109,3 +109,78 @@ build_figaro_pipeline_fixture_from_synthetic <- function() {
 
   list(sut = sut, domestic = domestic, bundle = bundle, result = result)
 }
+
+# Projection helper for golden snapshots (D-7.3, RESEARCH § Pattern 2).
+# Drops $matrices (BLAS-sensitive floating-point noise; Pitfall 4) and
+# projects to deterministic tabular fields. Drift in L surfaces through
+# summary$GO (derived via colSums(L) in R/compute.R:93).
+.snapshot_projection <- function(result) {
+  list(
+    summary       = result$summary[order(COUNTRY, CPAagg)],
+    tidy_shape    = list(rows = nrow(result$tidy),
+                         cols = sort(names(result$tidy))),
+    diagnostics   = result$diagnostics[order(country, year)]
+  )
+}
+
+# Sidecar loader for the opt-in elasticity path (D-7.2). Expected layout:
+#   $SUBE_FIGARO_INPUTS_DIR/{country}_{year}.csv with cols INDUSTRY/GO/VA/EMP/CO2
+# Returns NULL if any sidecar is missing or malformed — opt-in branch
+# then silently skips rather than hard-erroring.
+.load_figaro_inputs_sidecars <- function(inputs_dir, countries, year, bundle) {
+  rows <- list()
+  for (cc in countries) {
+    f <- file.path(inputs_dir, sprintf("%s_%d.csv", cc, year))
+    if (!file.exists(f)) return(NULL)
+    dt <- data.table::fread(f)
+    if (!all(c("INDUSTRY","GO","VA","EMP","CO2") %in% names(dt))) return(NULL)
+    dt[, YEAR := year]
+    dt[, REP  := cc]
+    rows[[length(rows) + 1]] <- dt[, .(YEAR, REP, INDUSTRY, GO, VA, EMP, CO2)]
+  }
+  data.table::rbindlist(rows)
+}
+
+# Run the full FIGARO pipeline against a real Eurostat FIGARO root
+# (SUBE_FIGARO_DIR). Default metrics = "GO" with synthesized
+# GO = colSums(S) because real FIGARO has no VA/EMP/CO2 sidecars
+# (A3 escalation, D-7.2). Opt-in elasticity branch activates when
+# SUBE_FIGARO_INPUTS_DIR points at valid sidecars.
+build_figaro_pipeline_fixture_from_real <- function(root,
+                                                     countries = c("DE","FR","IT","NL"),
+                                                     year = 2023L) {
+  sut <- sube::read_figaro(path = root, year = year)
+
+  sut_scoped <- sut[REP %in% countries]
+
+  domestic <- sube::extract_domestic_block(sut_scoped)
+
+  codes <- sort(unique(c(domestic$CPA,
+                         setdiff(domestic$VAR, "FU_bas"))))
+  maps <- build_nace_section_map(codes)
+
+  bundle <- sube::build_matrices(domestic, maps$cpa_map, maps$ind_map)
+
+  inputs <- data.table::rbindlist(lapply(names(bundle$matrices), function(nm) {
+    b <- bundle$matrices[[nm]]
+    go <- as.numeric(colSums(b$S))
+    data.table::data.table(
+      YEAR = b$year, REP = b$country, INDUSTRY = b$industries, GO = go
+    )
+  }))
+
+  result <- sube::compute_sube(bundle, inputs, metrics = "GO")
+
+  inputs_dir <- Sys.getenv("SUBE_FIGARO_INPUTS_DIR", unset = "")
+  result_opt <- NULL
+  if (nzchar(inputs_dir) && dir.exists(inputs_dir)) {
+    inputs_full <- .load_figaro_inputs_sidecars(inputs_dir, countries, year, bundle)
+    if (!is.null(inputs_full)) {
+      result_opt <- sube::compute_sube(bundle, inputs_full,
+                                       metrics = c("GO","VA","EMP","CO2"))
+    }
+  }
+
+  list(sut = sut_scoped, domestic = domestic, bundle = bundle,
+       result = result, result_opt = result_opt, inputs = inputs)
+}
