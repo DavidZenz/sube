@@ -26,6 +26,109 @@
   out
 }
 
+# D-8.11 #3 / RESEARCH §3 Open Item 2. Primary-input rows in read_figaro are
+# dropped BEFORE as.numeric() (R/import.R:247 vs 255), so sum(is.na(VALUE)) at
+# this point is the exact count of coercion-introduced NAs.
+.detect_coerced_na <- function(sut_raw) {
+  n <- sum(is.na(sut_raw$VALUE))
+  if (n <= 0L) return(.empty_diagnostics())
+  data.table::data.table(
+    country = NA_character_,
+    year    = NA_integer_,
+    stage   = "import",
+    status  = "coerced_na",
+    message = sprintf(
+      "%d row(s) with NA VALUE at import boundary (e.g. non-numeric obsValue).",
+      n
+    ),
+    n_rows  = n
+  )
+}
+
+# D-8.9 / RESEARCH §4. Catches BOTH correspondence-filter drops
+# (R/matrices.R:55) AND dcast-alignment NULL returns (R/matrices.R:89-91 → :103
+# Filter). Matrix keys are `paste(country, year, sep = "_")` per R/matrices.R:104.
+.detect_skipped_alignment <- function(sut, matrix_bundle) {
+  input_ids  <- unique(sut[, .(YEAR = as.integer(YEAR), REP = as.character(REP))])
+  input_keys <- paste(input_ids$REP, input_ids$YEAR, sep = "_")
+  output_keys <- names(matrix_bundle$matrices)
+  dropped <- setdiff(input_keys, output_keys)
+  if (length(dropped) == 0L) return(.empty_diagnostics())
+  data.table::data.table(
+    country = sub("_\\d+$", "", dropped),
+    year    = as.integer(sub("^.*_", "", dropped)),
+    stage   = "build",
+    status  = "skipped_alignment",
+    message = sprintf(
+      "Country-year %s present in SUT data but absent from build_matrices output (missing CPA/industry alignment after correspondence merge).",
+      dropped
+    ),
+    n_rows  = NA_integer_
+  )
+}
+
+# D-8.11 #4 / RESEARCH §4. model_data column is COUNTRY (not REP) per
+# R/matrices.R:179. Detects country-years present in both SUT and inputs but
+# dropped from model_data (R/matrices.R alignment paths return NULL).
+.detect_inputs_misaligned <- function(sut, inputs, matrix_bundle) {
+  sut_ids <- unique(sut[, .(YEAR = as.integer(YEAR), REP = as.character(REP))])
+  inp <- .standardize_names(data.table::copy(inputs))
+  input_ids <- unique(inp[, .(YEAR = as.integer(YEAR), REP = as.character(REP))])
+  joint <- merge(sut_ids, input_ids, by = c("YEAR", "REP"))
+  if (nrow(joint) == 0L) return(.empty_diagnostics())
+
+  md <- matrix_bundle$model_data
+  if (is.null(md) || nrow(md) == 0L) {
+    model_ids <- data.table::data.table(YEAR = integer(), REP = character())
+  } else {
+    model_ids <- unique(md[, .(YEAR = as.integer(YEAR), REP = as.character(COUNTRY))])
+  }
+
+  misaligned <- joint[!model_ids, on = c("YEAR", "REP")]
+  if (nrow(misaligned) == 0L) return(.empty_diagnostics())
+  data.table::data.table(
+    country = misaligned$REP,
+    year    = misaligned$YEAR,
+    stage   = "build",
+    status  = "inputs_misaligned",
+    message = sprintf(
+      "Country-year %s_%d present in both SUT and inputs but absent from build_matrices model_data.",
+      misaligned$REP, misaligned$YEAR
+    ),
+    n_rows  = NA_integer_
+  )
+}
+
+# D-8.11 #1. Transforms compute_sube()'s 3-column diagnostics (country, year,
+# status) into the 6-column unified schema by stamping stage = "compute",
+# filling concrete per-status messages, and setting n_rows = NA_integer_.
+.extend_compute_diagnostics <- function(compute_diag) {
+  if (is.null(compute_diag) || nrow(compute_diag) == 0L) {
+    return(.empty_diagnostics())
+  }
+  out <- data.table::copy(compute_diag)
+  out[, stage := "compute"]
+  # Concrete message per status; unknown statuses fall through to the raw
+  # status code. fcase()'s `default` must be a scalar, so we build the
+  # message column via a named lookup with a scalar fallback, then fill any
+  # unknowns in-place from the raw status.
+  message_map <- c(
+    ok                = "ok",
+    singular_supply   = "Supply matrix singular; country-year skipped.",
+    singular_go       = "GO diagonal singular; country-year skipped.",
+    singular_leontief = "Leontief matrix (I-A) singular; country-year skipped."
+  )
+  raw_status <- as.character(out$status)
+  mapped <- unname(message_map[raw_status])
+  mapped[is.na(mapped)] <- raw_status[is.na(mapped)]
+  out[, message := mapped]
+  out[, n_rows := NA_integer_]
+  out[, country := as.character(country)]
+  out[, year    := as.integer(year)]
+  data.table::setcolorder(out, c("country", "year", "stage", "status", "message", "n_rows"))
+  out[]
+}
+
 # Upfront `inputs` validation (RESEARCH §3 Open Item 6). Uses data.table::copy()
 # so the caller's object is never mutated by .standardize_names() (Pitfall 10).
 .validate_pipeline_inputs <- function(inputs) {
@@ -149,8 +252,8 @@ run_sube_pipeline <- function(
     )
   )
 
-  # --- 3. coerced-NA diagnostics at import boundary (Task 2 fills) ---
-  diag_import <- .empty_diagnostics()
+  # --- 3. coerced-NA diagnostics at import boundary ---
+  diag_import <- .detect_coerced_na(sut_raw)
 
   # --- 4. domestic filter ---
   sut <- if (isTRUE(domestic_only)) extract_domestic_block(sut_raw) else sut_raw
@@ -158,14 +261,58 @@ run_sube_pipeline <- function(
   # --- 5. build_matrices ---
   matrix_bundle <- build_matrices(sut, cpa_map, ind_map, inputs = inputs)
 
-  # --- 6. diagnostics: skipped_alignment + inputs_misaligned (Task 2 fills) ---
-  diag_build <- .empty_diagnostics()
+  # --- 6. diagnostics: skipped_alignment + inputs_misaligned ---
+  diag_build <- data.table::rbindlist(
+    list(
+      .detect_skipped_alignment(sut, matrix_bundle),
+      .detect_inputs_misaligned(sut, inputs, matrix_bundle)
+    ),
+    fill = TRUE
+  )
 
-  # --- 7. compute_sube ---
-  results <- compute_sube(matrix_bundle, inputs, ...)
+  # --- 7. compute_sube (resilient: converts deep alignment errors into
+  #        pipeline-stage diagnostic rows so the wrapper always returns) ---
+  compute_dots <- dots[intersect(
+    names(dots),
+    c("metrics", "diagonal_adjustment", "zero_replacement")
+  )]
+  results <- tryCatch(
+    do.call(
+      compute_sube,
+      c(list(matrix_bundle = matrix_bundle, inputs = inputs), compute_dots)
+    ),
+    error = function(e) {
+      diag_build <<- data.table::rbindlist(
+        list(
+          diag_build,
+          data.table::data.table(
+            country = NA_character_,
+            year    = NA_integer_,
+            stage   = "compute",
+            status  = "error",
+            message = conditionMessage(e),
+            n_rows  = NA_integer_
+          )
+        ),
+        fill = TRUE
+      )
+      # Return an empty, well-formed sube_results shell so downstream code
+      # (and the returned `$results$summary`) stay usable even on failure.
+      empty <- list(
+        summary     = data.table::data.table(),
+        tidy        = data.table::data.table(),
+        diagnostics = data.table::data.table(
+          country = character(), year = integer(), status = character()
+        ),
+        matrices    = list()
+      )
+      class(empty) <- c("sube_results", class(empty))
+      empty
+    }
+  )
 
-  # --- 8. diagnostics: extend compute_sube output to unified schema (Task 2 fills) ---
-  diag_compute <- .empty_diagnostics()
+  # --- 8. diagnostics: extend compute_sube output to unified schema ---
+  diag_compute <- .extend_compute_diagnostics(results$diagnostics)
 
   # --- 9. opt-in estimate_elasticities (Task 3) ---
   models <- NULL
