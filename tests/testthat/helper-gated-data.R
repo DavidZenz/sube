@@ -1,18 +1,24 @@
-# tests/testthat/helper-replication.R
-# Shared fixtures for the paper-replication test. Lifted from
-# inst/scripts/replicate_paper.R steps 1-4 + 9a. Do NOT source this file
-# manually -- testthat auto-loads helper-*.R.
+# tests/testthat/helper-gated-data.R
+# Shared fixtures and env-var resolvers for the gated data tests
+# (paper-replication + FIGARO E2E). Renamed from helper-replication.R
+# in Phase 7 (INFRA-02 / D-7.7). Do NOT source this file manually --
+# testthat auto-loads helper-*.R.
 
-# Resolve the WIOD root directory. Priority:
-#   1) SUBE_WIOD_DIR env var (researcher-set, per CONTEXT.md D-04)
-#   2) system.file("extdata", "wiod", package = "sube") local-dev fallback (D-06)
-#   3) "" (empty) -> caller should skip_if_not(nzchar(root))
+# Resolve the WIOD root directory.
+# D-7.7: env-var-only contract. No fallback to inst/extdata/wiod/.
+# Returns "" when SUBE_WIOD_DIR is unset or points at a missing dir;
+# callers should skip_if_not(nzchar(root)).
 resolve_wiod_root <- function() {
   env <- Sys.getenv("SUBE_WIOD_DIR", unset = "")
-  if (nzchar(env) && dir.exists(env)) return(env)
-  fallback <- system.file("extdata", "wiod", package = "sube")
-  if (nzchar(fallback) && dir.exists(fallback)) return(fallback)
-  ""
+  if (nzchar(env) && dir.exists(env)) env else ""
+}
+
+# Resolve the FIGARO root directory. Parallel contract to
+# resolve_wiod_root(): env-var-only, no fallback. Gates the FIG-E2E-01
+# test introduced in 07-04-*.
+resolve_figaro_root <- function() {
+  env <- Sys.getenv("SUBE_FIGARO_DIR", unset = "")
+  if (nzchar(env) && dir.exists(env)) env else ""
 }
 
 # Build the bundle the test asserts against. Runs the full pipeline once;
