@@ -84,13 +84,13 @@ From v1.1 / Phase 5-6:
 
 **Claude's Discretion:** `style = "deparse"` vs `"serialize"` — planner/executor picks whichever produces a reviewable-in-git snapshot. If `deparse` produces multi-MB text, switch to `serialize`.
 
-### D-7.4 — Country × year scope: DEU, FRA, ITA, NLD × 2019
+### D-7.4 — Country × year scope: DE, FR, IT, NL × 2023
 
 **What:** The FIGARO gated test exercises 4 countries × 1 year:
-- Countries: **DEU** (Germany), **FRA** (France), **ITA** (Italy), **NLD** (Netherlands)
-- Year: **2019**
+- Countries: **DE** (Germany), **FR** (France), **IT** (Italy), **NL** (Netherlands) — ISO-3166 alpha-2 as used by FIGARO's `refArea` column
+- Year: **2023** (reference year encoded in the locally-mounted `flatfile_eu-ic-*_25ed_2023.csv`)
 
-**Why:** Four largest EU economies with complete FIGARO 2023-edition coverage. 2019 is pre-COVID (cleaner than 2020-2021), recent enough to be relevant, and far enough in the past that FIGARO has settled on final figures.
+**Why:** Four largest EU economies with complete FIGARO 2023-edition coverage. 2023 matches the edition the researcher already has on disk (no extra download needed). Revised from earlier 2019 target after research confirmed FIGARO uses 2-letter ISO codes and the locally-mounted flatfile is reference year 2023.
 
 **How to apply:**
 - Hardcode these in the test or helper. Env-var override (`SUBE_FIGARO_COUNTRIES`, `SUBE_FIGARO_YEAR`) is **not** in scope for v1.2 — keep the surface minimal. If a researcher wants a different scope, they edit the test file locally.
