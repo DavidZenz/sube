@@ -38,12 +38,18 @@
 **Depends on**: Phase 6 (v1.1 FIGARO ingestion + gated replication contract)
 **Requirements**: FIG-E2E-01, FIG-E2E-02, FIG-E2E-03, INFRA-02
 **Success Criteria** (what must be TRUE):
-  1. User can set `SUBE_FIGARO_DIR` and run a gated test that drives a real FIGARO 2023 flatfile through `read_figaro → extract_domestic_block → build_matrices → compute_sube → estimate_elasticities` for representative country × year pairs, with structural invariants (shapes, non-NULL core columns, sane elasticity signs) and a golden-digest regression on `model_data` both asserted
-  2. On every CRAN/CI build, `tests/testthat/test-figaro-pipeline.R` pushes the synthetic `inst/extdata/figaro-sample/` fixture through `build_matrices → compute_sube → estimate_elasticities` with no external data and exits green
+  1. User can set `SUBE_FIGARO_DIR` and run a gated test that drives a real FIGARO 2023 flatfile through `read_figaro → extract_domestic_block → build_matrices → compute_sube` (+ opt-in `estimate_elasticities` via `SUBE_FIGARO_INPUTS_DIR`) for DE/FR/IT/NL × 2023, with structural invariants (shapes, non-NULL core columns, sane elasticity signs) and a testthat golden snapshot on the deterministic projection of `compute_sube()` output both asserted
+  2. On every CRAN/CI build, `tests/testthat/test-figaro-pipeline.R` pushes the extended synthetic `inst/extdata/figaro-sample/` fixture through `read_figaro → extract_domestic_block → build_matrices → compute_sube` with no external data and exits green
   3. A researcher reading `vignettes/figaro-workflow.Rmd` can trace the full journey from downloading a FIGARO flatfile to final elasticity output, including env-var gating and expected artifacts (vignette uses `eval = FALSE` and renders cleanly on pkgdown)
-  4. When `SUBE_WIOD_DIR` is unset, `resolve_wiod_root()` skips cleanly under `devtools::load_all` even if `inst/extdata/wiod/` exists on disk; the local fallback only activates when `SUBE_WIOD_FALLBACK` is explicitly set, with a test covering both the guarded-skip and the opt-in path
-  5. Both gated tests (WIOD replication + FIGARO E2E) skip deterministically on CRAN/CI with the env vars unset
-**Plans**: TBD
+  4. When `SUBE_WIOD_DIR` is unset, `resolve_wiod_root()` returns `""` even when `inst/extdata/wiod/` exists on disk; parallel `resolve_figaro_root()` has the same env-var-only contract; a dedicated test file covers both resolvers across unset / fallback-present / valid-path / invalid-path branches
+  5. Both gated tests (WIOD replication + FIGARO E2E) skip deterministically on CRAN/CI with the env vars unset, with skip messages simplified to `"SUBE_{WIOD,FIGARO}_DIR not set — ..."` (no fallback mention)
+**Plans**: 5 plans
+Plans:
+- [ ] 07-01-infra02-gated-data-contract-PLAN.md — Rename helper, remove WIOD fallback, add FIGARO resolver, ship INFRA-02 contract tests, update skip messages
+- [ ] 07-02-extend-synthetic-fixture-PLAN.md — Regenerate 8-CPA × 8-industry × 3-country synthetic fixture and update test-figaro.R value-baked assertions
+- [ ] 07-03-figaro-pipeline-synthetic-contract-PLAN.md — Add section-map + synthetic-pipeline helpers and FIG-E2E-02 contract test
+- [ ] 07-04-figaro-gated-e2e-snapshot-PLAN.md — Add real-data pipeline helper + snapshot projection + FIG-E2E-01 gated blocks (human-verify checkpoint for snapshot capture)
+- [ ] 07-05-figaro-vignette-docs-PLAN.md — Ship vignettes/figaro-workflow.Rmd, wire both it and paper-replication into _pkgdown.yml, add NEWS.md bullets
 
 ### Phase 8: Convenience Helpers
 **Goal**: Researchers can run the full SUBE workflow through a single exported `run_sube_pipeline()` call or batch it across countries and years via `batch_sube()`, with visibility into silent data-quality issues through diagnostic warnings
@@ -74,7 +80,6 @@
   1. A Nyquist-schema `*-VALIDATION.md` report exists in the phase 5 (figaro-sut-ingestion) planning directory, mapping shipped artifacts to the Nyquist validation schema
   2. A Nyquist-schema `*-VALIDATION.md` report exists in the phase 6 (paper-replication-verification) planning directory, mapping shipped artifacts to the Nyquist validation schema
   3. A follow-up audit against PROJECT.md / v1.1 closeout records no longer flags `nyquist.overall: not_enforced` for phases 5 or 6
-**Plans**: TBD
 
 ## Progress
 
@@ -89,7 +94,7 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 (Phase 10 may run in paral
 | 4. Release, CI, and Migration Readiness | v1.0 | 3/3 | Complete | 2026-04-08 |
 | 5. FIGARO SUT Ingestion | v1.1 | 4/4 | Complete | 2026-04-16 |
 | 6. Paper Replication Verification | v1.1 | 3/3 | Complete | 2026-04-16 |
-| 7. FIGARO End-to-End Validation & Fallback Hardening | v1.2 | 0/TBD | Not started | - |
+| 7. FIGARO End-to-End Validation & Fallback Hardening | v1.2 | 0/5 | Planned | - |
 | 8. Convenience Helpers | v1.2 | 0/TBD | Not started | - |
 | 9. Test Infrastructure Tech Debt | v1.2 | 0/TBD | Not started | - |
 | 10. Retroactive Nyquist Validation | v1.2 | 0/TBD | Not started | - |
