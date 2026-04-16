@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: FIGARO Validation, Convenience & Tech Debt
 status: executing
-stopped_at: Roadmap created — Phases 7-10 defined, ready to plan Phase 7
-last_updated: "2026-04-16T14:06:48.183Z"
+stopped_at: Phase 8 context gathered
+last_updated: "2026-04-16T18:54:32.446Z"
 last_activity: 2026-04-16
 progress:
   total_phases: 4
@@ -76,6 +76,6 @@ None blocking; v1.2 explicitly addresses the tech debt from v1.1.
 
 ## Session Continuity
 
-Last session: 2026-04-16
-Stopped at: Roadmap created — Phases 7-10 defined, ready to plan Phase 7
-Resume file: .planning/ROADMAP.md (then `/gsd-plan-phase 7`)
+Last session: 2026-04-16T18:54:32.444Z
+Stopped at: Phase 8 context gathered
+Resume file: .planning/phases/08-convenience-helpers/08-CONTEXT.md
