@@ -120,7 +120,7 @@ extract_leontief_matrices <- function(results, matrix = c("A", "L"), format = c(
 #'   \item Drop 38 country-product pairs across 14 countries (e.g. \code{LUX} P04/P05/P06/...).
 #'   \item Drop \code{CO2} rows for \code{CHE}, \code{HRV}, \code{NOR}.
 #'   \item Multiplier plausibility bounds (only when \code{apply_bounds = TRUE}):
-#'     \code{GO} in [1, 4], \code{VA} in [0, 1], \code{EMP}/\code{CO2} >= 0.
+#'     \code{GO} in \code{[1, 4]}, \code{VA} in \code{[0, 1]}, \code{EMP}/\code{CO2} >= 0.
 #'   \item Drop rows where elasticity is negative.
 #' }
 #'
