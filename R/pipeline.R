@@ -374,6 +374,161 @@ run_sube_pipeline <- function(
 # batch_sube() — CONV-02 + CONV-03 at batch scope (Plan 08-02)
 # ==============================================================================
 
+# D-8.7. tryCatch boundary here — see RESEARCH §4 "tryCatch Boundary".
+# Any stage error becomes one diagnostic row; the loop continues. Data-quality
+# issues are caught inside this helper; the batch_sube() caller's tryCatch is a
+# safety net for programming errors in the helper itself.
+.batch_run_one <- function(group, cpa_map, ind_map, inputs, estimate, dots) {
+  gk  <- group$group_key
+  sut <- group$sut
+
+  tryCatch({
+    # Diagnostics containers — seeded with coerced_na on the slice.
+    diag_import <- .detect_coerced_na(sut)
+
+    matrix_bundle <- do.call(
+      build_matrices,
+      c(list(sut_data = sut, cpa_map = cpa_map, ind_map = ind_map,
+             inputs = inputs),
+        dots[intersect(names(dots), c("final_demand_var"))])
+    )
+
+    diag_build <- data.table::rbindlist(
+      list(
+        .detect_skipped_alignment(sut, matrix_bundle),
+        .detect_inputs_misaligned(sut, inputs, matrix_bundle)
+      ),
+      fill = TRUE
+    )
+
+    # Resilient compute: deep "Input rows do not align..." errors become
+    # diagnostic rows instead of bubbling. Mirrors run_sube_pipeline()'s
+    # tryCatch wrap.
+    results <- tryCatch(
+      do.call(
+        compute_sube,
+        c(list(matrix_bundle = matrix_bundle, inputs = inputs),
+          dots[intersect(names(dots),
+                         c("metrics", "diagonal_adjustment", "zero_replacement"))])
+      ),
+      error = function(e) {
+        diag_build <<- data.table::rbindlist(
+          list(
+            diag_build,
+            data.table::data.table(
+              country = NA_character_,
+              year    = NA_integer_,
+              stage   = "compute",
+              status  = "error",
+              message = conditionMessage(e),
+              n_rows  = NA_integer_
+            )
+          ),
+          fill = TRUE
+        )
+        empty <- list(
+          summary     = data.table::data.table(),
+          tidy        = data.table::data.table(),
+          diagnostics = data.table::data.table(
+            country = character(), year = integer(), status = character()
+          ),
+          matrices    = list()
+        )
+        class(empty) <- c("sube_results", class(empty))
+        empty
+      }
+    )
+
+    diag_compute <- .extend_compute_diagnostics(results$diagnostics)
+
+    models <- NULL
+    if (isTRUE(estimate) && !is.null(matrix_bundle$model_data) &&
+        nrow(matrix_bundle$model_data) > 0L) {
+      models <- estimate_elasticities(matrix_bundle$model_data)
+    }
+
+    diagnostics <- data.table::rbindlist(
+      list(diag_import, diag_build, diag_compute),
+      fill = TRUE
+    )
+    data.table::setcolorder(
+      diagnostics,
+      c("country", "year", "stage", "status", "message", "n_rows")
+    )
+
+    call_meta <- list(
+      source          = NA_character_,   # batch mode: no importer dispatch
+      path            = NA_character_,
+      n_countries     = length(unique(sut$REP)),
+      n_years         = length(unique(sut$YEAR)),
+      estimate        = isTRUE(estimate),
+      group_key       = gk,
+      r_version       = R.version.string,
+      package_version = as.character(utils::packageVersion("sube"))
+    )
+
+    # A group has "errored" if its diagnostics contain any status == "error"
+    # (including the compute-stage error path above).
+    errored <- any(diagnostics$status == "error")
+
+    res <- .sube_pipeline_result(results, models, diagnostics, call_meta)
+    list(group_key = gk, pipeline_result = res, errored = errored)
+  },
+  error = function(e) {
+    err_diag <- data.table::data.table(
+      country = NA_character_,
+      year    = NA_integer_,
+      stage   = "pipeline",
+      status  = "error",
+      message = conditionMessage(e),
+      n_rows  = NA_integer_
+    )
+    call_meta <- list(
+      source = NA_character_, path = NA_character_,
+      n_countries = NA_integer_, n_years = NA_integer_,
+      estimate = isTRUE(estimate),
+      group_key = gk,
+      r_version = R.version.string,
+      package_version = as.character(utils::packageVersion("sube"))
+    )
+    res <- .sube_pipeline_result(NULL, NULL, err_diag, call_meta)
+    list(group_key = gk, pipeline_result = res, errored = TRUE)
+  })
+}
+
+# D-8.10. ONE warning() per batch, counts sorted descending so the largest
+# issue category surfaces first. Silent when no errors AND no non-ok rows.
+.emit_batch_warning <- function(diagnostics, n_errors, n_groups) {
+  if ((is.null(diagnostics) || nrow(diagnostics) == 0L) && n_errors == 0L) {
+    return(invisible(NULL))
+  }
+  bad <- if (!is.null(diagnostics) && nrow(diagnostics) > 0L) {
+    diagnostics[status != "ok"]
+  } else {
+    diagnostics
+  }
+  if ((is.null(bad) || nrow(bad) == 0L) && n_errors == 0L) {
+    return(invisible(NULL))
+  }
+  counts <- if (!is.null(bad) && nrow(bad) > 0L) {
+    bad[, .N, by = status]
+  } else {
+    data.table::data.table(status = character(), N = integer())
+  }
+  if (nrow(counts) > 0L) data.table::setorder(counts, -N)
+  parts <- if (nrow(counts) > 0L) {
+    sprintf("%d %s", counts$N, counts$status)
+  } else character(0)
+  warning(
+    sprintf(
+      "Batch completed with %d error(s) across %d group(s); issues: %s. See result$diagnostics for details.",
+      n_errors, n_groups,
+      if (length(parts) > 0L) paste(parts, collapse = ", ") else "none"
+    ),
+    call. = FALSE
+  )
+}
+
 # D-8.6 / D-8.8. Key format per group aligned with build_matrices() naming
 # convention (REP_YEAR). Preserves sube_suts/sube_domestic_suts class on each
 # slice so downstream helpers continue to see a valid sube_suts.
@@ -507,17 +662,54 @@ batch_sube <- function(
   # --- 3. split ---
   groups <- .batch_split(sut_data, countries, years, by)
 
-  # --- 4. per-group loop (Task 2 fills with .batch_run_one) ---
-  per_group <- list()
-  n_errors  <- 0L
+  # --- 4. per-group loop ---
+  dots <- list(...)
+  processed <- lapply(groups, function(g) {
+    .batch_run_one(g, cpa_map, ind_map, inputs, estimate, dots)
+  })
 
-  # Stub: Task 2 replaces this empty loop with real per-group processing.
+  per_group <- setNames(
+    lapply(processed, function(p) p$pipeline_result),
+    vapply(processed, function(p) p$group_key, character(1))
+  )
+  n_errors <- sum(vapply(processed, function(p) isTRUE(p$errored), logical(1)))
 
-  # --- 5. assemble merged tables ---
-  summary_dt     <- data.table::data.table()
-  tidy_dt        <- data.table::data.table()
-  diagnostics_dt <- .empty_diagnostics()
-  diagnostics_dt[, group_key := character()]
+  # --- 5. assemble merged tables (D-8.6) ---
+  summary_dt <- data.table::rbindlist(
+    lapply(per_group, function(r) {
+      if (is.null(r$results)) data.table::data.table() else r$results$summary
+    }),
+    fill = TRUE
+  )
+  tidy_dt <- data.table::rbindlist(
+    lapply(per_group, function(r) {
+      if (is.null(r$results)) data.table::data.table() else r$results$tidy
+    }),
+    fill = TRUE
+  )
+  diagnostics_dt <- data.table::rbindlist(
+    lapply(names(per_group), function(gk) {
+      d <- data.table::copy(per_group[[gk]]$diagnostics)
+      if (nrow(d) == 0L) {
+        empty <- .empty_diagnostics()
+        empty[, group_key := character()]
+        return(empty)
+      }
+      d[, group_key := gk]
+      d
+    }),
+    fill = TRUE
+  )
+  if (nrow(diagnostics_dt) > 0L) {
+    data.table::setcolorder(
+      diagnostics_dt,
+      c("country", "year", "stage", "status", "message", "n_rows", "group_key")
+    )
+  } else {
+    # Guarantee schema for empty merged diagnostics
+    diagnostics_dt <- .empty_diagnostics()
+    diagnostics_dt[, group_key := character()]
+  }
 
   call_meta <- list(
     by              = by,
@@ -528,6 +720,9 @@ batch_sube <- function(
     r_version       = R.version.string,
     package_version = as.character(utils::packageVersion("sube"))
   )
+
+  # --- 6. summary warning (D-8.10) ---
+  .emit_batch_warning(diagnostics_dt, n_errors, length(groups))
 
   .sube_batch_result(per_group, summary_dt, tidy_dt, diagnostics_dt, call_meta)
 }
