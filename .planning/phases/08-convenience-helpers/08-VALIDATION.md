@@ -2,8 +2,8 @@
 phase: 8
 slug: convenience-helpers
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-16
 ---
 
@@ -36,11 +36,17 @@ created: 2026-04-16
 
 ## Per-Task Verification Map
 
-Tasks below are filled by the planner. Row template:
-
-| Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
-|---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 8-01-01 | 01 | 1 | CONV-01 | — | N/A | unit | `Rscript -e "devtools::test(filter = 'pipeline')"` | ❌ W0 | ⬜ pending |
+| Task ID  | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
+|----------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
+| 8-01-01  | 01   | 1    | CONV-01, CONV-03 | T-8.1-01 | data.table::copy of inputs before .standardize_names | unit | `Rscript -e "devtools::test(filter = 'pipeline')"` | ✅       | ⬜ pending |
+| 8-01-02  | 01   | 1    | CONV-03 | T-8.1-01 | diagnostic detections read-only on sut/inputs | unit + integration (figaro fixture) | `Rscript -e "devtools::test(filter = 'pipeline')"` | ✅ | ⬜ pending |
+| 8-01-03  | 01   | 1    | CONV-01, CONV-03 | — | N/A | unit + integration | `Rscript -e "devtools::test(filter = 'pipeline')"` | ✅ | ⬜ pending |
+| 8-02-01  | 02   | 2    | CONV-02 | T-8.2-01 | data.table::copy guards on cpa_map/ind_map/inputs | unit | `Rscript -e "devtools::test(filter = 'pipeline')"` | ✅ | ⬜ pending |
+| 8-02-02  | 02   | 2    | CONV-02, CONV-03 | T-8.2-01 | tryCatch isolation per group | unit + resilience | `Rscript -e "devtools::test(filter = 'pipeline')"` | ✅ | ⬜ pending |
+| 8-03-01  | 03   | 3    | CONV-01, CONV-02 | — | N/A | doc build | `Rscript -e "devtools::document()"` | ✅ | ⬜ pending |
+| 8-03-02  | 03   | 3    | CONV-01, CONV-02, CONV-03 | — | N/A | config | `Rscript -e "yaml::read_yaml('_pkgdown.yml')"` | ✅ | ⬜ pending |
+| 8-03-03  | 03   | 3    | CONV-01, CONV-02, CONV-03 | — | N/A | vignette build | `Rscript -e "devtools::build_vignettes()"` | ✅ | ⬜ pending |
+| 8-03-04  | 03   | 3    | CONV-01, CONV-02, CONV-03 | — | N/A | full CRAN check | `Rscript -e "devtools::check(args = c('--no-manual','--no-vignettes'), error_on = 'warning')"` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
