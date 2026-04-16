@@ -47,7 +47,7 @@
 Plans:
 - [x] 07-01-infra02-gated-data-contract-PLAN.md — Rename helper, remove WIOD fallback, add FIGARO resolver, ship INFRA-02 contract tests, update skip messages
 - [x] 07-02-extend-synthetic-fixture-PLAN.md — Regenerate 8-CPA × 8-industry × 3-country synthetic fixture and update test-figaro.R value-baked assertions
-- [ ] 07-03-figaro-pipeline-synthetic-contract-PLAN.md — Add section-map + synthetic-pipeline helpers and FIG-E2E-02 contract test
+- [x] 07-03-figaro-pipeline-synthetic-contract-PLAN.md — Add section-map + synthetic-pipeline helpers and FIG-E2E-02 contract test
 - [ ] 07-04-figaro-gated-e2e-snapshot-PLAN.md — Add real-data pipeline helper + snapshot projection + FIG-E2E-01 gated blocks (human-verify checkpoint for snapshot capture)
 - [x] 07-05-figaro-vignette-docs-PLAN.md — Ship vignettes/figaro-workflow.Rmd, wire both it and paper-replication into _pkgdown.yml, add NEWS.md bullets
 
