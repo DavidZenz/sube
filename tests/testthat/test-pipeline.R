@@ -146,6 +146,28 @@ test_that("summary warning emitted exactly once when any diagnostic is non-ok (D
   expect_match(conditionMessage(w), "See result\\$diagnostics for details\\.")
 })
 
+test_that(".emit_pipeline_warning stays silent when all statuses are 'ok'", {
+  # Unit test on the helper: an all-'ok' diagnostics table must emit no warning.
+  clean_diag <- data.table::data.table(
+    country = "AAA", year = 2020L, stage = "compute",
+    status = "ok", message = "ok", n_rows = NA_integer_
+  )
+  expect_no_warning(sube:::.emit_pipeline_warning(clean_diag))
+  # Non-ok diagnostics trigger exactly one warning.
+  dirty_diag <- data.table::data.table(
+    country = c(NA_character_, "AAA"),
+    year    = c(NA_integer_, 2020L),
+    stage   = c("import", "compute"),
+    status  = c("coerced_na", "ok"),
+    message = c("1 row(s) with NA VALUE.", "ok"),
+    n_rows  = c(1L, NA_integer_)
+  )
+  expect_warning(
+    sube:::.emit_pipeline_warning(dirty_diag),
+    "^Pipeline completed with issues: 1 coerced_na\\. See result\\$diagnostics for details\\.$"
+  )
+})
+
 test_that("estimate = TRUE attaches sube_models when model_data is non-empty (D-8.4)", {
   sut_path <- system.file("extdata", "sample", "sut_data.csv", package = "sube")
   res <- suppressWarnings(run_sube_pipeline(

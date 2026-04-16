@@ -129,6 +129,24 @@
   out[]
 }
 
+# D-8.10. ONE warning() per run, counts sorted descending so the largest issue
+# category surfaces first. "ok" rows excluded by construction.
+.emit_pipeline_warning <- function(diagnostics) {
+  if (is.null(diagnostics) || nrow(diagnostics) == 0L) return(invisible(NULL))
+  bad <- diagnostics[status != "ok"]
+  if (nrow(bad) == 0L) return(invisible(NULL))
+  counts <- bad[, .N, by = status]
+  data.table::setorder(counts, -N)
+  parts <- sprintf("%d %s", counts$N, counts$status)
+  warning(
+    sprintf(
+      "Pipeline completed with issues: %s. See result$diagnostics for details.",
+      paste(parts, collapse = ", ")
+    ),
+    call. = FALSE
+  )
+}
+
 # Upfront `inputs` validation (RESEARCH §3 Open Item 6). Uses data.table::copy()
 # so the caller's object is never mutated by .standardize_names() (Pitfall 10).
 .validate_pipeline_inputs <- function(inputs) {
@@ -314,15 +332,25 @@ run_sube_pipeline <- function(
   # --- 8. diagnostics: extend compute_sube output to unified schema ---
   diag_compute <- .extend_compute_diagnostics(results$diagnostics)
 
-  # --- 9. opt-in estimate_elasticities (Task 3) ---
+  # --- 9. opt-in estimate_elasticities (D-8.4) ---
   models <- NULL
+  if (isTRUE(estimate) &&
+      !is.null(matrix_bundle$model_data) &&
+      nrow(matrix_bundle$model_data) > 0L) {
+    models <- estimate_elasticities(matrix_bundle$model_data)
+  }
 
-  # --- 10. assemble + summary warning (Task 3) ---
+  # --- 10. assemble unified diagnostics ---
   diagnostics <- data.table::rbindlist(
     list(diag_import, diag_build, diag_compute),
     fill = TRUE
   )
+  data.table::setcolorder(
+    diagnostics,
+    c("country", "year", "stage", "status", "message", "n_rows")
+  )
 
+  # --- 11. build call_meta ---
   n_countries <- length(unique(sut$REP))
   years <- unique(sut$YEAR)
   call_meta <- list(
@@ -335,6 +363,9 @@ run_sube_pipeline <- function(
     r_version       = R.version.string,
     package_version = as.character(utils::packageVersion("sube"))
   )
+
+  # --- 12. single summary warning (D-8.10) ---
+  .emit_pipeline_warning(diagnostics)
 
   .sube_pipeline_result(results, models, diagnostics, call_meta)
 }
