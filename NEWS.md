@@ -1,5 +1,25 @@
 # sube (development version)
 
+- Added `run_sube_pipeline()`, a one-call wrapper that chains
+  `import_suts()` or `read_figaro()` → `extract_domestic_block()` →
+  `build_matrices()` → `compute_sube()` (with opt-in
+  `estimate_elasticities()`) for a single SUT path. Returns a structured
+  `sube_pipeline_result` object carrying `$results`, `$models`,
+  `$diagnostics`, and `$call` provenance. See
+  `vignette("pipeline-helpers")`.
+- Added `batch_sube()`, which loops the convenience pipeline over a
+  pre-imported `sube_suts` table grouped by country, year, or
+  country-year (default `by = "country_year"`), returning per-group
+  results alongside merged tidy `$summary`, `$tidy`, and `$diagnostics`
+  tables suitable for downstream analysis. Per-group errors never abort
+  the batch. See `vignette("pipeline-helpers")`.
+- Added the unified pipeline diagnostics layer: `run_sube_pipeline()`
+  and `batch_sube()` surface four categories of silent data-quality
+  issues — coerced-NA rows at import, country-years dropped by
+  correspondence-map alignment, singular matrix branches from
+  `compute_sube()`, and input-metric misalignments from
+  `build_matrices()` model-data — through a unified `$diagnostics`
+  `data.table` and a single summary `warning()` per run.
 - **BREAKING (development contract, INFRA-02):** `resolve_wiod_root()` no
   longer falls back to `inst/extdata/wiod/` when `SUBE_WIOD_DIR` is unset.
   The gated replication test now skips cleanly in that case instead of
