@@ -45,11 +45,11 @@
   5. Both gated tests (WIOD replication + FIGARO E2E) skip deterministically on CRAN/CI with the env vars unset, with skip messages simplified to `"SUBE_{WIOD,FIGARO}_DIR not set — ..."` (no fallback mention)
 **Plans**: 5 plans
 Plans:
-- [ ] 07-01-infra02-gated-data-contract-PLAN.md — Rename helper, remove WIOD fallback, add FIGARO resolver, ship INFRA-02 contract tests, update skip messages
-- [ ] 07-02-extend-synthetic-fixture-PLAN.md — Regenerate 8-CPA × 8-industry × 3-country synthetic fixture and update test-figaro.R value-baked assertions
+- [x] 07-01-infra02-gated-data-contract-PLAN.md — Rename helper, remove WIOD fallback, add FIGARO resolver, ship INFRA-02 contract tests, update skip messages
+- [x] 07-02-extend-synthetic-fixture-PLAN.md — Regenerate 8-CPA × 8-industry × 3-country synthetic fixture and update test-figaro.R value-baked assertions
 - [ ] 07-03-figaro-pipeline-synthetic-contract-PLAN.md — Add section-map + synthetic-pipeline helpers and FIG-E2E-02 contract test
 - [ ] 07-04-figaro-gated-e2e-snapshot-PLAN.md — Add real-data pipeline helper + snapshot projection + FIG-E2E-01 gated blocks (human-verify checkpoint for snapshot capture)
-- [ ] 07-05-figaro-vignette-docs-PLAN.md — Ship vignettes/figaro-workflow.Rmd, wire both it and paper-replication into _pkgdown.yml, add NEWS.md bullets
+- [x] 07-05-figaro-vignette-docs-PLAN.md — Ship vignettes/figaro-workflow.Rmd, wire both it and paper-replication into _pkgdown.yml, add NEWS.md bullets
 
 ### Phase 8: Convenience Helpers
 **Goal**: Researchers can run the full SUBE workflow through a single exported `run_sube_pipeline()` call or batch it across countries and years via `batch_sube()`, with visibility into silent data-quality issues through diagnostic warnings
