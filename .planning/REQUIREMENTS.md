@@ -55,25 +55,31 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Which phases cover which requirements. Filled by roadmapper.
+Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FIG-E2E-01 | TBD | Pending |
-| FIG-E2E-02 | TBD | Pending |
-| FIG-E2E-03 | TBD | Pending |
-| CONV-01 | TBD | Pending |
-| CONV-02 | TBD | Pending |
-| CONV-03 | TBD | Pending |
-| INFRA-01 | TBD | Pending |
-| INFRA-02 | TBD | Pending |
-| NYQ-01 | TBD | Pending |
-| NYQ-02 | TBD | Pending |
+| FIG-E2E-01 | Phase 7 | Pending |
+| FIG-E2E-02 | Phase 7 | Pending |
+| FIG-E2E-03 | Phase 7 | Pending |
+| INFRA-02 | Phase 7 | Pending |
+| CONV-01 | Phase 8 | Pending |
+| CONV-02 | Phase 8 | Pending |
+| CONV-03 | Phase 8 | Pending |
+| INFRA-01 | Phase 9 | Pending |
+| NYQ-01 | Phase 10 | Pending |
+| NYQ-02 | Phase 10 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 10 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 10
+- Mapped to phases: 10 (100%)
+- Unmapped: 0
+
+**Phase rollup:**
+- Phase 7 (FIGARO End-to-End Validation & Fallback Hardening): FIG-E2E-01, FIG-E2E-02, FIG-E2E-03, INFRA-02
+- Phase 8 (Convenience Helpers): CONV-01, CONV-02, CONV-03
+- Phase 9 (Test Infrastructure Tech Debt): INFRA-01
+- Phase 10 (Retroactive Nyquist Validation): NYQ-01, NYQ-02
 
 ---
-*Requirements defined: 2026-04-16*
+*Requirements defined: 2026-04-16; traceability filled by roadmapper 2026-04-16*

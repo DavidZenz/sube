@@ -4,6 +4,7 @@
 
 - ✅ **v1.0 Package Workflow Hardening** - Phases 1-4 (shipped 2026-04-08). See [v1.0-ROADMAP.md](.planning/milestones/v1.0-ROADMAP.md)
 - ✅ **v1.1 Replication, FIGARO & Convenience** - Phases 5-6 (shipped 2026-04-16). See [v1.1-ROADMAP.md](.planning/milestones/v1.1-ROADMAP.md)
+- 🚧 **v1.2 FIGARO Validation, Convenience & Tech Debt** - Phases 7-10 (in progress)
 
 ## Phases
 
@@ -21,6 +22,74 @@
 
 </details>
 
-## Next Milestone
+### 🚧 v1.2 FIGARO Validation, Convenience & Tech Debt (In Progress)
 
-No active milestone. Run `/gsd-new-milestone` to start the next cycle (questioning → research → requirements → roadmap).
+**Milestone Goal:** Prove the FIGARO pipeline works end-to-end on real data, deliver the long-promised one-call/batch convenience helpers, and clear the tech debt inherited from v1.1.
+
+- [ ] **Phase 7: FIGARO End-to-End Validation & Fallback Hardening** - Prove the FIGARO pipeline works on real data, on the synthetic fixture, and in docs — plus lock down the gated-env-var contract so local fallbacks never silently activate
+- [ ] **Phase 8: Convenience Helpers** - Deliver the long-deferred one-call pipeline, batch processor, and their diagnostic warnings layer
+- [ ] **Phase 9: Test Infrastructure Tech Debt** - Fix the pre-existing `test-workflow.R:218` subprocess failure under `R CMD check --as-cran`
+- [ ] **Phase 10: Retroactive Nyquist Validation** - Back-fill Nyquist `*-VALIDATION.md` reports for phases 5 and 6 to close the v1.1 audit's `not_enforced` flag
+
+## Phase Details
+
+### Phase 7: FIGARO End-to-End Validation & Fallback Hardening
+**Goal**: Researchers can run the full FIGARO pipeline end-to-end on real data and on the shipped synthetic fixture, documented by a narrated vignette, with the gated-env-var contract hardened so no local fallback silently activates during development
+**Depends on**: Phase 6 (v1.1 FIGARO ingestion + gated replication contract)
+**Requirements**: FIG-E2E-01, FIG-E2E-02, FIG-E2E-03, INFRA-02
+**Success Criteria** (what must be TRUE):
+  1. User can set `SUBE_FIGARO_DIR` and run a gated test that drives a real FIGARO 2023 flatfile through `read_figaro → extract_domestic_block → build_matrices → compute_sube → estimate_elasticities` for representative country × year pairs, with structural invariants (shapes, non-NULL core columns, sane elasticity signs) and a golden-digest regression on `model_data` both asserted
+  2. On every CRAN/CI build, `tests/testthat/test-figaro-pipeline.R` pushes the synthetic `inst/extdata/figaro-sample/` fixture through `build_matrices → compute_sube → estimate_elasticities` with no external data and exits green
+  3. A researcher reading `vignettes/figaro-workflow.Rmd` can trace the full journey from downloading a FIGARO flatfile to final elasticity output, including env-var gating and expected artifacts (vignette uses `eval = FALSE` and renders cleanly on pkgdown)
+  4. When `SUBE_WIOD_DIR` is unset, `resolve_wiod_root()` skips cleanly under `devtools::load_all` even if `inst/extdata/wiod/` exists on disk; the local fallback only activates when `SUBE_WIOD_FALLBACK` is explicitly set, with a test covering both the guarded-skip and the opt-in path
+  5. Both gated tests (WIOD replication + FIGARO E2E) skip deterministically on CRAN/CI with the env vars unset
+**Plans**: TBD
+
+### Phase 8: Convenience Helpers
+**Goal**: Researchers can run the full SUBE workflow through a single exported `run_sube_pipeline()` call or batch it across countries and years via `batch_sube()`, with visibility into silent data-quality issues through diagnostic warnings
+**Depends on**: Phase 7
+**Requirements**: CONV-01, CONV-02, CONV-03
+**Success Criteria** (what must be TRUE):
+  1. User can call a single exported `run_sube_pipeline()` function that chains import → matrix → compute with argument pass-through and returns one structured result object documenting the full pipeline output
+  2. User can call an exported `batch_sube()` that loops `run_sube_pipeline()` over supplied country × year sets and returns collected results in a tidy structure suitable for downstream analysis
+  3. When rows are dropped by coercion, matrices are skipped due to missing data, or singular branches are hit, `run_sube_pipeline()` and `batch_sube()` surface human-readable diagnostic warnings that pinpoint the country, year, and cause
+  4. Both helpers are exported with roxygen docs, NAMESPACE entries, pkgdown group assignment, and testthat coverage exercising success paths, skip paths, and warning paths
+**Plans**: TBD
+
+### Phase 9: Test Infrastructure Tech Debt
+**Goal**: The pre-existing legacy-wrapper subprocess test in `tests/testthat/test-workflow.R:218` runs cleanly under `R CMD check --as-cran`, closing the last non-blocking tarball-check failure inherited from v1.1
+**Depends on**: Phase 7 (shares the gated-test contract work)
+**Requirements**: INFRA-01
+**Success Criteria** (what must be TRUE):
+  1. `R CMD check --as-cran` on the built tarball exits with zero test failures from `test-workflow.R:218` (either by threading `R_LIBS`/`.libPaths()` into the `Rscript` subprocess or by applying a principled check-time skip with documented rationale in the test file and NEWS entry)
+  2. `devtools::test()` continues to run 102/102 green (no regressions in the non-subprocess path)
+  3. The resolution strategy (fix vs. documented skip) is recorded in PROJECT.md Key Decisions and in an inline comment at the test site so future maintainers understand the trade-off
+**Plans**: TBD
+
+### Phase 10: Retroactive Nyquist Validation
+**Goal**: Phases 5 and 6 carry Nyquist-schema `*-VALIDATION.md` reports that retroactively close the v1.1 audit's `nyquist.overall: not_enforced` flag
+**Depends on**: Nothing (pure retroactive documentation — can run in parallel with Phase 9)
+**Requirements**: NYQ-01, NYQ-02
+**Success Criteria** (what must be TRUE):
+  1. A Nyquist-schema `*-VALIDATION.md` report exists in the phase 5 (figaro-sut-ingestion) planning directory, mapping shipped artifacts to the Nyquist validation schema
+  2. A Nyquist-schema `*-VALIDATION.md` report exists in the phase 6 (paper-replication-verification) planning directory, mapping shipped artifacts to the Nyquist validation schema
+  3. A follow-up audit against PROJECT.md / v1.1 closeout records no longer flags `nyquist.overall: not_enforced` for phases 5 or 6
+**Plans**: TBD
+
+## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 7 → 8 → 9 → 10 (Phase 10 may run in parallel with Phase 9 if capacity permits — no hard dependency between them).
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Core Workflow Contracts | v1.0 | 3/3 | Complete | 2026-04-08 |
+| 2. Comparison Layer Stabilization | v1.0 | 3/3 | Complete | 2026-04-08 |
+| 3. Documentation Alignment | v1.0 | 3/3 | Complete | 2026-04-08 |
+| 4. Release, CI, and Migration Readiness | v1.0 | 3/3 | Complete | 2026-04-08 |
+| 5. FIGARO SUT Ingestion | v1.1 | 4/4 | Complete | 2026-04-16 |
+| 6. Paper Replication Verification | v1.1 | 3/3 | Complete | 2026-04-16 |
+| 7. FIGARO End-to-End Validation & Fallback Hardening | v1.2 | 0/TBD | Not started | - |
+| 8. Convenience Helpers | v1.2 | 0/TBD | Not started | - |
+| 9. Test Infrastructure Tech Debt | v1.2 | 0/TBD | Not started | - |
+| 10. Retroactive Nyquist Validation | v1.2 | 0/TBD | Not started | - |
