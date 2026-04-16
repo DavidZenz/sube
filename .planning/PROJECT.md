@@ -40,17 +40,17 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 - ✓ Harden GitHub Actions and release-check automation around the documented package workflow — v1.0
 - ✓ FIGARO industry-by-industry SUT ingestion producing the standard long-format SUBE table — v1.1 (FIG-01..04)
 - ✓ Paper replication with gated numerical match against legacy scripts using researcher-supplied WIOD data — v1.1 (REP-01, REP-02)
+- ✓ **FIG-E2E-01**: Gated FIGARO pipeline test (`SUBE_FIGARO_DIR`) drives real 2023 flatfile through full pipeline with structural invariants + golden-digest regression — v1.2 Phase 7
+- ✓ **FIG-E2E-02**: Contract tests push synthetic `figaro-sample` fixture through full pipeline (new `test-figaro-pipeline.R`) — v1.2 Phase 7
+- ✓ **FIG-E2E-03**: Standalone `vignettes/figaro-workflow.Rmd` companion to paper-replication vignette (`eval=FALSE`) — v1.2 Phase 7
+- ✓ **INFRA-02**: `resolve_wiod_root()` is env-var-only (no `inst/extdata/wiod/` fallback); parallel `resolve_figaro_root()` added — v1.2 Phase 7 (D-7.7 tightened from "opt-in" to "no fallback")
 
 ### Active (v1.2)
 
-- [ ] **FIG-E2E-01**: Gated FIGARO pipeline test (`SUBE_FIGARO_DIR`) drives real 2023 flatfile through full pipeline with structural invariants + golden-digest regression
-- [ ] **FIG-E2E-02**: Contract tests push synthetic `figaro-sample` fixture through full pipeline (new `test-figaro-pipeline.R`)
-- [ ] **FIG-E2E-03**: Standalone `vignettes/figaro-workflow.Rmd` companion to paper-replication vignette (`eval=FALSE`)
 - [ ] **CONV-01**: `run_sube_pipeline()` — one-call wrapper chaining import → matrix → compute
 - [ ] **CONV-02**: `batch_sube()` — country/year batch processor returning collected results
 - [ ] **CONV-03**: Pipeline diagnostic warnings for dropped rows, skipped matrices, singular branches
 - [ ] **INFRA-01**: `test-workflow.R:218` legacy-wrapper subprocess test passes under `R CMD check --as-cran`
-- [ ] **INFRA-02**: `resolve_wiod_root()` requires explicit `SUBE_WIOD_FALLBACK` opt-in before using local `inst/extdata/wiod/`
 - [ ] **NYQ-01**: Retroactive Nyquist `*-VALIDATION.md` for phase 5 (figaro-sut-ingestion)
 - [ ] **NYQ-02**: Retroactive Nyquist `*-VALIDATION.md` for phase 6 (paper-replication-verification)
 
@@ -124,4 +124,4 @@ This document evolves at phase transitions and milestone boundaries.
 5. Archive previous milestone's active content under `<details>`
 
 ---
-*Last updated: 2026-04-16 after v1.2 milestone start*
+*Last updated: 2026-04-16 after v1.2 Phase 7 completion (FIG-E2E-01/02/03 + INFRA-02 validated)*
