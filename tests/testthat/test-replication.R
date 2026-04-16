@@ -29,7 +29,7 @@ test_that("model_data W matrix matches legacy ground truth within 1e-6", {
   root <- resolve_wiod_root()
   testthat::skip_if_not(
     nzchar(root),
-    "SUBE_WIOD_DIR not set and inst/extdata/wiod/ absent - paper replication test skipped"
+    "SUBE_WIOD_DIR not set - paper replication test skipped"
   )
 
   bundle <- .replication_bundle()
@@ -63,7 +63,7 @@ test_that("raw SUP cells match legacy wide CSV within 1e-6", {
   root <- resolve_wiod_root()
   testthat::skip_if_not(
     nzchar(root),
-    "SUBE_WIOD_DIR not set and inst/extdata/wiod/ absent - paper replication test skipped"
+    "SUBE_WIOD_DIR not set - paper replication test skipped"
   )
 
   sut <- sube::import_suts(file.path(root, "International SUTs domestic"))
@@ -104,7 +104,7 @@ test_that("raw USE cells match legacy wide CSV within 1e-6", {
   root <- resolve_wiod_root()
   testthat::skip_if_not(
     nzchar(root),
-    "SUBE_WIOD_DIR not set and inst/extdata/wiod/ absent - paper replication test skipped"
+    "SUBE_WIOD_DIR not set - paper replication test skipped"
   )
 
   sut <- sube::import_suts(file.path(root, "International SUTs domestic"))
