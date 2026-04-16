@@ -36,6 +36,11 @@ This vignette walks through the full researcher journey:
 Every code chunk is `eval = FALSE` so the vignette renders cleanly on CRAN and
 in CI without requiring the actual FIGARO flatfiles (roughly 400-500 MB each).
 
+> **Tip.** For a one-call equivalent that chains `read_figaro()` through
+> `compute_sube()`, see
+> [`run_sube_pipeline(source = "figaro", ...)`](../reference/run_sube_pipeline.html)
+> and the [Pipeline Helpers vignette](pipeline-helpers.html).
+
 # 2. Obtaining the data
 
 FIGARO is distributed as two flat-format CSV files per reference year.

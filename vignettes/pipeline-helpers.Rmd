@@ -1,0 +1,171 @@
+---
+title: "Pipeline Helpers — One Call from Path to Multipliers"
+vignette: >
+  %\VignetteIndexEntry{Pipeline Helpers — One Call from Path to Multipliers}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>",
+  eval = TRUE
+)
+library(sube)
+library(data.table)
+```
+
+# 1. When to reach for the convenience helpers
+
+The four-step SUBE chain — `import_suts()` / `read_figaro()` →
+`extract_domestic_block()` → `build_matrices()` → `compute_sube()` — gives you
+full control over every stage. If you already have the intermediate objects in
+hand, call the four steps directly; it is two extra lines.
+
+Reach for the convenience helpers in two cases:
+
+1. You have a SUT file (or directory) on disk and want multipliers back in one
+   call: use `run_sube_pipeline()`.
+2. You have a pre-imported `sube_suts` table and want to sweep across many
+   country-year slices, collecting tidy merged outputs: use `batch_sube()`.
+
+Both helpers surface the same structured diagnostics contract so silent
+data-quality issues (dropped rows, misaligned inputs, singular branches) never
+disappear from the console.
+
+# 2. `run_sube_pipeline()` on sample data
+
+The package ships a tiny WIOD-format sample under
+`system.file("extdata", "sample", package = "sube")`. Feed its `sut_data.csv`
+straight into `run_sube_pipeline()`:
+
+```{r}
+sut_path <- system.file("extdata", "sample", "sut_data.csv", package = "sube")
+
+result <- run_sube_pipeline(
+  path    = sut_path,
+  cpa_map = sube_example_data("cpa_map"),
+  ind_map = sube_example_data("ind_map"),
+  inputs  = sube_example_data("inputs"),
+  source  = "wiod"
+)
+
+class(result)
+names(result)
+```
+
+# 3. Inspecting `$results`, `$diagnostics`, and `$call`
+
+The compute output lives under `$results`:
+
+```{r}
+result$results$summary
+```
+
+The unified diagnostics table has a 6-column schema — `country`, `year`,
+`stage`, `status`, `message`, `n_rows`:
+
+```{r}
+result$diagnostics
+```
+
+When every status is `"ok"` no warning is emitted. Provenance about the call
+itself lives under `$call`:
+
+```{r}
+result$call[c("source", "path", "n_countries", "n_years", "estimate",
+              "package_version")]
+```
+
+# 4. Switching to the FIGARO path
+
+The same helper imports FIGARO flatfiles when `source = "figaro"`. Because
+FIGARO data is ~400 MB per flatfile, the block below is illustrative
+(`eval = FALSE`):
+
+```{r eval = FALSE}
+figaro_dir <- Sys.getenv("SUBE_FIGARO_DIR")   # user-provided
+run_sube_pipeline(
+  path    = figaro_dir,
+  cpa_map = my_cpa_map,     # user-supplied correspondence
+  ind_map = my_ind_map,
+  inputs  = my_inputs,      # industry-level GO/VA/EMP/CO2
+  source  = "figaro",
+  year    = 2023L
+)
+```
+
+See `vignette("figaro-workflow")` for the full FIGARO narrative including the
+env-var gate (`SUBE_FIGARO_DIR`) and map-table construction.
+
+# 5. `batch_sube()` across groups
+
+The sample data has one country (AAA) and one year (2020). To illustrate
+multi-group batching, duplicate the sample into a second year:
+
+```{r}
+sut <- sube_example_data("sut_data")
+sut2 <- data.table::copy(sut); sut2[, YEAR := 2021L]
+sut_multi <- rbind(sut, sut2)
+class(sut_multi) <- c("sube_suts", class(sut_multi))
+
+inp <- sube_example_data("inputs")
+inp2 <- data.table::copy(inp); inp2[, YEAR := 2021L]
+inp_multi <- rbind(inp, inp2)
+
+batch <- batch_sube(
+  sut_data = sut_multi,
+  cpa_map  = sube_example_data("cpa_map"),
+  ind_map  = sube_example_data("ind_map"),
+  inputs   = inp_multi
+)
+
+names(batch$results)
+batch$summary
+batch$diagnostics
+```
+
+Per-group results are preserved under `batch$results`; merged tables under
+`$summary`, `$tidy`, and `$diagnostics` (with a `group_key` column naming
+each batch key) are ready for downstream analysis.
+
+# 6. Turning on `estimate = TRUE`
+
+When you also want elasticities from `estimate_elasticities()`, pass
+`estimate = TRUE`. The sample data is tiny so the regression may return
+`NULL`; on production-sized inputs a `sube_models` object is attached:
+
+```{r}
+result_est <- run_sube_pipeline(
+  path     = sut_path,
+  cpa_map  = sube_example_data("cpa_map"),
+  ind_map  = sube_example_data("ind_map"),
+  inputs   = sube_example_data("inputs"),
+  source   = "wiod",
+  estimate = TRUE
+)
+class(result_est$models)   # "sube_models" when model_data is non-empty, else NULL
+```
+
+# 7. Reading the diagnostic warnings
+
+The `$diagnostics` table categorises silent issues into four statuses:
+
+- **`coerced_na`** (`stage = "import"`) — rows whose `VALUE` became `NA`
+  during `as.numeric()` coercion at import. Pipeline-level aggregate; count
+  lives in `n_rows`.
+- **`skipped_alignment`** (`stage = "build"`) — country-years present in
+  the SUT input but dropped by `build_matrices()` because the CPA or
+  industry correspondence left no aligned rows.
+- **`inputs_misaligned`** (`stage = "build"`) — country-years present in
+  both the SUT data and the `inputs` table but absent from
+  `build_matrices()`'s `$model_data`. Typical cause: industry codes in
+  `inputs` that do not match the matrix industries.
+- **`singular_supply` / `singular_go` / `singular_leontief`**
+  (`stage = "compute"`) — `compute_sube()` could not invert the relevant
+  matrix for this country-year. Pass-through from the compute stage's
+  existing diagnostics.
+
+When any row has `status != "ok"`, a single `warning()` summarises counts
+per category. Query the structured table for programmatic follow-up; read
+the warning for a fast interactive heads-up.
