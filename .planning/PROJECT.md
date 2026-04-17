@@ -2,7 +2,7 @@
 
 ## What This Is
 
-`sube` is an R package for supply-use based econometrics. It gives applied input-output researchers a package-first workflow that starts from supply and use tables, builds domestic matrices, computes Leontief-style benchmark multipliers, estimates SUBE regression models, and produces comparison-ready outputs and plots aligned with the companion paper. As of v1.1 the package imports both WIOD-style workbooks and FIGARO industry-by-industry SUT CSVs into the same canonical long-format table, and ships a gated replication test plus a narrated vignette that reproduce the paper's numerical results on researcher-supplied WIOD data.
+`sube` is an R package for supply-use based econometrics. It gives applied input-output researchers a package-first workflow that starts from supply and use tables, builds domestic matrices, computes Leontief-style benchmark multipliers, estimates SUBE regression models, and produces comparison-ready outputs and plots aligned with the companion paper. The package imports both WIOD-style workbooks and FIGARO industry-by-industry SUT CSVs into the same canonical long-format table, and ships convenience helpers (`run_sube_pipeline()`, `batch_sube()`) for one-call and batch workflows with diagnostic warnings. Gated replication tests and narrated vignettes reproduce the paper's numerical results on researcher-supplied data.
 
 ## Core Value
 
@@ -12,16 +12,7 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 
 - **v1.0 Package Workflow Hardening** (2026-04-08) — Contractual import-to-compute workflow, stabilized comparison layer, aligned docs, hardened release path, legacy-wrapper migration bridge.
 - **v1.1 Replication, FIGARO & Convenience** (2026-04-16) — FIGARO SUT ingestion (`read_figaro()` + synthetic fixture + NACE synonyms), gated paper replication test (`SUBE_WIOD_DIR`), exported `filter_paper_outliers()`, 9-section paper-replication vignette.
-
-## Current Milestone: v1.2 FIGARO Validation, Convenience & Tech Debt
-
-**Goal:** Prove the FIGARO pipeline works end-to-end on real data, deliver the long-promised one-call/batch convenience helpers, and clear the tech debt inherited from v1.1.
-
-**Target features:**
-- **FIGARO end-to-end validation** — gated `SUBE_FIGARO_DIR` real-data test with structural invariants + golden-digest regression; contract tests pushing the synthetic `figaro-sample` fixture through the full pipeline; standalone `figaro-workflow.Rmd` companion vignette.
-- **Convenience helpers** — `run_sube_pipeline()` (one-call import → compute), `batch_sube()` (country/year batch), and pipeline diagnostic warnings for dropped rows / skipped matrices / singular branches.
-- **Test-infrastructure tech debt** — fix `test-workflow.R:218` legacy-wrapper subprocess failure under `R CMD check --as-cran`; require explicit `SUBE_WIOD_FALLBACK` opt-in so `devtools::load_all` stops silently picking up `inst/extdata/wiod/`.
-- **Retroactive Nyquist validation** — back-fill Nyquist `*-VALIDATION.md` reports for phases 5 and 6 (closes v1.1 audit's `not_enforced` flag).
+- **v1.2 FIGARO Validation, Convenience & Tech Debt** (2026-04-17) — FIGARO E2E validation (gated real-data test + synthetic CI contract), env-var-only resolver contract, `run_sube_pipeline()` + `batch_sube()` convenience helpers with diagnostic warnings, `test-workflow.R` subprocess fix, retroactive Nyquist validation for phases 5-6.
 
 ## Requirements
 
@@ -40,19 +31,20 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 - ✓ Harden GitHub Actions and release-check automation around the documented package workflow — v1.0
 - ✓ FIGARO industry-by-industry SUT ingestion producing the standard long-format SUBE table — v1.1 (FIG-01..04)
 - ✓ Paper replication with gated numerical match against legacy scripts using researcher-supplied WIOD data — v1.1 (REP-01, REP-02)
-- ✓ **FIG-E2E-01**: Gated FIGARO pipeline test (`SUBE_FIGARO_DIR`) drives real 2023 flatfile through full pipeline with structural invariants + golden-digest regression — v1.2 Phase 7
-- ✓ **FIG-E2E-02**: Contract tests push synthetic `figaro-sample` fixture through full pipeline (new `test-figaro-pipeline.R`) — v1.2 Phase 7
-- ✓ **FIG-E2E-03**: Standalone `vignettes/figaro-workflow.Rmd` companion to paper-replication vignette (`eval=FALSE`) — v1.2 Phase 7
-- ✓ **INFRA-02**: `resolve_wiod_root()` is env-var-only (no `inst/extdata/wiod/` fallback); parallel `resolve_figaro_root()` added — v1.2 Phase 7 (D-7.7 tightened from "opt-in" to "no fallback")
+- ✓ **FIG-E2E-01**: Gated FIGARO pipeline test with structural invariants + golden-digest regression — v1.2
+- ✓ **FIG-E2E-02**: Contract tests push synthetic fixture through full pipeline on every CI build — v1.2
+- ✓ **FIG-E2E-03**: Standalone `figaro-workflow.Rmd` companion vignette — v1.2
+- ✓ **INFRA-02**: Env-var-only resolver contract (no silent `inst/extdata/` fallback) — v1.2
+- ✓ **CONV-01**: `run_sube_pipeline()` one-call wrapper — v1.2
+- ✓ **CONV-02**: `batch_sube()` country/year batch processor — v1.2
+- ✓ **CONV-03**: Pipeline diagnostic warnings for data-quality issues — v1.2
+- ✓ **INFRA-01**: Legacy-wrapper subprocess test passes `R CMD check --as-cran` — v1.2
+- ✓ **NYQ-01**: Retroactive Nyquist validation for phase 5 — v1.2
+- ✓ **NYQ-02**: Retroactive Nyquist validation for phase 6 — v1.2
 
-### Active (v1.2)
+### Active
 
-- ✓ **CONV-01**: `run_sube_pipeline()` — one-call wrapper chaining import → matrix → compute — v1.2 Phase 8
-- ✓ **CONV-02**: `batch_sube()` — country/year batch processor returning collected results — v1.2 Phase 8
-- ✓ **CONV-03**: Pipeline diagnostic warnings for dropped rows, skipped matrices, singular branches — v1.2 Phase 8
-- ✓ **INFRA-01**: `test-workflow.R:218` legacy-wrapper subprocess test passes under `R CMD check --as-cran` — v1.2 Phase 9
-- ✓ **NYQ-01**: Retroactive Nyquist `*-VALIDATION.md` for phase 5 (figaro-sut-ingestion) — v1.2 Phase 10
-- ✓ **NYQ-02**: Retroactive Nyquist `*-VALIDATION.md` for phase 6 (paper-replication-verification) — v1.2 Phase 10
+(No active requirements — next milestone not yet defined)
 
 ### Out of Scope
 
@@ -65,9 +57,9 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 
 ## Context
 
-The repository has a validated package-first maintenance path: exported R functions covering import (WIOD + FIGARO), matrix building, compute, diagnostics, Leontief extraction, comparison shaping, paper-style plotting, outlier filtering, and export. `testthat` coverage runs green (102/102 under `devtools::test()`; 46/46 FIGARO; 3 gated replication blocks skip cleanly on CRAN). pkgdown groups cover Data import, Matrix building, Compute, Elasticity models, Diagnostics, Paper replication tools, and Legacy migration. `R-CMD-check` GitHub Actions workflow is hardened; `.Rbuildignore` keeps planning artifacts and `inst/extdata/wiod/` out of the CRAN tarball. Historical paper material remains outside the package bundle except for local reference material in `inst/references/` and synthetic fixtures in `inst/extdata/`.
+Shipped v1.2 with 197 pass / 0 fail / 5 gated skips in testthat. Tech stack: R (>= 4.2.0) with `data.table`, `ggplot2`, `openxlsx`, `haven`, and `plm`. Exported functions cover import (WIOD + FIGARO), matrix building, compute, diagnostics, Leontief extraction, comparison shaping, paper-style plotting, outlier filtering, export, and convenience pipeline/batch helpers. Three narrated vignettes (`paper-replication.Rmd`, `figaro-workflow.Rmd`, `pipeline-helpers.Rmd`) all with `eval = FALSE`. pkgdown groups: Data import, Matrix building, Compute, Elasticity models, Diagnostics, Paper replication tools, Pipeline helpers, Legacy migration. GitHub Actions CI hardened; `.Rbuildignore` excludes planning artifacts and researcher data directories.
 
-Two documented non-blocking tech-debt items survive v1.1 closeout: (1) pre-existing `test-workflow.R:218` legacy-wrapper subprocess failure under `R CMD check --as-cran`, and (2) known ~4.4% methodological divergence when `devtools::load_all` triggers the local WIOD fallback. Both are candidates for v1.2 follow-up. Phase 8 shipped `run_sube_pipeline()` and `batch_sube()` with unified `$diagnostics` data.table (6-column schema) and four detection helpers. `testthat` coverage: 197 pass / 0 fail / 5 gated skips.
+All v1.1 tech debt resolved: `test-workflow.R:218` subprocess failure fixed via `R_LIBS` threading; WIOD/FIGARO resolvers are env-var-only (no silent fallback). Nyquist validation reports retroactively added for phases 5 and 6.
 
 ## Constraints
 
@@ -92,6 +84,8 @@ Two documented non-blocking tech-debt items survive v1.1 closeout: (1) pre-exist
 | Gate replication on `SUBE_WIOD_DIR`; exclude `inst/extdata/wiod/` from tarball | CRAN/CI skip deterministically; researchers reproduce locally with their own data | ✓ Good (v1.1) |
 | Defer v1.1's "Convenience" scope (pipeline, batch helpers) to v1.2 rather than back-filling CNV-requirements | No CNV- requirements were defined during planning; shipped convenience-shaped work landed under FIG-/REP- IDs | ✓ Good (v1.1) |
 | Thread `.libPaths()` via `R_LIBS` into legacy-wrapper subprocess test (INFRA-01) | `R CMD check --as-cran` isolates the package in a temp library that `system2()` children don't inherit; passing `R_LIBS` from `.libPaths()` is the zero-dependency cross-platform fix | ✓ Good (v1.2) |
+| Env-var-only resolver contract (INFRA-02): remove all local fallbacks | Prevents silent activation of researcher data during `devtools::load_all` — explicit opt-in via env var only | ✓ Good (v1.2) |
+| Accept existing Nyquist VALIDATION.md artifacts as-is for Phase 10 | Artifacts were comprehensive with full audit sections; regeneration would add no value | ✓ Good (v1.2) |
 
 <details>
 <summary>Previous milestone cycles</summary>
@@ -103,6 +97,10 @@ Document was seeded with initial v1.0 brownfield hardening scope and constraints
 ### After v1.1 milestone start
 
 Document tracked v1.1 active requirements (paper replication, FIGARO ingestion, pipeline helper, batch helper). Pipeline and batch helpers were deferred to a future milestone at closeout — no CNV- requirements were authored.
+
+### After v1.2 milestone start
+
+Document tracked v1.2 active requirements: FIGARO E2E validation (FIG-E2E-01/02/03), convenience helpers (CONV-01/02/03), test infrastructure (INFRA-01/02), and Nyquist validation (NYQ-01/02). All 10 requirements satisfied at milestone close.
 
 </details>
 
@@ -125,4 +123,4 @@ This document evolves at phase transitions and milestone boundaries.
 5. Archive previous milestone's active content under `<details>`
 
 ---
-*Last updated: 2026-04-17 after v1.2 Phase 10 completion (NYQ-01/NYQ-02 closed — retroactive Nyquist validation for phases 5 and 6)*
+*Last updated: 2026-04-17 after v1.2 milestone completion*
