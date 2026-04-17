@@ -48,22 +48,22 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FMT-01 | — | Pending |
-| FMT-02 | — | Pending |
-| FMT-03 | — | Pending |
-| FMT-04 | — | Pending |
-| VIG-01 | — | Pending |
-| VIG-02 | — | Pending |
-| VIG-03 | — | Pending |
-| DOC-01 | — | Pending |
-| PKG-01 | — | Pending |
-| PKG-02 | — | Pending |
+| FMT-01 | Phase 11 | Pending |
+| FMT-02 | Phase 11 | Pending |
+| FMT-03 | Phase 11 | Pending |
+| FMT-04 | Phase 11 | Pending |
+| VIG-01 | Phase 12 | Pending |
+| VIG-02 | Phase 12 | Pending |
+| VIG-03 | Phase 12 | Pending |
+| DOC-01 | Phase 12 | Pending |
+| PKG-01 | Phase 13 | Pending |
+| PKG-02 | Phase 13 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 10 total
-- Mapped to phases: 0
-- Unmapped: 10 ⚠️
+- Mapped to phases: 10
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-17*
-*Last updated: 2026-04-17 after initial definition*
+*Last updated: 2026-04-17 after roadmap creation*
