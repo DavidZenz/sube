@@ -8,6 +8,17 @@
 
 Researchers can run a reproducible end-to-end SUBE workflow in R without falling back to one-off scripts or undocumented paper code.
 
+## Current Milestone: v1.3 Documentation & pkgdown
+
+**Goal:** Thorough, source-agnostic documentation with a live pkgdown site on GitHub Pages.
+
+**Target features:**
+- Rewrite/improve existing vignettes with proper data format specification (column semantics, canonical long-format contract, satellite vector inputs)
+- Source-agnostic framing throughout — WIOD and FIGARO are just two built-in importers
+- README refresh aligned with the documentation narrative
+- pkgdown site deployed to GitHub Pages via GitHub Actions workflow
+- "Bring your own data" guidance for researchers with non-WIOD/FIGARO sources
+
 ## Shipped Milestones
 
 - **v1.0 Package Workflow Hardening** (2026-04-08) — Contractual import-to-compute workflow, stabilized comparison layer, aligned docs, hardened release path, legacy-wrapper migration bridge.
@@ -44,7 +55,11 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 
 ### Active
 
-(No active requirements — next milestone not yet defined)
+- [ ] Rewrite/improve vignettes with data format specification, column semantics, satellite vector contract
+- [ ] Source-agnostic framing throughout docs — WIOD and FIGARO as example importers
+- [ ] README refresh
+- [ ] pkgdown site deployed to GitHub Pages via GitHub Actions
+- [ ] "Bring your own data" guidance
 
 ### Out of Scope
 
@@ -123,4 +138,4 @@ This document evolves at phase transitions and milestone boundaries.
 5. Archive previous milestone's active content under `<details>`
 
 ---
-*Last updated: 2026-04-17 after v1.2 milestone completion*
+*Last updated: 2026-04-17 after v1.3 milestone start*
