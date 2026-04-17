@@ -125,4 +125,4 @@ This document evolves at phase transitions and milestone boundaries.
 5. Archive previous milestone's active content under `<details>`
 
 ---
-*Last updated: 2026-04-17 after v1.2 Phase 8 completion (CONV-01/02/03 validated — run_sube_pipeline + batch_sube + diagnostics shipped)*
+*Last updated: 2026-04-17 after v1.2 Phase 9 completion (INFRA-01 resolved — legacy wrapper subprocess test passes R CMD check --as-cran)*
