@@ -62,9 +62,9 @@ Plans:
   4. Both helpers are exported with roxygen docs, NAMESPACE entries, pkgdown group assignment, and testthat coverage exercising success paths, skip paths, and warning paths
 **Plans**: 3 plans
 Plans:
-- [ ] 08-01-pipeline-core-PLAN.md — Implement `run_sube_pipeline()` with `sube_pipeline_result` S3 class, unified 6-column `$diagnostics` schema, upfront `inputs` validation, all four CONV-03 detection helpers, and single-summary warning emission (CONV-01 + CONV-03 core)
-- [ ] 08-02-batch-sube-PLAN.md — Implement `batch_sube()` with `sube_batch_result` S3 class, copy-guarded maps/inputs, country × year splitter, per-group tryCatch resilience, and cross-group rbindlist merging with `group_key` (CONV-02 + CONV-03 batch scope)
-- [ ] 08-03-docs-vignette-PLAN.md — Regenerate man pages, update `_pkgdown.yml` (D-8.13 + D-8.14), add 3 NEWS.md bullets (D-8.15), ship `vignettes/pipeline-helpers.Rmd`, cross-link from `paper-replication.Rmd`/`figaro-workflow.Rmd`, run `R CMD check --no-manual --no-vignettes` clean
+- [x] 08-01-pipeline-core-PLAN.md — Implement `run_sube_pipeline()` with `sube_pipeline_result` S3 class, unified 6-column `$diagnostics` schema, upfront `inputs` validation, all four CONV-03 detection helpers, and single-summary warning emission (CONV-01 + CONV-03 core)
+- [x] 08-02-batch-sube-PLAN.md — Implement `batch_sube()` with `sube_batch_result` S3 class, copy-guarded maps/inputs, country × year splitter, per-group tryCatch resilience, and cross-group rbindlist merging with `group_key` (CONV-02 + CONV-03 batch scope)
+- [x] 08-03-docs-vignette-PLAN.md — Regenerate man pages, update `_pkgdown.yml` (D-8.13 + D-8.14), add 3 NEWS.md bullets (D-8.15), ship `vignettes/pipeline-helpers.Rmd`, cross-link from `paper-replication.Rmd`/`figaro-workflow.Rmd`, run `R CMD check --no-manual --no-vignettes` clean
 
 ### Phase 9: Test Infrastructure Tech Debt
 **Goal**: The pre-existing legacy-wrapper subprocess test in `tests/testthat/test-workflow.R:218` runs cleanly under `R CMD check --as-cran`, closing the last non-blocking tarball-check failure inherited from v1.1
