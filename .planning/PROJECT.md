@@ -55,11 +55,10 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 
 ### Active
 
-- [ ] Rewrite/improve vignettes with data format specification, column semantics, satellite vector contract
+- ✓ Data format specification with canonical SUT column semantics, satellite vector contract, synonym table, and BYOD guide — Validated in Phase 11
 - [ ] Source-agnostic framing throughout docs — WIOD and FIGARO as example importers
 - [ ] README refresh
 - [ ] pkgdown site deployed to GitHub Pages via GitHub Actions
-- [ ] "Bring your own data" guidance
 
 ### Out of Scope
 
@@ -138,4 +137,4 @@ This document evolves at phase transitions and milestone boundaries.
 5. Archive previous milestone's active content under `<details>`
 
 ---
-*Last updated: 2026-04-17 after v1.3 milestone start*
+*Last updated: 2026-04-17 after Phase 11 completion*
