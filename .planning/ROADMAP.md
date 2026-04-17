@@ -34,7 +34,7 @@
 
 **Milestone Goal:** Thorough, source-agnostic documentation with a live pkgdown site on GitHub Pages.
 
-- [ ] **Phase 11: Data Format Specification** - Define canonical SUT column semantics, satellite vector contract, synonym flexibility, and BYOD guide
+- [x] **Phase 11: Data Format Specification** - Define canonical SUT column semantics, satellite vector contract, synonym flexibility, and BYOD guide (completed 2026-04-17)
 - [ ] **Phase 12: Vignette & README Refresh** - Apply source-agnostic framing throughout all vignettes, expand data-prep vignette, improve narrative flow, refresh README
 - [ ] **Phase 13: pkgdown Deployment** - Deploy pkgdown site to GitHub Pages via GitHub Actions and align site structure with documentation narrative
 
@@ -49,9 +49,9 @@
   2. User can find documentation of the satellite vector inputs (GO, VA, EMP, CO2) explaining what each is, where it comes from, and that it is researcher-supplied
   3. User can follow a step-by-step "bring your own data" guide to reshape arbitrary supply-use data into the canonical long format
   4. User can discover that column names are flexible (INDUSTRY, NACE, NACE_R2 all accepted) from a documented synonym table
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
-- [ ] 11-01-PLAN.md — Write canonical format spec, satellite vector contract, synonym table, and BYOD guide into data-preparation.Rmd
+- [x] 11-01-PLAN.md — Write canonical format spec, satellite vector contract, synonym table, and BYOD guide into data-preparation.Rmd
 
 ### Phase 12: Vignette & README Refresh
 **Goal**: All vignettes and the README frame WIOD and FIGARO as two example data sources among many, the data-prep vignette is the authoritative format reference, and the narrative reads coherently from start to finish
@@ -89,6 +89,6 @@ Plans:
 | 8. Convenience Helpers | v1.2 | 3/3 | Complete | 2026-04-17 |
 | 9. Test Infrastructure Tech Debt | v1.2 | 1/1 | Complete | 2026-04-17 |
 | 10. Retroactive Nyquist Validation | v1.2 | 1/1 | Complete | 2026-04-17 |
-| 11. Data Format Specification | v1.3 | 0/1 | Planning | - |
+| 11. Data Format Specification | v1.3 | 1/1 | Complete    | 2026-04-17 |
 | 12. Vignette & README Refresh | v1.3 | 0/? | Not started | - |
 | 13. pkgdown Deployment | v1.3 | 0/? | Not started | - |

@@ -4,14 +4,14 @@ milestone: v1.3
 milestone_name: Documentation & pkgdown
 status: planning
 stopped_at: Phase 11 context gathered
-last_updated: "2026-04-17T13:15:45.158Z"
-last_activity: 2026-04-17 — Roadmap created for v1.3
+last_updated: "2026-04-17T13:41:33.460Z"
+last_activity: 2026-04-17
 progress:
   total_phases: 3
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
+  percent: 100
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-17 for v1.3)
 
 ## Current Position
 
-Phase: 11 of 13 (Data Format Specification)
-Plan: — (not yet planned)
+Phase: 12 of 13 (vignette & readme refresh)
+Plan: Not started
 Status: Ready to plan
-Last activity: 2026-04-17 — Roadmap created for v1.3
+Last activity: 2026-04-17
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -36,7 +36,7 @@ Progress: [░░░░░░░░░░] 0%
 
 **Velocity:**
 
-- Total plans completed: 39 (v1.0: 12; v1.1: 7; v1.2: 10; v1.3: 0)
+- Total plans completed: 40 (v1.0: 12; v1.1: 7; v1.2: 10; v1.3: 0)
 - Total phases shipped: 10 (v1.0: 1-4; v1.1: 5-6; v1.2: 7-10)
 
 **By Milestone:**
