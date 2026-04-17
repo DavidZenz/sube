@@ -29,7 +29,7 @@ metrics:
 
 # Phase 9 Plan 01: Legacy Wrapper Subprocess Fix (INFRA-01) Summary
 
-**One-liner:** Fixed R CMD check subprocess failure by threading `.libPaths()` into child Rscript via `R_LIBS` env var in `system2()` call.
+**One-liner:** Fixed R CMD check subprocess failure by threading `.libPaths()` into child Rscript via `R_LIBS` env var and using full `R.home("bin")` path in `system2()` call.
 
 ## What Was Built
 
@@ -49,7 +49,7 @@ Resolved the pre-existing `test-workflow.R:218` failure under `R CMD check --as-
 
 ## Deviations from Plan
 
-None — plan executed exactly as written.
+- Used `file.path(R.home("bin"), "Rscript")` instead of `Sys.which("Rscript")` — R CMD check --as-cran rejects bare "Rscript" invocations per par. 1.6 of the Writing R Extensions manual. Discovered during human verification gate.
 
 ## Known Stubs
 
