@@ -86,6 +86,9 @@ Plans:
   1. A Nyquist-schema `*-VALIDATION.md` report exists in the phase 5 (figaro-sut-ingestion) planning directory, mapping shipped artifacts to the Nyquist validation schema
   2. A Nyquist-schema `*-VALIDATION.md` report exists in the phase 6 (paper-replication-verification) planning directory, mapping shipped artifacts to the Nyquist validation schema
   3. A follow-up audit against PROJECT.md / v1.1 closeout records no longer flags `nyquist.overall: not_enforced` for phases 5 or 6
+**Plans**: 1 plan
+Plans:
+- [ ] 10-01-PLAN.md — Create 10-VERIFICATION.md cross-referencing existing Nyquist artifacts, update REQUIREMENTS.md traceability for NYQ-01/NYQ-02
 
 ## Progress
 
@@ -103,4 +106,4 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 (Phase 10 may run in paral
 | 7. FIGARO End-to-End Validation & Fallback Hardening | v1.2 | 5/5 | Complete | 2026-04-17 |
 | 8. Convenience Helpers | v1.2 | 3/3 | Complete | 2026-04-17 |
 | 9. Test Infrastructure Tech Debt | v1.2 | 0/1 | Not started | - |
-| 10. Retroactive Nyquist Validation | v1.2 | 0/TBD | Not started | - |
+| 10. Retroactive Nyquist Validation | v1.2 | 0/1 | Not started | - |
