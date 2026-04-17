@@ -1,10 +1,11 @@
 ---
 phase: 5
 slug: figaro-sut-ingestion
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: audited
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-09
+updated: 2026-04-17
 ---
 
 # Phase 5 — Validation Strategy
@@ -42,7 +43,10 @@ created: 2026-04-09
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| _planner fills_ | | | | | | | | | ⬜ pending |
+| 5-01-01 | 01 | 1 | FIG-01, FIG-02, FIG-04 | — | N/A | TDD RED fixtures | `Rscript -e "devtools::test(filter = 'figaro')"` | ✅ | ✅ green |
+| 5-02-01 | 02 | 2 | FIG-01, FIG-02 | — | N/A | unit + integration | `Rscript -e "devtools::test(filter = 'figaro')"` | ✅ | ✅ green |
+| 5-03-01 | 03 | 3 | FIG-03 | — | N/A | unit | `Rscript -e "devtools::test(filter = 'figaro')"` | ✅ | ✅ green |
+| 5-04-01 | 04 | 4 | FIG-04 | — | N/A | doc + R CMD check | `Rscript -e "devtools::test()"` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -50,44 +54,36 @@ created: 2026-04-09
 
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|--------------|
-| FIG-01 | `read_figaro("fixture_dir", year = 2023)` returns a `sube_suts` object | unit | `devtools::test(filter = "figaro")` | ❌ Wave 0 |
-| FIG-01 | Output has seven canonical columns with correct types (REP/PAR/CPA/VAR char, VALUE num, YEAR int, TYPE char) | unit | same | ❌ Wave 0 |
-| FIG-01 | `TYPE` contains exactly `"SUP"` and `"USE"` | unit | same | ❌ Wave 0 |
-| FIG-01 | Missing/invalid `year` arg is a hard error | unit | `expect_error(read_figaro(path))` | ❌ Wave 0 |
-| FIG-01 | Non-existent path is a hard error | unit | `expect_error(read_figaro("/nonexistent", 2023))` | ❌ Wave 0 |
-| FIG-01 | Zero or multiple supply/use files in directory is a hard error | unit | `expect_error` with tempdir variants | ❌ Wave 0 |
-| FIG-02 | `CPA_` prefix stripped from `CPA` column | unit | `expect_true(all(!startsWith(out$CPA, "CPA_")))` | ❌ Wave 0 |
-| FIG-02 | `REP`/`PAR` preserve inter-country rows (not filtered to diagonal) | unit | `expect_true(any(out$REP != out$PAR))` | ❌ Wave 0 |
-| FIG-02 | Primary-input rows (`B2A3G`, `D1`, `D21X31`, `D29X39`, `OP_RES`, `OP_NRES` with `refArea == "W2"`) are filtered out (D-19) | unit | `expect_false("B2A3G" %in% out$CPA); expect_false("W2" %in% out$REP)` | ❌ Wave 0 |
-| FIG-02 | Five final-demand columns aggregated into single `VAR = "FU_bas"` per (REP,PAR,CPA) (D-20) | unit | `expect_true("FU_bas" %in% out[TYPE == "USE"]$VAR); expect_false(any(c("P3_S13","P3_S14","P3_S15","P51G","P5M") %in% out$VAR))` | ❌ Wave 0 |
-| FIG-02 | `FIGW1` rows are preserved (not filtered) (D-21) | unit | injected `FIGW1` test row survives import | ❌ Wave 0 |
-| FIG-02 | `final_demand_vars=` arg with subset produces aggregation over the subset only (D-20) | unit | `out2 <- read_figaro(dir, 2023, final_demand_vars = "P3_S14"); expect_lt(sum(out2$VALUE[VAR == "FU_bas"]), sum(out$VALUE[VAR == "FU_bas"]))` | ❌ Wave 0 |
-| FIG-02 | `final_demand_vars=` with unknown code hard-errors | unit | `expect_error(read_figaro(dir, 2023, final_demand_vars = "BOGUS"))` | ❌ Wave 0 |
-| FIG-03 | `.coerce_map()` routes a column named `NACE` to `VAR` (D-16) | unit | `build_matrices()` succeeds with `NACE`-named ind_map | ❌ Wave 0 |
-| FIG-03 | `.coerce_map()` routes a column named `NACE_R2` to `VAR` (D-16) | unit | same pattern with `NACE_R2` | ❌ Wave 0 |
+| FIG-01 | `read_figaro("fixture_dir", year = 2023)` returns a `sube_suts` object | unit | `devtools::test(filter = "figaro")` | ✅ exists |
+| FIG-01 | Output has seven canonical columns with correct types (REP/PAR/CPA/VAR char, VALUE num, YEAR int, TYPE char) | unit | same | ✅ exists |
+| FIG-01 | `TYPE` contains exactly `"SUP"` and `"USE"` | unit | same | ✅ exists |
+| FIG-01 | Missing/invalid `year` arg is a hard error | unit | `expect_error(read_figaro(path))` | ✅ exists |
+| FIG-01 | Non-existent path is a hard error | unit | `expect_error(read_figaro("/nonexistent", 2023))` | ✅ exists |
+| FIG-01 | Zero or multiple supply/use files in directory is a hard error | unit | `expect_error` with tempdir variants | ✅ exists |
+| FIG-02 | `CPA_` prefix stripped from `CPA` column | unit | `expect_true(all(!startsWith(out$CPA, "CPA_")))` | ✅ exists |
+| FIG-02 | `REP`/`PAR` preserve inter-country rows (not filtered to diagonal) | unit | `expect_true(any(out$REP != out$PAR))` | ✅ exists |
+| FIG-02 | Primary-input rows (`B2A3G`, `D1`, `D21X31`, `D29X39`, `OP_RES`, `OP_NRES` with `refArea == "W2"`) are filtered out (D-19) | unit | `expect_false("B2A3G" %in% out$CPA); expect_false("W2" %in% out$REP)` | ✅ exists |
+| FIG-02 | Five final-demand columns aggregated into single `VAR = "FU_bas"` per (REP,PAR,CPA) (D-20) | unit | `expect_true("FU_bas" %in% out[TYPE == "USE"]$VAR); expect_false(any(c("P3_S13","P3_S14","P3_S15","P51G","P5M") %in% out$VAR))` | ✅ exists |
+| FIG-02 | `FIGW1` rows are preserved (not filtered) (D-21) | unit | injected `FIGW1` test row survives import | ✅ exists |
+| FIG-02 | `final_demand_vars=` arg with subset produces aggregation over the subset only (D-20) | unit | `out2 <- read_figaro(dir, 2023, final_demand_vars = "P3_S14"); expect_lt(sum(out2$VALUE[VAR == "FU_bas"]), sum(out$VALUE[VAR == "FU_bas"]))` | ✅ exists |
+| FIG-02 | `final_demand_vars=` with unknown code hard-errors | unit | `expect_error(read_figaro(dir, 2023, final_demand_vars = "BOGUS"))` | ✅ exists |
+| FIG-03 | `.coerce_map()` routes a column named `NACE` to `VAR` (D-16) | unit | `build_matrices()` succeeds with `NACE`-named ind_map | ✅ exists |
+| FIG-03 | `.coerce_map()` routes a column named `NACE_R2` to `VAR` (D-16) | unit | same pattern with `NACE_R2` | ✅ exists |
 | FIG-03 | Existing WIOD mapping synonyms still route correctly (no regression) | unit | Re-run existing `test-workflow.R` | ✅ exists |
-| FIG-04 | `inst/extdata/figaro-sample/` directory installs and is reachable via `system.file()` | unit | `expect_true(nzchar(system.file("extdata", "figaro-sample", package = "sube")))` | ❌ Wave 0 |
-| FIG-04 | Both synthetic fixture files present after install | unit | `expect_true(file.exists(system.file(...)))` for supply + use | ❌ Wave 0 |
-| FIG-04 | End-to-end: `read_figaro()` → `extract_domestic_block()` → `build_matrices()` → `compute_sube()` produces non-empty `sube_results` | integration | one `test_that()` block chaining all four calls on the fixture | ❌ Wave 0 |
-| FIG-04 | `extract_domestic_block()` on `read_figaro()` output yields only `REP == PAR` rows | unit | `expect_true(all(domestic$REP == domestic$PAR))` | ❌ Wave 0 |
+| FIG-04 | `inst/extdata/figaro-sample/` directory installs and is reachable via `system.file()` | unit | `expect_true(nzchar(system.file("extdata", "figaro-sample", package = "sube")))` | ✅ exists |
+| FIG-04 | Both synthetic fixture files present after install | unit | `expect_true(file.exists(system.file(...)))` for supply + use | ✅ exists |
+| FIG-04 | End-to-end: `read_figaro()` → `extract_domestic_block()` → `build_matrices()` → `compute_sube()` produces non-empty `sube_results` | integration | one `test_that()` block chaining all four calls on the fixture | ✅ exists |
+| FIG-04 | `extract_domestic_block()` on `read_figaro()` output yields only `REP == PAR` rows | unit | `expect_true(all(domestic$REP == domestic$PAR))` | ✅ exists |
 | FIG-04 | `R CMD check --as-cran` passes with 0 errors, 0 warnings, 0 new notes | R CMD check | `Rscript -e 'devtools::check()'` or CI `.github/workflows/R-CMD-check.yaml` | ✅ CI exists |
 
 ---
 
 ## Wave 0 Requirements
 
-- [ ] `tests/testthat/test-figaro.R` — new test file covering FIG-01..FIG-04 per the Phase Requirements → Test Map above. Must `library(testthat); library(sube)` at top; use `system.file("extdata", "figaro-sample", package = "sube")` for fixture path; structure as one `test_that()` block per behavior group (matching `test-workflow.R` style).
-- [ ] `inst/extdata/figaro-sample/flatfile_eu-ic-supply_sample.csv` — synthetic supply fixture:
-  - Seven-column header: `icsupRow,icsupCol,refArea,rowPi,counterpartArea,colPi,obsValue`
-  - 2 countries (`REP1`, `REP2`) × 3 CPA (`CPA_P01`, `CPA_P02`, `CPA_P03`) × 3 NACE (`I01`, `I02`, `I03`) × 2 counterparts = 36 rows
-  - Synthetic non-zero `obsValue` producing a non-singular supply matrix after aggregation
-- [ ] `inst/extdata/figaro-sample/flatfile_eu-ic-use_sample.csv` — synthetic use fixture:
-  - Same seven-column header with `icuseRow`/`icuseCol`
-  - 36 intermediate-use rows (same shape as supply)
-  - ≥ 5 final-demand rows with `colPi ∈ {P3_S13, P3_S14, P3_S15, P51G, P5M}` to exercise FD aggregation (D-20)
-  - ≥ 1 primary-input row (`refArea = "W2"`, `rowPi = "B2A3G"`) to exercise the primary-input filter (D-19)
-  - ≥ 1 row with `refArea = "FIGW1"` or `counterpartArea = "FIGW1"` to exercise FIGW1 preservation (D-21)
-- [ ] Shared fixtures / helpers — inline inside `test-figaro.R`; no conftest equivalent in testthat
+- [x] `tests/testthat/test-figaro.R` — 11 test_that blocks covering FIG-01..FIG-04 (46 expectations, all green)
+- [x] `inst/extdata/figaro-sample/flatfile_eu-ic-supply_sample.csv` — 37 lines (header + 36 data rows)
+- [x] `inst/extdata/figaro-sample/flatfile_eu-ic-use_sample.csv` — 69 lines (header + 68 data rows: 36 intermediate + 30 FD + 1 primary-input + 1 FIGW1)
+- [x] Shared fixtures / helpers — `figaro_fixture_dir()` and `make_tiny_figaro_maps()` inline in `test-figaro.R`
 
 **Framework install:** Not needed — `testthat` already in DESCRIPTION Suggests and in CI.
 
@@ -105,11 +101,28 @@ created: 2026-04-09
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (test-figaro.R + fixture CSVs)
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 30s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (test-figaro.R + fixture CSVs)
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** approved (2026-04-17 retroactive audit)
+
+---
+
+## Validation Audit 2026-04-17
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+**Notes:**
+- FIGARO filter: 56 pass / 0 fail / 2 expected skip (Phase 7 gated E2E)
+- 11 `test_that` blocks in `test-figaro.R` cover all FIG-01..FIG-04 requirements
+- All 21 behavioral requirements from the Phase Requirements → Test Map have automated coverage
+- Wave 0 artifacts (test file + 2 fixture CSVs) were delivered in Plan 01 and made green in Plans 02-04
+- Retroactive audit — phase was executed before Nyquist validation was enforced
