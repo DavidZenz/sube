@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Documentation & pkgdown
 status: planning
-stopped_at: Phase 11 context gathered
-last_updated: "2026-04-17T13:41:33.460Z"
+stopped_at: Phase 12 context gathered
+last_updated: "2026-04-17T16:35:05.498Z"
 last_activity: 2026-04-17
 progress:
   total_phases: 3
@@ -64,6 +64,6 @@ None. Phase 11 (FMT-01..04) is foundational — Phase 12 depends on its output.
 
 ## Session Continuity
 
-Last session: 2026-04-17T13:15:45.155Z
-Stopped at: Phase 11 context gathered
-Resume file: .planning/phases/11-data-format-specification/11-CONTEXT.md
+Last session: 2026-04-17T16:35:05.493Z
+Stopped at: Phase 12 context gathered
+Resume file: .planning/phases/12-vignette-readme-refresh/12-CONTEXT.md
