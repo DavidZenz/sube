@@ -66,6 +66,11 @@
   `SUBE_WIOD_DIR`; auto-skipped on CRAN and in CI) which asserts bit-level
   equality against the legacy paper ground-truth matrices for AUS, DEU,
   USA, and JPN in 2005.
+- Fixed the legacy-wrapper subprocess test (`test-workflow.R`) to pass under
+  `R CMD check --as-cran` by threading `.libPaths()` into the child `Rscript`
+  process via the `R_LIBS` environment variable (INFRA-01). Previously, the
+  subprocess could not find `sube` because `R CMD check` installs to a
+  temporary library not on the child's default search path.
 
 # sube 0.1.2
 

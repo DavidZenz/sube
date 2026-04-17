@@ -91,6 +91,7 @@ Two documented non-blocking tech-debt items survive v1.1 closeout: (1) pre-exist
 | Strip `CPA_` prefix and aggregate FD columns to `FU_bas` at FIGARO import time | Downstream code never has to distinguish raw vs. stripped product codes or FIGARO vs. WIOD FD conventions | ✓ Good (v1.1) |
 | Gate replication on `SUBE_WIOD_DIR`; exclude `inst/extdata/wiod/` from tarball | CRAN/CI skip deterministically; researchers reproduce locally with their own data | ✓ Good (v1.1) |
 | Defer v1.1's "Convenience" scope (pipeline, batch helpers) to v1.2 rather than back-filling CNV-requirements | No CNV- requirements were defined during planning; shipped convenience-shaped work landed under FIG-/REP- IDs | ✓ Good (v1.1) |
+| Thread `.libPaths()` via `R_LIBS` into legacy-wrapper subprocess test (INFRA-01) | `R CMD check --as-cran` isolates the package in a temp library that `system2()` children don't inherit; passing `R_LIBS` from `.libPaths()` is the zero-dependency cross-platform fix | ✓ Good (v1.2) |
 
 <details>
 <summary>Previous milestone cycles</summary>
