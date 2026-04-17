@@ -275,17 +275,19 @@ Step 2.5 SKIPPED — security_enforcement not in config, but this phase edits on
 | A2 | The transition sentence at data-preparation.Rmd line 107 ("The remaining sections walk through…") was written by Phase 11 and may already serve as adequate bridging prose for D-13 | Architecture Patterns | Low — if adequate, D-13 tasks may be lighter than anticipated |
 | A3 | `R CMD check` will flag broken Rmd cross-reference links as NOTEs or WARNINGs | Validation Architecture | Low — even if not flagged, manual verification during PR catches broken links |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Documentation section in README: update to list all 7 vignettes?**
    - What we know: README Documentation section currently lists 4 vignettes; 3 newer vignettes (pipeline-helpers, figaro-workflow, paper-replication) are absent
    - What's unclear: Whether updating this list is explicitly required or within Claude's discretion
    - Recommendation: Treat as within-discretion housekeeping — update the list when making D-10 edits; costs one extra line, improves discoverability
+   - RESOLVED: Task 3 updates Documentation section to list all 7 vignettes in canonical order.
 
 2. **Transition sentence at data-preparation.Rmd line 107**
    - What we know: "The remaining sections walk through the shipped example objects in detail, illustrating each data family in the preparation sequence." already bridges Phase 11 BYOD section to original sections
    - What's unclear: Whether this is sufficient for D-13 or whether each original section also needs an opening line referencing the spec above
    - Recommendation: Per D-13, add 1-sentence openers to each of `## Supply-use data`, `## Mapping tables`, `## Input metrics` that echo back to the canonical spec (e.g., "The `sut_data` example shows the 7-column canonical format described above."). This is light and explicit.
+   - RESOLVED: Task 2 adds 1-sentence openers to each of the four original sections (Supply-use data, Mapping tables, Input metrics, Modeling table) that echo back to the spec above.
 
 ## Sources
 
