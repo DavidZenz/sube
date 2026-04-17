@@ -47,9 +47,9 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 
 ### Active (v1.2)
 
-- [ ] **CONV-01**: `run_sube_pipeline()` — one-call wrapper chaining import → matrix → compute
-- [ ] **CONV-02**: `batch_sube()` — country/year batch processor returning collected results
-- [ ] **CONV-03**: Pipeline diagnostic warnings for dropped rows, skipped matrices, singular branches
+- ✓ **CONV-01**: `run_sube_pipeline()` — one-call wrapper chaining import → matrix → compute — v1.2 Phase 8
+- ✓ **CONV-02**: `batch_sube()` — country/year batch processor returning collected results — v1.2 Phase 8
+- ✓ **CONV-03**: Pipeline diagnostic warnings for dropped rows, skipped matrices, singular branches — v1.2 Phase 8
 - [ ] **INFRA-01**: `test-workflow.R:218` legacy-wrapper subprocess test passes under `R CMD check --as-cran`
 - [ ] **NYQ-01**: Retroactive Nyquist `*-VALIDATION.md` for phase 5 (figaro-sut-ingestion)
 - [ ] **NYQ-02**: Retroactive Nyquist `*-VALIDATION.md` for phase 6 (paper-replication-verification)
@@ -67,7 +67,7 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 
 The repository has a validated package-first maintenance path: exported R functions covering import (WIOD + FIGARO), matrix building, compute, diagnostics, Leontief extraction, comparison shaping, paper-style plotting, outlier filtering, and export. `testthat` coverage runs green (102/102 under `devtools::test()`; 46/46 FIGARO; 3 gated replication blocks skip cleanly on CRAN). pkgdown groups cover Data import, Matrix building, Compute, Elasticity models, Diagnostics, Paper replication tools, and Legacy migration. `R-CMD-check` GitHub Actions workflow is hardened; `.Rbuildignore` keeps planning artifacts and `inst/extdata/wiod/` out of the CRAN tarball. Historical paper material remains outside the package bundle except for local reference material in `inst/references/` and synthetic fixtures in `inst/extdata/`.
 
-Two documented non-blocking tech-debt items survive v1.1 closeout: (1) pre-existing `test-workflow.R:218` legacy-wrapper subprocess failure under `R CMD check --as-cran`, and (2) known ~4.4% methodological divergence when `devtools::load_all` triggers the local WIOD fallback. Both are candidates for v1.2 follow-up.
+Two documented non-blocking tech-debt items survive v1.1 closeout: (1) pre-existing `test-workflow.R:218` legacy-wrapper subprocess failure under `R CMD check --as-cran`, and (2) known ~4.4% methodological divergence when `devtools::load_all` triggers the local WIOD fallback. Both are candidates for v1.2 follow-up. Phase 8 shipped `run_sube_pipeline()` and `batch_sube()` with unified `$diagnostics` data.table (6-column schema) and four detection helpers. `testthat` coverage: 197 pass / 0 fail / 5 gated skips.
 
 ## Constraints
 
@@ -124,4 +124,4 @@ This document evolves at phase transitions and milestone boundaries.
 5. Archive previous milestone's active content under `<details>`
 
 ---
-*Last updated: 2026-04-16 after v1.2 Phase 7 completion (FIG-E2E-01/02/03 + INFRA-02 validated)*
+*Last updated: 2026-04-17 after v1.2 Phase 8 completion (CONV-01/02/03 validated — run_sube_pipeline + batch_sube + diagnostics shipped)*
