@@ -12,20 +12,20 @@ Requirements for milestone v1.2. Each maps to roadmap phases.
 
 ### FIGARO End-to-End Validation
 
-- [ ] **FIG-E2E-01**: User can run a gated test (`SUBE_FIGARO_DIR`) that drives the real FIGARO 2023 flatfile through the full pipeline (`read_figaro → extract_domestic_block → build_matrices → compute_sube → estimate_elasticities`) for ~4 representative countries × 1 reference year, asserting (a) pipeline completes without error, (b) structural invariants hold (shapes, non-NULL core columns, elasticity signs sane), (c) digest of `model_data` matches a stored golden value (auto-captured on first green run). Skipped cleanly on CRAN/CI when the env var is unset.
-- [ ] **FIG-E2E-02**: Contract tests push the synthetic `inst/extdata/figaro-sample/` fixture through the downstream pipeline (`build_matrices → compute_sube → estimate_elasticities`) in a new `tests/testthat/test-figaro-pipeline.R`, runnable on every CRAN/CI build with no external data.
-- [ ] **FIG-E2E-03**: Standalone `vignettes/figaro-workflow.Rmd` (companion to `paper-replication.Rmd`, `eval = FALSE`) narrates the full researcher journey from downloading a FIGARO flatfile to final elasticity output.
+- [x] **FIG-E2E-01**: User can run a gated test (`SUBE_FIGARO_DIR`) that drives the real FIGARO 2023 flatfile through the full pipeline (`read_figaro → extract_domestic_block → build_matrices → compute_sube → estimate_elasticities`) for ~4 representative countries × 1 reference year, asserting (a) pipeline completes without error, (b) structural invariants hold (shapes, non-NULL core columns, elasticity signs sane), (c) digest of `model_data` matches a stored golden value (auto-captured on first green run). Skipped cleanly on CRAN/CI when the env var is unset.
+- [x] **FIG-E2E-02**: Contract tests push the synthetic `inst/extdata/figaro-sample/` fixture through the downstream pipeline (`build_matrices → compute_sube → estimate_elasticities`) in a new `tests/testthat/test-figaro-pipeline.R`, runnable on every CRAN/CI build with no external data.
+- [x] **FIG-E2E-03**: Standalone `vignettes/figaro-workflow.Rmd` (companion to `paper-replication.Rmd`, `eval = FALSE`) narrates the full researcher journey from downloading a FIGARO flatfile to final elasticity output.
 
 ### Convenience Helpers
 
-- [ ] **CONV-01**: User can call a single exported `run_sube_pipeline()` function that chains import → matrix → compute with arg pass-through and returns a single structured result object.
-- [ ] **CONV-02**: User can call an exported `batch_sube()` that loops `run_sube_pipeline()` over supplied country × year sets and returns collected results in a tidy structure.
-- [ ] **CONV-03**: `run_sube_pipeline()` and `batch_sube()` surface human-readable diagnostic warnings when rows are dropped by coercion, matrices are skipped due to missing data, or singular branches are hit — giving visibility into silent data-quality issues.
+- [x] **CONV-01**: User can call a single exported `run_sube_pipeline()` function that chains import → matrix → compute with arg pass-through and returns a single structured result object.
+- [x] **CONV-02**: User can call an exported `batch_sube()` that loops `run_sube_pipeline()` over supplied country × year sets and returns collected results in a tidy structure.
+- [x] **CONV-03**: `run_sube_pipeline()` and `batch_sube()` surface human-readable diagnostic warnings when rows are dropped by coercion, matrices are skipped due to missing data, or singular branches are hit — giving visibility into silent data-quality issues.
 
 ### Test Infrastructure
 
 - [ ] **INFRA-01**: `tests/testthat/test-workflow.R:218` (legacy-wrapper subprocess test) passes cleanly under `R CMD check --as-cran`, either by threading `R_LIBS`/`.libPaths()` into the `Rscript` subprocess or by applying a principled check-time skip with documented rationale.
-- [ ] **INFRA-02**: `resolve_wiod_root()` is env-var-only: the `inst/extdata/wiod/` local fallback is removed entirely, and a parallel `resolve_figaro_root()` reads only `SUBE_FIGARO_DIR`. Unset env var → clean skip regardless of local dir presence. Ships with contract tests asserting guarded-skip and opt-in paths for both resolvers. (Revised during Phase 7 discuss from earlier `SUBE_WIOD_FALLBACK` opt-in wording — locked by CONTEXT.md D-7.7.)
+- [x] **INFRA-02**: `resolve_wiod_root()` is env-var-only: the `inst/extdata/wiod/` local fallback is removed entirely, and a parallel `resolve_figaro_root()` reads only `SUBE_FIGARO_DIR`. Unset env var → clean skip regardless of local dir presence. Ships with contract tests asserting guarded-skip and opt-in paths for both resolvers. (Revised during Phase 7 discuss from earlier `SUBE_WIOD_FALLBACK` opt-in wording — locked by CONTEXT.md D-7.7.)
 
 ### Validation Coverage
 
@@ -59,19 +59,21 @@ Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FIG-E2E-01 | Phase 7 | Pending |
-| FIG-E2E-02 | Phase 7 | Pending |
-| FIG-E2E-03 | Phase 7 | Pending |
-| INFRA-02 | Phase 7 | Pending |
-| CONV-01 | Phase 8 | Pending |
-| CONV-02 | Phase 8 | Pending |
-| CONV-03 | Phase 8 | Pending |
+| FIG-E2E-01 | Phase 7 | Satisfied |
+| FIG-E2E-02 | Phase 7 | Satisfied |
+| FIG-E2E-03 | Phase 7 | Satisfied |
+| INFRA-02 | Phase 7 | Satisfied |
+| CONV-01 | Phase 8 | Satisfied |
+| CONV-02 | Phase 8 | Satisfied |
+| CONV-03 | Phase 8 | Satisfied |
 | INFRA-01 | Phase 9 | Pending |
 | NYQ-01 | Phase 10 | Pending |
 | NYQ-02 | Phase 10 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 10 total
+- Satisfied: 7 (FIG-E2E-01/02/03, INFRA-02, CONV-01/02/03)
+- Pending: 3 (INFRA-01, NYQ-01, NYQ-02)
 - Mapped to phases: 10 (100%)
 - Unmapped: 0
 

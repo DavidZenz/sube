@@ -26,8 +26,8 @@
 
 **Milestone Goal:** Prove the FIGARO pipeline works end-to-end on real data, deliver the long-promised one-call/batch convenience helpers, and clear the tech debt inherited from v1.1.
 
-- [ ] **Phase 7: FIGARO End-to-End Validation & Fallback Hardening** - Prove the FIGARO pipeline works on real data, on the synthetic fixture, and in docs — plus lock down the gated-env-var contract so local fallbacks never silently activate
-- [ ] **Phase 8: Convenience Helpers** - Deliver the long-deferred one-call pipeline, batch processor, and their diagnostic warnings layer
+- [x] **Phase 7: FIGARO End-to-End Validation & Fallback Hardening** - Prove the FIGARO pipeline works on real data, on the synthetic fixture, and in docs — plus lock down the gated-env-var contract so local fallbacks never silently activate
+- [x] **Phase 8: Convenience Helpers** - Deliver the long-deferred one-call pipeline, batch processor, and their diagnostic warnings layer
 - [ ] **Phase 9: Test Infrastructure Tech Debt** - Fix the pre-existing `test-workflow.R:218` subprocess failure under `R CMD check --as-cran`
 - [ ] **Phase 10: Retroactive Nyquist Validation** - Back-fill Nyquist `*-VALIDATION.md` reports for phases 5 and 6 to close the v1.1 audit's `not_enforced` flag
 
@@ -98,7 +98,7 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 (Phase 10 may run in paral
 | 4. Release, CI, and Migration Readiness | v1.0 | 3/3 | Complete | 2026-04-08 |
 | 5. FIGARO SUT Ingestion | v1.1 | 4/4 | Complete | 2026-04-16 |
 | 6. Paper Replication Verification | v1.1 | 3/3 | Complete | 2026-04-16 |
-| 7. FIGARO End-to-End Validation & Fallback Hardening | v1.2 | 0/5 | Planned | - |
-| 8. Convenience Helpers | v1.2 | 0/3 | Planned | - |
+| 7. FIGARO End-to-End Validation & Fallback Hardening | v1.2 | 5/5 | Complete | 2026-04-17 |
+| 8. Convenience Helpers | v1.2 | 3/3 | Complete | 2026-04-17 |
 | 9. Test Infrastructure Tech Debt | v1.2 | 0/TBD | Not started | - |
 | 10. Retroactive Nyquist Validation | v1.2 | 0/TBD | Not started | - |
