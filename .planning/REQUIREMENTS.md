@@ -29,8 +29,8 @@ Requirements for milestone v1.2. Each maps to roadmap phases.
 
 ### Validation Coverage
 
-- [ ] **NYQ-01**: A Nyquist-schema `*-VALIDATION.md` report exists for phase 5 (figaro-sut-ingestion), retroactively closing the v1.1 audit's `nyquist.overall: not_enforced` flag.
-- [ ] **NYQ-02**: A Nyquist-schema `*-VALIDATION.md` report exists for phase 6 (paper-replication-verification), retroactively closing the same audit flag.
+- [x] **NYQ-01**: A Nyquist-schema `*-VALIDATION.md` report exists for phase 5 (figaro-sut-ingestion), retroactively closing the v1.1 audit's `nyquist.overall: not_enforced` flag.
+- [x] **NYQ-02**: A Nyquist-schema `*-VALIDATION.md` report exists for phase 6 (paper-replication-verification), retroactively closing the same audit flag.
 
 ## Future Requirements
 
@@ -67,13 +67,13 @@ Which phases cover which requirements.
 | CONV-02 | Phase 8 | Satisfied |
 | CONV-03 | Phase 8 | Satisfied |
 | INFRA-01 | Phase 9 | Pending |
-| NYQ-01 | Phase 10 | Pending |
-| NYQ-02 | Phase 10 | Pending |
+| NYQ-01 | Phase 10 | Satisfied |
+| NYQ-02 | Phase 10 | Satisfied |
 
 **Coverage:**
 - v1.2 requirements: 10 total
-- Satisfied: 7 (FIG-E2E-01/02/03, INFRA-02, CONV-01/02/03)
-- Pending: 3 (INFRA-01, NYQ-01, NYQ-02)
+- Satisfied: 9 (FIG-E2E-01/02/03, INFRA-02, CONV-01/02/03, NYQ-01, NYQ-02)
+- Pending: 1 (INFRA-01)
 - Mapped to phases: 10 (100%)
 - Unmapped: 0
 
