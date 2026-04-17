@@ -241,10 +241,12 @@ test_that("legacy wrapper script remains a usable migration bridge", {
   # temporary library directory is visible to the subprocess. Without this,
   # library(sube) fails in the child because R CMD check isolates the
   # installed package in a temp dir that is not on the default search path.
+  # Use R.home("bin") for the full Rscript path — R CMD check --as-cran
+  # rejects bare "Rscript" invocations (par. 1.6 of the manual).
   r_libs <- paste(.libPaths(), collapse = .Platform$path.sep)
 
   status <- system2(
-    Sys.which("Rscript"),
+    file.path(R.home("bin"), "Rscript"),
     c(script_path, sut_path, cpa_map_path, ind_map_path, inputs_path, output_dir),
     stdout = TRUE,
     stderr = TRUE,
