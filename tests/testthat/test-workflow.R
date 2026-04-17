@@ -231,6 +231,11 @@ test_that("legacy wrapper script remains a usable migration bridge", {
 
   source_script_path <- testthat::test_path("..", "..", "inst", "scripts", "run_legacy_pipeline.R")
   installed_script_path <- system.file("scripts", "run_legacy_pipeline.R", package = "sube")
+  # Prefer the working-tree copy so the test exercises the current source.
+  # Falls back to the installed package only when the source path does not
+  # exist (e.g. running tests against an installed binary without the source
+  # tree present). If neither path resolves, mustWork = TRUE will abort with
+  # a clear error rather than silently passing a wrong path to system2().
   script_path <- if (file.exists(source_script_path)) {
     normalizePath(source_script_path, mustWork = TRUE)
   } else {
@@ -253,6 +258,13 @@ test_that("legacy wrapper script remains a usable migration bridge", {
     env    = paste0("R_LIBS=", r_libs)
   )
 
+  exit_code <- attr(status, "status")
+  if (!is.null(exit_code) && exit_code != 0L) {
+    fail(paste0(
+      "Legacy wrapper exited with status ", exit_code, ".\nOutput:\n",
+      paste(status, collapse = "\n")
+    ))
+  }
   expect_null(attr(status, "status"))
   expect_true(dir.exists(output_dir))
   expect_true(file.exists(file.path(output_dir, "sube_results.csv")))
