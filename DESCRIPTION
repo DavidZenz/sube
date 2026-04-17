@@ -10,8 +10,7 @@ Description: Tools for importing supply-use tables, building domestic
     matrices, computing Leontief-style SUBE multipliers, estimating
     panel and cross-sectional elasticity regressions, filtering derived
     results, plotting tidy outputs, and exporting package objects for
-    reproducible input-output analysis workflows. The legacy wrapper test
-    threads .libPaths() via R_LIBS to support R CMD check environments.
+    reproducible input-output analysis workflows.
 License: GPL-3
 URL: https://github.com/davidzenz/sube
 BugReports: https://github.com/davidzenz/sube/issues
