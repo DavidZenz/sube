@@ -33,6 +33,79 @@ The shipped example objects map directly to those four families:
 
 That sample-data path is the easiest way to understand the required contracts before switching to external research data.
 
+## Canonical SUT Format
+
+All SUT data must resolve to a long-format data frame with exactly 7 columns. Each row represents one cell of the supply-use table. Supply and use tables are stacked in the same data frame and distinguished by the TYPE column.
+
+| Column | Type | Semantics | Example |
+|--------|------|-----------|---------|
+| REP | character | Reporting country — the economy whose supply-use table is being described | `"AAA"` |
+| PAR | character | Partner country — the economy supplying or demanding the product. Equal to REP for the domestic block | `"AAA"` |
+| CPA | character | Product code — identifies the good or service (CPA/NACE product classification) | `"P1"` |
+| VAR | character | Industry or final-demand variable — identifies the column in the SUT (an industry code or a final-demand code) | `"I1"`, `"FU_bas"` |
+| VALUE | numeric | Cell value in the supply-use table, in the unit of the source data (typically millions of current-price currency units) | `10` |
+| YEAR | integer | Reference year of the data | `2020` |
+| TYPE | character | Table type: `"SUP"` for supply table, `"USE"` for use table | `"SUP"` |
+
+The shipped example shows this structure concretely:
+
+```{r}
+sube_example_data("sut_data")
+```
+
+### Column name synonyms
+
+Column names in the 7-column SUT table are matched after uppercasing only — there is no synonym resolution for the SUT columns themselves. Synonyms apply exclusively to **mapping table columns** (`cpa_map`, `ind_map`) passed to functions such as `import_suts()`. All matching is case-insensitive because column names are uppercased on import.
+
+| Canonical Name | Accepted Synonyms |
+|----------------|-------------------|
+| CPA | CPA, CPA56, CPA_CODE |
+| CPAAGG | CPAAGG, CPA_AGG, PRODUCT, PRODUCT_AGG |
+| VARS | VARS, VAR, INDUSTRY, IND, CODE, NACE, NACE_R2 |
+| INDAGG | INDAGG, IND_AGG, INDUSTRY_AGG, SECTOR |
+
+## Satellite Vector Inputs
+
+The `inputs` table is researcher-supplied from national accounts or external sources — the package does **not** derive these values from the SUT data. `compute_sube()` requires it as a separate argument alongside the matrix bundle.
+
+| Column | Type | What It Measures | Required? | Source |
+|--------|------|-----------------|-----------|--------|
+| YEAR | integer | Reference year | Yes | Must match SUT YEAR values |
+| REP | character | Country code | Yes | Must match SUT REP values |
+| INDUSTRY (or synonym) | character | Industry identifier | Yes | Must match VAR codes in the SUT |
+| GO | numeric | Gross output — total production value by industry | Yes | Researcher-supplied (e.g. national accounts) |
+| VA | numeric | Value added — GDP contribution by industry | Optional | Researcher-supplied |
+| EMP | numeric | Employment — workers or hours by industry | Optional | Researcher-supplied |
+| CO2 | numeric | CO2 emissions by industry | Optional | Researcher-supplied |
+
+The industry identifier column accepts synonyms: IND, INDUSTRY, INDUSTRIES, INDAGG (checked in that order; first match wins). GO is the only metric always required. VA, EMP, and CO2 are computed when present in the data frame.
+
+```{r}
+sube_example_data("inputs")
+```
+
+## Bring Your Own Data
+
+This section walks through reshaping arbitrary supply-use data into the canonical format expected by the package.
+
+### SUT table preparation
+
+1. Identify which columns in your source data correspond to REP, PAR, CPA, YEAR, and TYPE.
+2. Rename or map columns to the canonical names, or supply them with any casing — `import_suts()` will uppercase all column names on import.
+3. Choose a layout: long format (all 7 columns including VAR and VALUE) or wide format (5 identity columns with industry codes as column headers). `import_suts()` accepts both.
+4. If using wide format: be aware that aggregate demand columns (e.g. total final use) will be melted as industry columns unless they match known WIOD aggregates. Remove or rename them before import if needed.
+5. Call `import_suts()` on the file path. Inspect the result with `head()` and `str()` to verify all 7 columns are present and values look correct.
+
+### Satellite vector preparation
+
+1. Obtain gross output (GO) by industry from national accounts or your preferred source. This column is required.
+2. Optionally gather value added (VA), employment (EMP), and CO2 emissions (CO2) by industry.
+3. Structure the data with columns YEAR, REP, and one industry identifier column (any of: IND, INDUSTRY, INDUSTRIES, or INDAGG).
+4. Ensure YEAR and REP values match those in your SUT data exactly.
+5. Provide one row per (YEAR, REP, INDUSTRY) combination. Pass the resulting data frame to the `inputs` argument of `compute_sube()`.
+
+The remaining sections walk through the shipped example objects in detail, illustrating each data family in the preparation sequence.
+
 ## Supply-use data
 
 Imported SUT data should resolve to these columns:
