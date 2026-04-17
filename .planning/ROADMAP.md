@@ -76,7 +76,7 @@ Plans:
   3. The resolution strategy (fix vs. documented skip) is recorded in PROJECT.md Key Decisions and in an inline comment at the test site so future maintainers understand the trade-off
 **Plans**: 1 plan
 Plans:
-- [ ] 09-01-PLAN.md — Thread .libPaths() via R_LIBS into legacy-wrapper subprocess test and document resolution in PROJECT.md, NEWS.md, DESCRIPTION
+- [x] 09-01-PLAN.md — Thread .libPaths() via R_LIBS into legacy-wrapper subprocess test and document resolution in PROJECT.md, NEWS.md, DESCRIPTION
 
 ### Phase 10: Retroactive Nyquist Validation
 **Goal**: Phases 5 and 6 carry Nyquist-schema `*-VALIDATION.md` reports that retroactively close the v1.1 audit's `nyquist.overall: not_enforced` flag
