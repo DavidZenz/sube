@@ -74,7 +74,9 @@ Plans:
   1. `R CMD check --as-cran` on the built tarball exits with zero test failures from `test-workflow.R:218` (either by threading `R_LIBS`/`.libPaths()` into the `Rscript` subprocess or by applying a principled check-time skip with documented rationale in the test file and NEWS entry)
   2. `devtools::test()` continues to run 102/102 green (no regressions in the non-subprocess path)
   3. The resolution strategy (fix vs. documented skip) is recorded in PROJECT.md Key Decisions and in an inline comment at the test site so future maintainers understand the trade-off
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 09-01-PLAN.md — Thread .libPaths() via R_LIBS into legacy-wrapper subprocess test and document resolution in PROJECT.md, NEWS.md, DESCRIPTION
 
 ### Phase 10: Retroactive Nyquist Validation
 **Goal**: Phases 5 and 6 carry Nyquist-schema `*-VALIDATION.md` reports that retroactively close the v1.1 audit's `nyquist.overall: not_enforced` flag
@@ -100,5 +102,5 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 (Phase 10 may run in paral
 | 6. Paper Replication Verification | v1.1 | 3/3 | Complete | 2026-04-16 |
 | 7. FIGARO End-to-End Validation & Fallback Hardening | v1.2 | 5/5 | Complete | 2026-04-17 |
 | 8. Convenience Helpers | v1.2 | 3/3 | Complete | 2026-04-17 |
-| 9. Test Infrastructure Tech Debt | v1.2 | 0/TBD | Not started | - |
+| 9. Test Infrastructure Tech Debt | v1.2 | 0/1 | Not started | - |
 | 10. Retroactive Nyquist Validation | v1.2 | 0/TBD | Not started | - |
