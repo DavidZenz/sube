@@ -50,7 +50,7 @@ Researchers can run a reproducible end-to-end SUBE workflow in R without falling
 - ✓ **CONV-01**: `run_sube_pipeline()` — one-call wrapper chaining import → matrix → compute — v1.2 Phase 8
 - ✓ **CONV-02**: `batch_sube()` — country/year batch processor returning collected results — v1.2 Phase 8
 - ✓ **CONV-03**: Pipeline diagnostic warnings for dropped rows, skipped matrices, singular branches — v1.2 Phase 8
-- [ ] **INFRA-01**: `test-workflow.R:218` legacy-wrapper subprocess test passes under `R CMD check --as-cran`
+- ✓ **INFRA-01**: `test-workflow.R:218` legacy-wrapper subprocess test passes under `R CMD check --as-cran` — v1.2 Phase 9
 - ✓ **NYQ-01**: Retroactive Nyquist `*-VALIDATION.md` for phase 5 (figaro-sut-ingestion) — v1.2 Phase 10
 - ✓ **NYQ-02**: Retroactive Nyquist `*-VALIDATION.md` for phase 6 (paper-replication-verification) — v1.2 Phase 10
 

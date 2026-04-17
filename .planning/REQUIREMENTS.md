@@ -24,7 +24,7 @@ Requirements for milestone v1.2. Each maps to roadmap phases.
 
 ### Test Infrastructure
 
-- [ ] **INFRA-01**: `tests/testthat/test-workflow.R:218` (legacy-wrapper subprocess test) passes cleanly under `R CMD check --as-cran`, either by threading `R_LIBS`/`.libPaths()` into the `Rscript` subprocess or by applying a principled check-time skip with documented rationale.
+- [x] **INFRA-01**: `tests/testthat/test-workflow.R:218` (legacy-wrapper subprocess test) passes cleanly under `R CMD check --as-cran`, either by threading `R_LIBS`/`.libPaths()` into the `Rscript` subprocess or by applying a principled check-time skip with documented rationale.
 - [x] **INFRA-02**: `resolve_wiod_root()` is env-var-only: the `inst/extdata/wiod/` local fallback is removed entirely, and a parallel `resolve_figaro_root()` reads only `SUBE_FIGARO_DIR`. Unset env var → clean skip regardless of local dir presence. Ships with contract tests asserting guarded-skip and opt-in paths for both resolvers. (Revised during Phase 7 discuss from earlier `SUBE_WIOD_FALLBACK` opt-in wording — locked by CONTEXT.md D-7.7.)
 
 ### Validation Coverage
@@ -66,14 +66,14 @@ Which phases cover which requirements.
 | CONV-01 | Phase 8 | Satisfied |
 | CONV-02 | Phase 8 | Satisfied |
 | CONV-03 | Phase 8 | Satisfied |
-| INFRA-01 | Phase 9 | Pending |
+| INFRA-01 | Phase 9 | Satisfied |
 | NYQ-01 | Phase 10 | Satisfied |
 | NYQ-02 | Phase 10 | Satisfied |
 
 **Coverage:**
 - v1.2 requirements: 10 total
-- Satisfied: 9 (FIG-E2E-01/02/03, INFRA-02, CONV-01/02/03, NYQ-01, NYQ-02)
-- Pending: 1 (INFRA-01)
+- Satisfied: 10 (FIG-E2E-01/02/03, INFRA-01, INFRA-02, CONV-01/02/03, NYQ-01, NYQ-02)
+- Pending: 0
 - Mapped to phases: 10 (100%)
 - Unmapped: 0
 

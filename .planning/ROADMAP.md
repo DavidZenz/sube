@@ -28,7 +28,7 @@
 
 - [x] **Phase 7: FIGARO End-to-End Validation & Fallback Hardening** - Prove the FIGARO pipeline works on real data, on the synthetic fixture, and in docs — plus lock down the gated-env-var contract so local fallbacks never silently activate
 - [x] **Phase 8: Convenience Helpers** - Deliver the long-deferred one-call pipeline, batch processor, and their diagnostic warnings layer
-- [ ] **Phase 9: Test Infrastructure Tech Debt** - Fix the pre-existing `test-workflow.R:218` subprocess failure under `R CMD check --as-cran`
+- [x] **Phase 9: Test Infrastructure Tech Debt** - Fix the pre-existing `test-workflow.R:218` subprocess failure under `R CMD check --as-cran`
 - [x] **Phase 10: Retroactive Nyquist Validation** - Back-fill Nyquist `*-VALIDATION.md` reports for phases 5 and 6 to close the v1.1 audit's `not_enforced` flag (completed 2026-04-17)
 
 ## Phase Details
@@ -105,5 +105,5 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 (Phase 10 may run in paral
 | 6. Paper Replication Verification | v1.1 | 3/3 | Complete | 2026-04-16 |
 | 7. FIGARO End-to-End Validation & Fallback Hardening | v1.2 | 5/5 | Complete | 2026-04-17 |
 | 8. Convenience Helpers | v1.2 | 3/3 | Complete | 2026-04-17 |
-| 9. Test Infrastructure Tech Debt | v1.2 | 0/1 | Not started | - |
+| 9. Test Infrastructure Tech Debt | v1.2 | 1/1 | Complete | 2026-04-17 |
 | 10. Retroactive Nyquist Validation | v1.2 | 1/1 | Complete    | 2026-04-17 |
