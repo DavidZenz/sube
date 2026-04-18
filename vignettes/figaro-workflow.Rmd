@@ -36,6 +36,12 @@ This vignette walks through the full researcher journey:
 Every code chunk is `eval = FALSE` so the vignette renders cleanly on CRAN and
 in CI without requiring the actual FIGARO flatfiles (roughly 400-500 MB each).
 
+This vignette covers FIGARO-specific import. Once data is in canonical
+`sube_suts` format, the downstream pipeline — `build_matrices()`,
+`compute_sube()`, and `estimate_elasticities()` — works the same for any SUT
+source. Only steps 2–4 (file layout, `read_figaro()`, and NACE mapping) are
+FIGARO-specific.
+
 > **Tip.** For a one-call equivalent that chains `read_figaro()` through
 > `compute_sube()`, see
 > [`run_sube_pipeline(source = "figaro", ...)`](../reference/run_sube_pipeline.html)

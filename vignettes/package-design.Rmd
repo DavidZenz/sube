@@ -13,6 +13,11 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 `sube` is organized around a workflow API instead of a script pipeline. That design choice is tied to the research problem developed in the companion paper, but the package documentation treats the operational workflow as primary and the paper as motivation.
 [Wrapping input-output multipliers in confidence intervals](https://doi.org/10.1186/s40008-024-00331-4).
 
+The workflow is source-agnostic: it operates on any supply-use data in the
+canonical long format. WIOD and FIGARO are shipped as example importers, but
+custom national supply-use tables work the same way once reshaped into the
+[canonical format](data-preparation.html).
+
 ## Why this package exists
 
 The package sits between two traditions:

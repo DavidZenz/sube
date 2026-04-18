@@ -39,7 +39,11 @@ This vignette shows the compact public workflow used across the package docs:
 5. compare or export both layers from package objects.
 
 All examples below use only the shipped sample data, so the full workflow can
-be verified from a clean checkout without external downloads.
+be verified from a clean checkout without external downloads. The package
+works with any supply-use data in the canonical long format — WIOD and FIGARO
+are two built-in importers, but you can also bring your own source. Readers
+who want to skip ahead to input contracts and format details can jump to the
+[data-preparation vignette](data-preparation.html).
 
 ## Load sample inputs
 

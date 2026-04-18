@@ -20,7 +20,16 @@ library(data.table)
 The four-step SUBE chain — `import_suts()` / `read_figaro()` →
 `extract_domestic_block()` → `build_matrices()` → `compute_sube()` — gives you
 full control over every stage. If you already have the intermediate objects in
-hand, call the four steps directly; it is two extra lines.
+hand, call the four steps directly; it is two extra lines. The manual workflow
+is covered in detail in the
+[modeling-and-outputs vignette](modeling-and-outputs.html); see the
+[data-preparation vignette](data-preparation.html) for input contracts and the
+canonical format.
+
+These helpers work with any SUT source in the canonical long format, not just
+WIOD and FIGARO. The `source` parameter selects the matching importer; once
+data is in canonical `sube_suts` shape, the downstream pipeline is identical
+regardless of origin.
 
 Reach for the convenience helpers in two cases:
 

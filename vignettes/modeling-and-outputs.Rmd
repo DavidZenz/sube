@@ -20,6 +20,12 @@ The key idea is to keep Leontief benchmark results and SUBE model outputs in a
 shared comparison structure instead of treating them as separate reporting
 pipelines.
 
+The examples below use shipped sample data, but the modeling and output layer
+works identically for any SUT source once data is in the canonical long format
+— whether it came from WIOD, FIGARO, or a custom national supply-use table.
+Data preparation and format details are covered in the
+[data-preparation vignette](data-preparation.html).
+
 ## Compute the sample workflow
 
 ```{r}

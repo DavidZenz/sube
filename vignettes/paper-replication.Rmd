@@ -24,6 +24,11 @@ by `sube`. All code chunks are shown `eval = FALSE` so the vignette
 builds cleanly on CRAN and in CI without requiring the ~4 GB WIOD data
 archive.
 
+This vignette is specific to WIOD data because the paper itself is
+WIOD-based. The pipeline from `build_matrices()` onward is identical for
+any SUT source in canonical format — the WIOD-specific steps are the
+import (section 3) and the correspondence tables (section 4).
+
 The gated test at `tests/testthat/test-replication.R` asserts bit-level
 numerical equivalence for a representative subset (AUS, DEU, USA, JPN
 for 2005). Running it locally is covered in section 9.
