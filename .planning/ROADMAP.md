@@ -74,7 +74,11 @@ Plans:
   1. Pushing to master triggers a GitHub Actions workflow that builds and deploys the pkgdown site to GitHub Pages without manual steps
   2. User visiting the pkgdown site finds articles grouped and ordered to reflect the documentation narrative established in Phase 12
   3. User visiting the pkgdown site finds reference sections and navbar consistent with current package exports and vignette titles
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 13-01-PLAN.md — Modernize pkgdown deploy workflow + add PR smoke-build (PKG-01)
+- [ ] 13-02-PLAN.md — Realign _pkgdown.yml article grouping and reference taxonomy (PKG-02)
+- [ ] 13-03-PLAN.md — Document D-14/D-15 manual verification prerequisites in 13-VERIFICATION.md (PKG-01, PKG-02)
 
 ## Progress
 
@@ -92,4 +96,4 @@ Plans:
 | 10. Retroactive Nyquist Validation | v1.2 | 1/1 | Complete | 2026-04-17 |
 | 11. Data Format Specification | v1.3 | 1/1 | Complete    | 2026-04-17 |
 | 12. Vignette & README Refresh | v1.3 | 1/1 | Complete    | 2026-04-18 |
-| 13. pkgdown Deployment | v1.3 | 0/? | Not started | - |
+| 13. pkgdown Deployment | v1.3 | 0/3 | Not started | - |
