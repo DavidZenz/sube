@@ -16,13 +16,13 @@ Requirements for Documentation & pkgdown milestone. Each maps to roadmap phases.
 
 ### Vignette Improvements
 
-- [ ] **VIG-01**: All vignettes frame WIOD and FIGARO as example data sources, not as "the" data source — source-agnostic language throughout
-- [ ] **VIG-02**: Data-preparation vignette expanded with canonical format specification, column definitions, and worked examples
-- [ ] **VIG-03**: Narrative flow across all vignettes reviewed and improved for coherent reading order
+- [x] **VIG-01**: All vignettes frame WIOD and FIGARO as example data sources, not as "the" data source — source-agnostic language throughout
+- [x] **VIG-02**: Data-preparation vignette expanded with canonical format specification, column definitions, and worked examples
+- [x] **VIG-03**: Narrative flow across all vignettes reviewed and improved for coherent reading order
 
 ### README
 
-- [ ] **DOC-01**: README refreshed with source-agnostic framing and clear statement that the package works with any SUT data in the canonical format
+- [x] **DOC-01**: README refreshed with source-agnostic framing and clear statement that the package works with any SUT data in the canonical format
 
 ### pkgdown & Deployment
 
@@ -52,10 +52,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FMT-02 | Phase 11 | Pending |
 | FMT-03 | Phase 11 | Pending |
 | FMT-04 | Phase 11 | Pending |
-| VIG-01 | Phase 12 | Pending |
-| VIG-02 | Phase 12 | Pending |
-| VIG-03 | Phase 12 | Pending |
-| DOC-01 | Phase 12 | Pending |
+| VIG-01 | Phase 12 | Complete |
+| VIG-02 | Phase 12 | Complete |
+| VIG-03 | Phase 12 | Complete |
+| DOC-01 | Phase 12 | Complete |
 | PKG-01 | Phase 13 | Pending |
 | PKG-02 | Phase 13 | Pending |
 

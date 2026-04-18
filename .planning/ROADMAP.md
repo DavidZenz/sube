@@ -35,7 +35,7 @@
 **Milestone Goal:** Thorough, source-agnostic documentation with a live pkgdown site on GitHub Pages.
 
 - [x] **Phase 11: Data Format Specification** - Define canonical SUT column semantics, satellite vector contract, synonym flexibility, and BYOD guide (completed 2026-04-17)
-- [ ] **Phase 12: Vignette & README Refresh** - Apply source-agnostic framing throughout all vignettes, expand data-prep vignette, improve narrative flow, refresh README
+- [x] **Phase 12: Vignette & README Refresh** - Apply source-agnostic framing throughout all vignettes, expand data-prep vignette, improve narrative flow, refresh README (completed 2026-04-18)
 - [ ] **Phase 13: pkgdown Deployment** - Deploy pkgdown site to GitHub Pages via GitHub Actions and align site structure with documentation narrative
 
 ## Phase Details
@@ -62,9 +62,9 @@ Plans:
   2. User reading the data-preparation vignette finds the canonical format specification (column definitions, satellite vector contract, worked reshape examples) from Phase 11 integrated into its narrative
   3. User reading the vignettes in sequence finds a coherent flow: data preparation → pipeline workflow → paper replication → FIGARO workflow → helpers
   4. User reading the README finds a source-agnostic description of what the package does and an explicit statement that any SUT data in the canonical format is supported
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
-- [ ] 12-01-PLAN.md — Add source-agnostic framing to all 7 vignettes and README, integrate Phase 11 spec with transitions, establish cross-references
+- [x] 12-01-PLAN.md — Add source-agnostic framing to all 7 vignettes and README, integrate Phase 11 spec with transitions, establish cross-references
 
 ### Phase 13: pkgdown Deployment
 **Goal**: A live pkgdown site is deployed to GitHub Pages on every push to master, with article grouping and navigation aligned to the documentation narrative
@@ -91,5 +91,5 @@ Plans:
 | 9. Test Infrastructure Tech Debt | v1.2 | 1/1 | Complete | 2026-04-17 |
 | 10. Retroactive Nyquist Validation | v1.2 | 1/1 | Complete | 2026-04-17 |
 | 11. Data Format Specification | v1.3 | 1/1 | Complete    | 2026-04-17 |
-| 12. Vignette & README Refresh | v1.3 | 0/1 | Not started | - |
+| 12. Vignette & README Refresh | v1.3 | 1/1 | Complete   | 2026-04-18 |
 | 13. pkgdown Deployment | v1.3 | 0/? | Not started | - |
