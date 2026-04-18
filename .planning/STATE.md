@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Documentation & pkgdown
 status: executing
-stopped_at: Phase 13 context gathered
-last_updated: "2026-04-18T16:03:25.819Z"
-last_activity: 2026-04-18 -- Phase 13 planning complete
+stopped_at: Phase 13 executed (pending D-14/D-15 manual post-merge steps)
+last_updated: "2026-04-18T20:30:00.000Z"
+last_activity: 2026-04-18 -- Phase 13 executed (3/3 plans, verification report clean)
 progress:
   total_phases: 3
-  completed_phases: 2
-  total_plans: 5
-  completed_plans: 2
-  percent: 40
+  completed_phases: 3
+  total_plans: 8
+  completed_plans: 8
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-17 for v1.3)
 
 **Core value:** Researchers can run a reproducible end-to-end SUBE workflow in R without falling back to one-off scripts or undocumented paper code.
-**Current focus:** Phase 12 — vignette-readme-refresh
+**Current focus:** Phase 13 — pkgdown-deployment (executed; awaiting D-14/D-15)
 
 ## Current Position
 
 Phase: 13
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-04-18 -- Phase 13 planning complete
+Plan: All 3 complete
+Status: Executed — awaiting manual D-14 (Pages Source flip) + D-15 (post-merge live-site verification)
+Last activity: 2026-04-18 -- Phase 13 executed (3/3 plans, verification report clean)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
