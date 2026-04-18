@@ -16,6 +16,9 @@ Economic Structures* 13, 17.
 [Springer article](https://link.springer.com/article/10.1186/s40008-024-00331-4),
 [DOI](https://doi.org/10.1186/s40008-024-00331-4).
 
+The package works with any supply-use data in the canonical long format,
+including WIOD, FIGARO, and custom national accounts.
+
 ## Installation
 
 ```r
@@ -28,12 +31,14 @@ install package dependencies.
 
 ## What the package does
 
-- imports and standardizes supply-use inputs
+- imports and standardizes supply-use inputs (WIOD workbooks, FIGARO CSVs, or custom supply-use tables in the canonical format)
 - extracts domestic blocks from multi-country tables
 - builds product-industry matrices for rectangular systems
 - computes Leontief-style multipliers and elasticities
 - estimates OLS, pooled, and between SUBE models
 - prepares paper-style comparison tables and plots
+
+For reshaping custom supply-use data into the expected format, see `vignette("data-preparation", package = "sube")`.
 
 ## Workflow at a glance
 
@@ -104,10 +109,18 @@ For local documentation work, the paper reference is kept in
 
 - `vignette("getting-started", package = "sube")` for the end-to-end sample
   workflow
-- `vignette("data-preparation", package = "sube")` for the input contracts
+- `vignette("package-design", package = "sube")` for how the package workflow
+  relates to the companion paper
+- `vignette("data-preparation", package = "sube")` for input contracts and the
+  canonical data format
 - `vignette("modeling-and-outputs", package = "sube")` for modeling and plot
   outputs
-- `vignette("package-design", package = "sube")` for how the package workflow relates to the companion paper
+- `vignette("paper-replication", package = "sube")` for reproducing the
+  companion paper results (requires WIOD data)
+- `vignette("figaro-workflow", package = "sube")` for working with Eurostat
+  FIGARO tables (requires FIGARO data)
+- `vignette("pipeline-helpers", package = "sube")` for convenience wrappers
+  that run the full pipeline in one call
 
 The full reference and articles are designed to be published with `pkgdown`,
 with the website acting as the main public documentation surface.
