@@ -12,7 +12,7 @@ Description: Tools for importing supply-use tables, building domestic
     results, plotting tidy outputs, and exporting package objects for
     reproducible input-output analysis workflows.
 License: GPL-3
-URL: https://github.com/davidzenz/sube
+URL: https://github.com/davidzenz/sube, https://davidzenz.github.io/sube/
 BugReports: https://github.com/davidzenz/sube/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

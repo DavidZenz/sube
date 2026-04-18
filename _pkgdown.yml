@@ -8,55 +8,61 @@ home:
     SUBE models, and paper-style comparison workflows in R.
 
 reference:
-  - title: Data import and preparation
+  - title: Data import
+    desc: Ingest supply-use tables from WIOD workbooks, FIGARO CSVs, or shipped example datasets.
     contents:
       - import_suts
       - read_figaro
-      - extract_domestic_block
       - sube_example_data
+  - title: Matrix building
+    desc: Extract the domestic block and assemble the supply, use, and Leontief matrices.
+    contents:
+      - extract_domestic_block
       - build_matrices
-      - run_sube_pipeline
-      - batch_sube
-  - title: Compute, model, and compare
+      - extract_leontief_matrices
+  - title: Compute & models
+    desc: Compute SUBE multipliers and estimate panel or cross-sectional elasticity regressions.
     contents:
       - compute_sube
       - estimate_elasticities
-  - title: Paper replication tools
+  - title: Pipeline helpers
+    desc: One-call wrappers from raw input paths to SUBE results, for single runs or batches.
+    contents:
+      - run_sube_pipeline
+      - batch_sube
+  - title: Paper replication
+    desc: Filter outliers, prepare comparison tibbles, and plot the paper's three diagnostic views.
     contents:
       - filter_paper_outliers
       - prepare_sube_comparison
       - plot_paper_comparison
       - plot_paper_regression
       - plot_paper_interval_ranges
-  - title: Comparison and export helpers
+  - title: Output & export
+    desc: Filter, visualize, and write SUBE results to CSV, Excel, Stata, or PDF.
     contents:
-      - extract_leontief_matrices
       - filter_sube
       - plot_sube
       - write_sube
+  - title: internal
+    contents:
+      - sube-package
+      - sube-classes
 
 articles:
-  - title: Workflow Start Here
+  - title: Getting started
     navbar: Get started
     contents:
       - getting-started
-  - title: Inputs and Preparation
+      - package-design
+  - title: Workflow
     contents:
       - data-preparation
-  - title: Modeling, Comparison, and Outputs
-    contents:
       - modeling-and-outputs
-  - title: Pipeline Helpers
-    contents:
       - pipeline-helpers
-  - title: Package Design and Paper Context
-    contents:
-      - package-design
-  - title: Paper replication
+  - title: Data sources in practice
     contents:
       - paper-replication
-  - title: FIGARO workflow
-    contents:
       - figaro-workflow
 
 navbar:
