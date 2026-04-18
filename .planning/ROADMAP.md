@@ -91,5 +91,5 @@ Plans:
 | 9. Test Infrastructure Tech Debt | v1.2 | 1/1 | Complete | 2026-04-17 |
 | 10. Retroactive Nyquist Validation | v1.2 | 1/1 | Complete | 2026-04-17 |
 | 11. Data Format Specification | v1.3 | 1/1 | Complete    | 2026-04-17 |
-| 12. Vignette & README Refresh | v1.3 | 1/1 | Complete   | 2026-04-18 |
+| 12. Vignette & README Refresh | v1.3 | 1/1 | Complete    | 2026-04-18 |
 | 13. pkgdown Deployment | v1.3 | 0/? | Not started | - |

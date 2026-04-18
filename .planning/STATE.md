@@ -4,7 +4,7 @@ milestone: v1.3
 milestone_name: Documentation & pkgdown
 status: verifying
 stopped_at: Phase 12 plan 01 complete
-last_updated: "2026-04-18T14:53:51.837Z"
+last_updated: "2026-04-18T15:02:16.333Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 3
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-04-17 for v1.3)
 
 ## Current Position
 
-Phase: 12 (vignette-readme-refresh) — EXECUTING
-Plan: 1 of 1
+Phase: 13
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-04-18
 
@@ -36,7 +36,7 @@ Progress: [░░░░░░░░░░] 0%
 
 **Velocity:**
 
-- Total plans completed: 40 (v1.0: 12; v1.1: 7; v1.2: 10; v1.3: 0)
+- Total plans completed: 41 (v1.0: 12; v1.1: 7; v1.2: 10; v1.3: 0)
 - Total phases shipped: 10 (v1.0: 1-4; v1.1: 5-6; v1.2: 7-10)
 
 **By Milestone:**
