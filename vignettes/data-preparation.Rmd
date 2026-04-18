@@ -20,6 +20,12 @@ projects need four input families:
    computation.
 4. A prepared modeling table for SUBE regressions.
 
+Whether your data comes from WIOD, FIGARO, or another national statistical
+office, the same canonical format applies. The package ships importers for
+WIOD workbooks (`import_suts()`) and FIGARO CSV flatfiles (`read_figaro()`),
+but any supply-use data reshaped into the canonical long format described
+below will flow through the same downstream pipeline.
+
 The package deliberately separates matrix construction from econometric
 estimation. That keeps the Leontief benchmark workflow usable even when the
 modeling table is assembled elsewhere.
@@ -108,6 +114,10 @@ The remaining sections walk through the shipped example objects in detail, illus
 
 ## Supply-use data
 
+The `sut_data` example below shows the 7-column canonical format described
+above in practice — the shipped object already conforms to the contract, so
+you can inspect its shape before reshaping your own source.
+
 Imported SUT data should resolve to these columns:
 
 ```{r}
@@ -122,6 +132,11 @@ year, variable, and product codes before import. The package will normalize
 column names, but it does not guess missing structural fields.
 
 ## Mapping tables
+
+Mapping tables bridge the canonical SUT columns to the aggregated matrix
+dimensions needed by `build_matrices()`. The synonym resolution described
+above applies here — use any of the accepted column-name variants for the
+source code and aggregated code.
 
 The product and industry maps can use simple two-column tables:
 
@@ -139,6 +154,10 @@ the comparison plots will reflect that aggregation choice.
 
 ## Input metrics
 
+The `inputs` example provides the satellite vectors described in the Satellite
+Vector Inputs section above — researcher-supplied series (GO required; VA,
+EMP, CO2 optional) joined to the matrix bundle during compute.
+
 The computation stage needs `YEAR`, `REP`, one industry identifier column, and
 at least `GO`. Additional metrics such as `VA`, `EMP`, and `CO2` are computed
 when present.
@@ -148,6 +167,10 @@ sube_example_data("inputs")
 ```
 
 ## Modeling table
+
+The modeling table combines matrix outputs with satellite-derived multipliers
+for econometric estimation — it is the last-mile object assembled after the
+Leontief benchmark layer is stable.
 
 `estimate_elasticities()` uses a prepared table with:
 
