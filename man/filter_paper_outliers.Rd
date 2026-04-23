@@ -27,10 +27,10 @@ multiplier outliers in the output.}
 A filtered \code{data.table} with the same columns as \code{data}.
 }
 \description{
-Applies the six exclusion layers from the 2018 paper's legacy script
-\code{archive/legacy-scripts/08_outlier_treatment.R} (lines 89-181) to a
-SUBE comparison table or results summary. These are historical,
-paper-specific filters - not general-purpose data-quality rules.
+Applies the six exclusion layers from the 2024 paper's outlier
+treatment to a SUBE comparison table or results summary. These are
+historical, paper-specific filters - not general-purpose data-quality
+rules.
 }
 \details{
 The six layers:

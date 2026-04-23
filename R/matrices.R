@@ -106,8 +106,7 @@ build_matrices <- function(sut_data, cpa_map, ind_map, final_demand_var = "FU_ba
   # model_data: Net-supply regression matrix (W = SUP - USE).
   # Only computed when `inputs` is supplied (needs GO/VA/EMP/CO2 per industry).
   #
-  # The legacy regression (05_SUBE_regress.R lines 28-55) builds the regression
-  # input as:
+  # The paper's regression pipeline builds the regression input as:
   #   1. Read raw per-country SUP and USE CSVs (56 CPA rows × 56 industry cols)
   #   2. Merge CPA with product correspondence → get CPAagg
   #   3. Melt + aggregate by CPAagg → 22 product rows × 56 industry cols

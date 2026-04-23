@@ -16,7 +16,7 @@ library(sube)
 
 # 1. What this vignette replicates
 
-The 2018 SUBE paper computes Leontief multipliers, elasticities, and
+The 2024 SUBE paper computes Leontief multipliers, elasticities, and
 regression coefficients from WIOD international supply-use tables. This
 vignette walks through the end-to-end reproduction of the paper's raw
 supply, use, and net-supply matrices using only the functions exported
@@ -56,7 +56,7 @@ $SUBE_WIOD_DIR/
   GOVAcur/      GO_{country}_{year}.dta
   EMP/          EMP_{country}_{year}.dta
   CO2/          CO2_{country}_{year}.dta
-  Regression/data/   {country}_{year}.csv  (legacy ground-truth W matrices)
+  Regression/data/   {country}_{year}.csv  (paper ground-truth W matrices)
 ```
 
 Set the environment variable before running the gated test:
@@ -123,7 +123,7 @@ models$OLS[term == "P01" & variable == "GO"]
 #> in one call. See ?estimate_elasticities for the full return shape.
 ```
 
-# 8. Comparing with the legacy paper output
+# 8. Comparing with the 2024 paper output
 
 Running the full pipeline on the 2018 WIOD data yields:
 
@@ -156,10 +156,10 @@ Rscript -e 'devtools::test(filter = "replication")'
 
 # Beyond this vignette
 
-- **IHS regression variants.** `archive/legacy-scripts/06_SUBE_ihs*.R`,
-  `06_SUBE_lin-ihs*.R`, `06_SUBE_ihs-lin*.R` fit inverse-hyperbolic-sine
-  transformed variants. Not part of `sube` v1.1; use the legacy scripts
-  directly if needed.
+- **IHS regression variants.** The 2024 paper additionally fits
+  inverse-hyperbolic-sine transformed variants (linear, IHS, and mixed
+  lin-IHS / IHS-lin combinations). Those are not part of `sube` v1.1;
+  contact the maintainer if you need the extension.
 - **Paper figures.** `plot_paper_comparison()`, `plot_paper_regression()`,
   and `plot_paper_interval_ranges()` reproduce the published figures.
   Each ships with its own man page.

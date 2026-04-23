@@ -65,7 +65,7 @@ averaged over time as in the paper comparison tables.}
 
 \item{variables}{Variables to include.}
 
-\item{apply_paper_filters}{Whether to apply the legacy paper exclusion rules.}
+\item{apply_paper_filters}{Whether to apply the 2024 paper exclusion rules.}
 
 \item{data}{A tidy comparison table returned by \code{\link[=prepare_sube_comparison]{prepare_sube_comparison()}}.}
 

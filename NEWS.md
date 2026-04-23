@@ -56,15 +56,15 @@
 - Exported `filter_paper_outliers()` (formerly internal `.apply_paper_filters()`)
   with `variables` and `apply_bounds` arguments so researchers can apply the
   paper's six-layer outlier treatment directly to SUBE comparison or results
-  tables. See `?filter_paper_outliers` for the full rule list with citations
-  to `archive/legacy-scripts/08_outlier_treatment.R:89-181`.
+  tables. See `?filter_paper_outliers` for the full rule list drawn from
+  the 2024 paper's outlier treatment.
 - Added the `paper-replication` vignette: a nine-section walkthrough of the
-  end-to-end reproduction of the 2018 paper's raw supply, use, and
+  end-to-end reproduction of the 2024 paper's raw supply, use, and
   net-supply matrices from WIOD data. Builds with `eval = FALSE` so it
   renders cleanly on CRAN.
 - Added the gated `tests/testthat/test-replication.R` suite (requires
   `SUBE_WIOD_DIR`; auto-skipped on CRAN and in CI) which asserts bit-level
-  equality against the legacy paper ground-truth matrices for AUS, DEU,
+  equality against the 2024 paper ground-truth matrices for AUS, DEU,
   USA, and JPN in 2005.
 - Fixed the legacy-wrapper subprocess test (`test-workflow.R`) to pass under
   `R CMD check --as-cran` by threading `.libPaths()` into the child `Rscript`
@@ -93,5 +93,5 @@
 - Made `plm` a required dependency for pooled and between model estimation.
 - Added CRAN-oriented metadata, release notes, and documentation scaffolding.
 - Added sample-data-driven vignettes and `pkgdown` configuration.
-- Moved legacy paper scripts into a local ignored archive instead of packaging
+- Moved the 2024 paper scripts into a local ignored archive instead of packaging
   them.

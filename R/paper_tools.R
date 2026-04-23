@@ -14,7 +14,7 @@
 #' @param aggregate_years Whether yearly Leontief and OLS results should be
 #'   averaged over time as in the paper comparison tables.
 #' @param variables Variables to include.
-#' @param apply_paper_filters Whether to apply the legacy paper exclusion rules.
+#' @param apply_paper_filters Whether to apply the 2024 paper exclusion rules.
 #' @param data A tidy comparison table returned by [prepare_sube_comparison()].
 #' @param kind Plot type: `"by_country"`, `"by_product"`, or `"density"`.
 #' @param type Comparison types to plot. Defaults to all available types.
@@ -108,10 +108,10 @@ extract_leontief_matrices <- function(results, matrix = c("A", "L"), format = c(
 
 #' Apply the paper's outlier treatment
 #'
-#' Applies the six exclusion layers from the 2018 paper's legacy script
-#' \code{archive/legacy-scripts/08_outlier_treatment.R} (lines 89-181) to a
-#' SUBE comparison table or results summary. These are historical,
-#' paper-specific filters - not general-purpose data-quality rules.
+#' Applies the six exclusion layers from the 2024 paper's outlier
+#' treatment to a SUBE comparison table or results summary. These are
+#' historical, paper-specific filters - not general-purpose data-quality
+#' rules.
 #'
 #' The six layers:
 #' \enumerate{
