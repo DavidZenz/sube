@@ -2,7 +2,7 @@
 title: "FIGARO End-to-End Workflow"
 vignette: >
   %\VignetteIndexEntry{FIGARO End-to-End Workflow}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 

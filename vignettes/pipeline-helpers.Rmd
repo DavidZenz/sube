@@ -2,7 +2,7 @@
 title: "Pipeline Helpers - One Call from Path to Multipliers"
 vignette: >
   %\VignetteIndexEntry{Pipeline Helpers - One Call from Path to Multipliers}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 

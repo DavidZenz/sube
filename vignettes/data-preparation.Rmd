@@ -2,7 +2,7 @@
 title: "Preparing Data for sube"
 vignette: >
   %\VignetteIndexEntry{Preparing Data for sube}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 

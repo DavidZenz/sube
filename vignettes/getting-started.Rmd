@@ -2,7 +2,7 @@
 title: "Getting Started with sube"
 vignette: >
   %\VignetteIndexEntry{Getting Started with sube}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 

@@ -2,7 +2,7 @@
 title: "Leontief, SUBE, and the Paper Workflow"
 vignette: >
   %\VignetteIndexEntry{Leontief, SUBE, and the paper workflow}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 

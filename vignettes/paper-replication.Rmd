@@ -2,7 +2,7 @@
 title: "Reproducing the SUBE Paper"
 vignette: >
   %\VignetteIndexEntry{Reproducing the SUBE Paper}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
@@ -106,8 +106,8 @@ results$tidy[COUNTRY == "AUS" & YEAR == 2005 & measure == "multiplier"][1:5]
 models <- estimate_elasticities(results)
 comp <- prepare_sube_comparison(results, models)
 comp_filtered <- filter_paper_outliers(comp)
-#> Applies the six exclusion layers from 08_outlier_treatment.R:89-181 --
-#> see ?filter_paper_outliers for the full rule list.
+#> Applies the six exclusion layers from the 2024 paper's outlier
+#> treatment - see ?filter_paper_outliers for the full rule list.
 ```
 
 Pass `apply_bounds = FALSE` to keep multiplier outliers in the output,
