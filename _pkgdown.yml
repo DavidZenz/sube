@@ -56,11 +56,13 @@ articles:
       - getting-started
       - package-design
   - title: Workflow
+    navbar: Workflow
     contents:
       - data-preparation
       - modeling-and-outputs
       - pipeline-helpers
   - title: Data sources in practice
+    navbar: Data sources
     contents:
       - paper-replication
       - figaro-workflow

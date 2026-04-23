@@ -40,7 +40,7 @@ This vignette shows the compact public workflow used across the package docs:
 
 All examples below use only the shipped sample data, so the full workflow can
 be verified from a clean checkout without external downloads. The package
-works with any supply-use data in the canonical long format — WIOD and FIGARO
+works with any supply-use data in the canonical long format - WIOD and FIGARO
 are two built-in importers, but you can also bring your own source. Readers
 who want to skip ahead to input contracts and format details can jump to the
 [data-preparation vignette](data-preparation.html).
@@ -92,7 +92,12 @@ output, or Leontief branches.
 
 ## Estimate SUBE models
 
-```{r}
+The shipped `model_data` is a tiny synthetic fixture, so `estimate_elasticities()`
+emits `NaN`/"essentially perfect fit" warnings here. Those are artefacts of the
+small sample - real datasets do not trigger them. Warnings are suppressed below
+to keep the output readable.
+
+```{r, warning = FALSE}
 model_data <- sube_example_data("model_data")
 models <- estimate_elasticities(model_data, predictor_vars = c("P01", "P02"))
 head(models$tidy)

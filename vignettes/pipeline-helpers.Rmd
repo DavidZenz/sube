@@ -1,7 +1,7 @@
 ---
-title: "Pipeline Helpers — One Call from Path to Multipliers"
+title: "Pipeline Helpers - One Call from Path to Multipliers"
 vignette: >
-  %\VignetteIndexEntry{Pipeline Helpers — One Call from Path to Multipliers}
+  %\VignetteIndexEntry{Pipeline Helpers - One Call from Path to Multipliers}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,8 +17,8 @@ library(data.table)
 
 # 1. When to reach for the convenience helpers
 
-The four-step SUBE chain — `import_suts()` / `read_figaro()` →
-`extract_domestic_block()` → `build_matrices()` → `compute_sube()` — gives you
+The four-step SUBE chain - `import_suts()` / `read_figaro()` →
+`extract_domestic_block()` → `build_matrices()` → `compute_sube()` - gives you
 full control over every stage. If you already have the intermediate objects in
 hand, call the four steps directly; it is two extra lines. The manual workflow
 is covered in detail in the
@@ -71,7 +71,7 @@ The compute output lives under `$results`:
 result$results$summary
 ```
 
-The unified diagnostics table has a 6-column schema — `country`, `year`,
+The unified diagnostics table has a 6-column schema - `country`, `year`,
 `stage`, `status`, `message`, `n_rows`:
 
 ```{r}
@@ -160,18 +160,18 @@ class(result_est$models)   # "sube_models" when model_data is non-empty, else NU
 
 The `$diagnostics` table categorises silent issues into four statuses:
 
-- **`coerced_na`** (`stage = "import"`) — rows whose `VALUE` became `NA`
+- **`coerced_na`** (`stage = "import"`) - rows whose `VALUE` became `NA`
   during `as.numeric()` coercion at import. Pipeline-level aggregate; count
   lives in `n_rows`.
-- **`skipped_alignment`** (`stage = "build"`) — country-years present in
+- **`skipped_alignment`** (`stage = "build"`) - country-years present in
   the SUT input but dropped by `build_matrices()` because the CPA or
   industry correspondence left no aligned rows.
-- **`inputs_misaligned`** (`stage = "build"`) — country-years present in
+- **`inputs_misaligned`** (`stage = "build"`) - country-years present in
   both the SUT data and the `inputs` table but absent from
   `build_matrices()`'s `$model_data`. Typical cause: industry codes in
   `inputs` that do not match the matrix industries.
 - **`singular_supply` / `singular_go` / `singular_leontief`**
-  (`stage = "compute"`) — `compute_sube()` could not invert the relevant
+  (`stage = "compute"`) - `compute_sube()` could not invert the relevant
   matrix for this country-year. Pass-through from the compute stage's
   existing diagnostics.
 

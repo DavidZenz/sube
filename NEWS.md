@@ -15,10 +15,10 @@
   the batch. See `vignette("pipeline-helpers")`.
 - Added the unified pipeline diagnostics layer: `run_sube_pipeline()`
   and `batch_sube()` surface four categories of silent data-quality
-  issues — coerced-NA rows at import, country-years dropped by
+  issues - coerced-NA rows at import, country-years dropped by
   correspondence-map alignment, singular matrix branches from
   `compute_sube()`, and input-metric misalignments from
-  `build_matrices()` model-data — through a unified `$diagnostics`
+  `build_matrices()` model-data - through a unified `$diagnostics`
   `data.table` and a single summary `warning()` per run.
 - **BREAKING (development contract, INFRA-02):** `resolve_wiod_root()` no
   longer falls back to `inst/extdata/wiod/` when `SUBE_WIOD_DIR` is unset.

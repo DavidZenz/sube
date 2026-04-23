@@ -18,7 +18,7 @@ library(sube)
 
 FIGARO is the EU inter-country supply and use tables published at the
 NACE-R2 64-activity detail (A\*64 breakdown), distributed as long-format CSV
-flatfiles — one supply file and one use file per reference year.
+flatfiles - one supply file and one use file per reference year.
 
 This vignette walks through the full researcher journey:
 
@@ -37,8 +37,8 @@ Every code chunk is `eval = FALSE` so the vignette renders cleanly on CRAN and
 in CI without requiring the actual FIGARO flatfiles (roughly 400-500 MB each).
 
 This vignette covers FIGARO-specific import. Once data is in canonical
-`sube_suts` format, the downstream pipeline — `build_matrices()`,
-`compute_sube()`, and `estimate_elasticities()` — works the same for any SUT
+`sube_suts` format, the downstream pipeline - `build_matrices()`,
+`compute_sube()`, and `estimate_elasticities()` - works the same for any SUT
 source. Only steps 2–4 (file layout, `read_figaro()`, and NACE mapping) are
 FIGARO-specific.
 
@@ -176,8 +176,8 @@ dim(b_de$S)
 
 `compute_sube()` takes the matrix bundle and an inputs table, inverts
 `(I - A)` for each country-year, and returns multipliers and a tidy results
-table. When sidecar data (VA, EMP, CO2) is unavailable — the default for
-FIGARO — synthesise a gross-output vector from the supply matrix column sums:
+table. When sidecar data (VA, EMP, CO2) is unavailable - the default for
+FIGARO - synthesise a gross-output vector from the supply matrix column sums:
 
 ```{r}
 inputs <- data.table::rbindlist(lapply(names(bundle$matrices), function(nm) {
@@ -231,7 +231,7 @@ if (nzchar(inputs_dir)) {
 }
 ```
 
-The opt-in path does not have golden-snapshot assertions in the gated test —
+The opt-in path does not have golden-snapshot assertions in the gated test -
 only structural invariants (pipeline completes, coefficients non-NA, signs
 plausible) because snapshot assertions on researcher-supplied regression inputs
 would not be reproducible across environments.
@@ -256,10 +256,10 @@ auto-skips while the synthetic-fixture contract test always runs:
 ```bash
 Rscript -e 'devtools::test(filter = "figaro-pipeline")'
 #> FIG-E2E-02 synthetic contract: PASS
-#> FIG-E2E-01 gated real-data: SKIP (SUBE_FIGARO_DIR not set — FIGARO E2E test skipped)
+#> FIG-E2E-01 gated real-data: SKIP (SUBE_FIGARO_DIR not set - FIGARO E2E test skipped)
 ```
 
-The skip message is deterministic: `"SUBE_FIGARO_DIR not set — FIGARO E2E test skipped"`.
+The skip message is deterministic: `"SUBE_FIGARO_DIR not set - FIGARO E2E test skipped"`.
 
 # 9. What is NOT covered in v1.2
 

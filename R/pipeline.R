@@ -1,4 +1,4 @@
-# Phase 8: Convenience Helpers — one-call and batch wrappers with CONV-03 diagnostics.
+# Phase 8: Convenience Helpers - one-call and batch wrappers with CONV-03 diagnostics.
 
 # Unified diagnostics schema per D-8.12 / RESEARCH §3 Open Item 3.
 # Column order is load-bearing for rbindlist.
@@ -371,10 +371,10 @@ run_sube_pipeline <- function(
 }
 
 # ==============================================================================
-# batch_sube() — CONV-02 + CONV-03 at batch scope (Plan 08-02)
+# batch_sube() - CONV-02 + CONV-03 at batch scope (Plan 08-02)
 # ==============================================================================
 
-# D-8.7. tryCatch boundary here — see RESEARCH §4 "tryCatch Boundary".
+# D-8.7. tryCatch boundary here - see RESEARCH §4 "tryCatch Boundary".
 # Any stage error becomes one diagnostic row; the loop continues. Data-quality
 # issues are caught inside this helper; the batch_sube() caller's tryCatch is a
 # safety net for programming errors in the helper itself.
@@ -383,7 +383,7 @@ run_sube_pipeline <- function(
   sut <- group$sut
 
   tryCatch({
-    # Diagnostics containers — seeded with coerced_na on the slice.
+    # Diagnostics containers - seeded with coerced_na on the slice.
     diag_import <- .detect_coerced_na(sut)
 
     matrix_bundle <- do.call(

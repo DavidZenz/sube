@@ -43,7 +43,7 @@ import_suts <- function(path, sheets = c("SUP", "USE"), recursive = FALSE) {
       canonical <- c("REP", "PAR", "CPA", "VAR", "VALUE", "YEAR", "TYPE")
 
       if (all(canonical %in% names(data))) {
-        # Already in long format — use directly
+        # Already in long format - use directly
         return(data[, canonical, with = FALSE])
       }
 
@@ -52,7 +52,7 @@ import_suts <- function(path, sheets = c("SUP", "USE"), recursive = FALSE) {
       wide_id <- c("REP", "PAR", "CPA", "YEAR", "TYPE")
       if (!all(wide_id %in% names(data))) {
         warning(sprintf(
-          "Skipping %s — not a recognized SUT format (missing: %s).",
+          "Skipping %s - not a recognized SUT format (missing: %s).",
           basename(file_name),
           paste(setdiff(wide_id, names(data)), collapse = ", ")
         ), call. = FALSE)
